@@ -1,0 +1,15 @@
+[
+  {
+    "type": "program",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "Hello",
+    "named": false
+  },
+  {
+    "type": "Liquid",
+    "named": false
+  }
+]
