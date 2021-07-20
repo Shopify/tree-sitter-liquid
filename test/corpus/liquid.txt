@@ -8,7 +8,7 @@ Literal
 
 (program
  (expression
-  (literal_string)))
+  (string)))
 
 ==================
 Filter
@@ -20,10 +20,10 @@ Filter
 
 (program
  (expression
-  (literal_string)
+  (string)
   (filter
-   name: (identifier)
-   arguments: (literal_string))))
+   (identifier)
+   (argument_list (string)))))
 
 ==================
 Filter w/ variable
@@ -39,9 +39,9 @@ Filter w/ variable
   (variable
     name: (identifer)
     value: (expression
-     (literal_string))))
+     (string))))
  (expression
-  (literal_string)
+  (string)
   (filter
    name: (identifier)
    arguments: (variable))))
