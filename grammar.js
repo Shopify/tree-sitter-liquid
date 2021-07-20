@@ -60,7 +60,7 @@ module.exports = grammar({
       "assign",
       field('variable_name', $.identifier),
       "=",
-      field('value', $.expression),
+      field('value', choice($.filter, $.expression)),
     ),
 
     _literal: $ => choice(
