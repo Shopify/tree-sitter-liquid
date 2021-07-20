@@ -1,5 +1,43 @@
 [
   {
+    "type": "argument",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "argument_list",
     "named": true,
     "fields": {},
@@ -7,6 +45,14 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "argument",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -49,6 +95,11 @@
     }
   },
   {
+    "type": "boolean",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "expression",
     "named": true,
     "fields": {},
@@ -57,7 +108,15 @@
       "required": true,
       "types": [
         {
+          "type": "boolean",
+          "named": true
+        },
+        {
           "type": "filter",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         },
         {
@@ -109,6 +168,14 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
           {
             "type": "number",
             "named": true
@@ -189,6 +256,14 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
           {
             "type": "number",
             "named": true
@@ -325,6 +400,10 @@
     "named": false
   },
   {
+    "type": "false",
+    "named": false
+  },
+  {
     "type": "identifier",
     "named": true
   },
@@ -334,6 +413,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "true",
     "named": false
   },
   {

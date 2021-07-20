@@ -43,6 +43,7 @@ module.exports = grammar({
 
     _expression: $ => choice(
       $._literal,
+      $.identifier,
       $.predicate
     ),
 
@@ -62,7 +63,8 @@ module.exports = grammar({
 
     _literal: $ => choice(
       $.string,
-      $.number
+      $.number,
+      $.boolean,
     ),
 
     string: _ => choice(
@@ -72,15 +74,23 @@ module.exports = grammar({
 
     number: _ => /\d+/,
 
+    boolean: _ => choice('true', 'false'),
+
     identifier: _ => /([a-zA-Z_$][0-9a-zA-Z_]*)/,
 
     argument_list: $ => seq(
-      choice($._literal, $.identifier),
+      choice($._literal, $.identifier, $.argument),
       repeat(
         seq(",",
-          choice($._literal, $.identifier),
+          choice($._literal, $.identifier, $.argument),
         ),
       ),
+    ),
+
+    argument: $ => seq(
+      field('key', $.identifier),
+      ':',
+      field('value', choice($._literal, $.identifier)),
     ),
 
     predicate: $ => choice(

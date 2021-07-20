@@ -38,7 +38,7 @@ Filter w/ variable
  (statement
   (assignment
    variable_name: (identifier)
-    value: (expression (string))))
+   value: (expression (string))))
  (expression
   (string)
   (filter
@@ -61,3 +61,60 @@ Many filters
    (argument_list (identifier)))
   (filter
    name: (identifier))))
+
+==================
+Filters with many arguments
+==================
+
+{% assign kitchen_products = products | where: "type", "kitchen" %}
+
+---
+
+(program
+ (statement
+  (assignment
+   variable_name: (identifier)
+   value: (expression
+     (identifier)
+     (filter
+      name: (identifier)
+      (argument_list (string) (string)))))))
+
+==================
+Filters arument hash
+==================
+
+{{ display_price | default: true, allow_false: true }}
+
+---
+
+(program
+ (expression
+  (identifier)
+  (filter
+   name: (identifier)
+   (argument_list 
+    (boolean)
+    (argument key: (identifier) value: (boolean))))))
+
+==================
+Filters precedence
+==================
+
+{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+
+---
+
+(program
+ (expression
+  (string)
+  (filter
+   name: (identifier)
+   (argument_list 
+    (string)))
+  (filter
+   name: (identifier))
+  (filter
+   name: (identifier)
+   (argument_list 
+    (string)))))
