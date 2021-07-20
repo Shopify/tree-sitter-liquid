@@ -19,11 +19,10 @@ Filter
 ---
 
 (program
- (expression
-  (string)
-  (filter
-   name: (identifier)
-   (argument_list (string)))))
+ (filter
+  body: (expression (string))
+  name: (identifier)
+  (argument_list (string))))
 
 ==================
 Filter w/ variable
@@ -39,11 +38,10 @@ Filter w/ variable
   (assignment
    variable_name: (identifier)
    value: (expression (string))))
- (expression
-  (string)
-  (filter
-   name: (identifier)
-   (argument_list (identifier)))))
+ (filter
+  body: (expression (string))
+  name: (identifier)
+  (argument_list (identifier))))
 
 ==================
 Many filters
@@ -54,13 +52,13 @@ Many filters
 ---
 
 (program
- (expression
-  (string)
-  (filter
-   name: (identifier)
-   (argument_list (identifier)))
-  (filter
-   name: (identifier))))
+ (filter
+  body:
+   (filter
+    body: (expression (string))
+    name: (identifier)
+    (argument_list (identifier)))
+  name: (identifier)))
 
 ==================
 Filters with many arguments
@@ -74,11 +72,11 @@ Filters with many arguments
  (statement
   (assignment
    variable_name: (identifier)
-   value: (expression
-     (identifier)
-     (filter
-      name: (identifier)
-      (argument_list (string) (string)))))))
+   value:
+    (filter
+     body: (expression (identifier))
+     name: (identifier)
+     (argument_list (string) (string))))))
 
 ==================
 Filters argument hash
@@ -89,13 +87,12 @@ Filters argument hash
 ---
 
 (program
- (expression
-  (identifier)
   (filter
-   name: (identifier)
-   (argument_list 
-    (boolean)
-    (argument key: (identifier) value: (boolean))))))
+    body: (expression (identifier))
+    name: (identifier)
+    (argument_list
+     (boolean)
+     (argument key: (identifier) value: (boolean)))))
 
 ==================
 Filters precedence
@@ -117,5 +114,3 @@ Filters precedence
     name: (identifier))
   name: (identifier)
   (argument_list (string))))
-
-
