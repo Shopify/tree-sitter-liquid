@@ -19,6 +19,7 @@ module.exports = grammar({
       seq(
         choice('{{', '{%'),
         choice(
+          $.filter,
           $.expression,
           $.statement
         ),
@@ -27,6 +28,7 @@ module.exports = grammar({
     ),
 
     filter: $ => seq(
+      field("body", choice($.expression, $.filter)),
       "|",
       field('name', $.identifier),
       optional(
@@ -41,24 +43,24 @@ module.exports = grammar({
       $.assignment,
     ),
 
-    _expression: $ => choice(
+    expression: $ => choice(
       $._literal,
       $.identifier,
       $.predicate
     ),
 
-    expression: $ => seq(
-      $._expression,
-      repeat(
-        $.filter
-      )
-    ),
+    // expression: $ => seq(
+    //   $._expression,
+    //   repeat(
+    //     $.filter
+    //   )
+    // ),
 
     assignment: $ => seq(
       "assign",
       field('variable_name', $.identifier),
       "=",
-      field('value', $.expression),
+      field('value', choice($.filter, $.expression)),
     ),
 
     _literal: $ => choice(
@@ -111,9 +113,9 @@ module.exports = grammar({
         ['or', 'clause_connective'],
       ].map(([operator, precedence]) =>
         prec.left(precedence, seq(
-          field('left', $._expression),
+          field('left', $.expression),
           field('operator', operator),
-          field('right', $._expression)
+          field('right', $.expression)
         ))
       )
     ),
