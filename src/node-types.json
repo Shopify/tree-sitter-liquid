@@ -104,15 +104,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
           "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "filter",
           "named": true
         },
         {
@@ -138,6 +134,20 @@
     "type": "filter",
     "named": true,
     "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -169,23 +179,7 @@
         "required": true,
         "types": [
           {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "predicate",
-            "named": true
-          },
-          {
-            "type": "string",
+            "type": "expression",
             "named": true
           }
         ]
@@ -257,23 +251,7 @@
         "required": true,
         "types": [
           {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "predicate",
-            "named": true
-          },
-          {
-            "type": "string",
+            "type": "expression",
             "named": true
           }
         ]
@@ -290,6 +268,10 @@
       "types": [
         {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "filter",
           "named": true
         },
         {

@@ -81,7 +81,7 @@ Filters with many arguments
       (argument_list (string) (string)))))))
 
 ==================
-Filters arument hash
+Filters argument hash
 ==================
 
 {{ display_price | default: true, allow_false: true }}
@@ -106,15 +106,16 @@ Filters precedence
 ---
 
 (program
- (expression
-  (string)
-  (filter
-   name: (identifier)
-   (argument_list 
-    (string)))
-  (filter
-   name: (identifier))
-  (filter
-   name: (identifier)
-   (argument_list 
-    (string)))))
+ (filter
+  body:
+   (filter
+    body:
+     (filter
+      body: (expression (string))
+      name: (identifier)
+      (argument_list (string)))
+    name: (identifier))
+  name: (identifier)
+  (argument_list (string))))
+
+
