@@ -15,22 +15,26 @@ module.exports = grammar({
   ],
 
   rules: {
-    program: $ => seq(
-      '{{',
-      choice(
-        $.expression,
-        $.statement
+    program: $ => repeat1(
+      seq(
+        choice('{{', '{%'),
+        choice(
+          $.expression,
+          $.statement
+        ),
+        choice('}}', '%}'),
       ),
-      '}}',
     ),
 
     filter: $ => seq(
       "|",
-      $.identifier,
-      ":",
+      field('name', $.identifier),
       optional(
-        $.argument_list
-      )
+        seq(
+          ":",
+          $.argument_list,
+        ),
+      ),
     ),
 
     statement: $ => choice(
@@ -51,9 +55,9 @@ module.exports = grammar({
 
     assignment: $ => seq(
       "assign",
-      $.identifier,
+      field('variable_name', $.identifier),
       "=",
-      $.expression
+      field('value', $.expression),
     ),
 
     _literal: $ => choice(
@@ -71,10 +75,12 @@ module.exports = grammar({
     identifier: _ => /([a-zA-Z_$][0-9a-zA-Z_]*)/,
 
     argument_list: $ => seq(
-      $._literal,
+      choice($._literal, $.identifier),
       repeat(
-        seq(",", $._literal)
-      )
+        seq(",",
+          choice($._literal, $.identifier),
+        ),
+      ),
     ),
 
     predicate: $ => choice(

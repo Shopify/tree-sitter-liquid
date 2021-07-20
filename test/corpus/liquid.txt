@@ -22,26 +22,42 @@ Filter
  (expression
   (string)
   (filter
-   (identifier)
+   name: (identifier)
    (argument_list (string)))))
 
 ==================
 Filter w/ variable
 ==================
 
-{{ assign space = " " }}
+{% assign space = " " %}
 {{ 'string two' | split: space }}
 
 ---
 
 (program
- (assignment
-  (variable
-    name: (identifer)
-    value: (expression
-     (string))))
+ (statement
+  (assignment
+   variable_name: (identifier)
+    value: (expression (string))))
  (expression
   (string)
   (filter
    name: (identifier)
-   arguments: (variable))))
+   (argument_list (identifier)))))
+
+==================
+Many filters
+==================
+
+{{ 'string two' | split: space | first }}
+
+---
+
+(program
+ (expression
+  (string)
+  (filter
+   name: (identifier)
+   (argument_list (identifier)))
+  (filter
+   name: (identifier))))
