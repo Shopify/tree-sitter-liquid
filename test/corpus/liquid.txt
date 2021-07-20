@@ -1,9 +1,116 @@
 ==================
-Hello Liquid
+Literal
 ==================
 
-Hello Liquid
+{{ 'string' }}
 
 ---
 
-(program)
+(program
+ (expression
+  (string)))
+
+==================
+Filter
+==================
+
+{{ 'string two' | split: " " }}
+
+---
+
+(program
+ (filter
+  body: (expression (string))
+  name: (identifier)
+  (argument_list (string))))
+
+==================
+Filter w/ variable
+==================
+
+{% assign space = " " %}
+{{ 'string two' | split: space }}
+
+---
+
+(program
+ (statement
+  (assignment
+   variable_name: (identifier)
+   value: (expression (string))))
+ (filter
+  body: (expression (string))
+  name: (identifier)
+  (argument_list (identifier))))
+
+==================
+Many filters
+==================
+
+{{ 'string two' | split: space | first }}
+
+---
+
+(program
+ (filter
+  body:
+   (filter
+    body: (expression (string))
+    name: (identifier)
+    (argument_list (identifier)))
+  name: (identifier)))
+
+==================
+Filters with many arguments
+==================
+
+{% assign kitchen_products = products | where: "type", "kitchen" %}
+
+---
+
+(program
+ (statement
+  (assignment
+   variable_name: (identifier)
+   value:
+    (filter
+     body: (expression (identifier))
+     name: (identifier)
+     (argument_list (string) (string))))))
+
+==================
+Filters argument hash
+==================
+
+{{ display_price | default: true, allow_false: true }}
+
+---
+
+(program
+  (filter
+    body: (expression (identifier))
+    name: (identifier)
+    (argument_list
+     (boolean)
+     (argument key: (identifier) value: (boolean)))))
+
+==================
+Filters precedence
+==================
+
+{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+
+---
+
+(program
+ (filter
+  body:
+   (filter
+    body:
+     (filter
+      body: (expression (string))
+      name: (identifier)
+      (argument_list (string)))
+    name: (identifier))
+  name: (identifier)
+  (argument_list (string))))
