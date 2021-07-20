@@ -49,13 +49,6 @@ module.exports = grammar({
       $.predicate
     ),
 
-    // expression: $ => seq(
-    //   $._expression,
-    //   repeat(
-    //     $.filter
-    //   )
-    // ),
-
     assignment: $ => seq(
       "assign",
       field('variable_name', $.identifier),
