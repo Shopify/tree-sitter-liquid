@@ -1,9 +1,47 @@
 ==================
-Hello Liquid
+Literal
 ==================
 
-Hello Liquid
+{{ 'string' }}
 
 ---
 
-(program)
+(program
+ (expression
+  (literal_string)))
+
+==================
+Filter
+==================
+
+{{ 'string two' | split: " " }}
+
+---
+
+(program
+ (expression
+  (literal_string)
+  (filter
+   name: (identifier)
+   arguments: (literal_string))))
+
+==================
+Filter w/ variable
+==================
+
+{{ assign space = " " }}
+{{ 'string two' | split: space }}
+
+---
+
+(program
+ (assignment
+  (variable
+    name: (identifer)
+    value: (expression
+     (literal_string))))
+ (expression
+  (literal_string)
+  (filter
+   name: (identifier)
+   arguments: (variable))))

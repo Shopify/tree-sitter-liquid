@@ -1,15 +1,57 @@
 [
   {
-    "type": "program",
+    "type": "expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "literal_string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "literal_string",
     "named": true,
     "fields": {}
   },
   {
-    "type": "Hello",
+    "type": "program",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "\"",
     "named": false
   },
   {
-    "type": "Liquid",
+    "type": "'",
+    "named": false
+  },
+  {
+    "type": "`",
+    "named": false
+  },
+  {
+    "type": "{{",
+    "named": false
+  },
+  {
+    "type": "}}",
     "named": false
   }
 ]
