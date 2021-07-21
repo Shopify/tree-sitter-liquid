@@ -59,7 +59,7 @@ module.exports = grammar({
 
     boolean: (_) => choice("true", "false"),
 
-    identifier: (_) => /([a-zA-Z_$][0-9a-zA-Z_]*)/,
+    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
 
     argument_list: ($) =>
       seq(
