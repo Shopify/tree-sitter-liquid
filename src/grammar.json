@@ -130,6 +130,44 @@
         {
           "type": "SYMBOL",
           "name": "predicate"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "call"
+        }
+      ]
+    },
+    "call": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "receiver",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "call"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "FIELD",
+          "name": "method",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
         }
       ]
     },
@@ -246,7 +284,7 @@
     },
     "identifier": {
       "type": "PATTERN",
-      "value": "([a-zA-Z_$][0-9a-zA-Z_]*)"
+      "value": "([a-zA-Z][0-9a-zA-Z_-]*)"
     },
     "argument_list": {
       "type": "SEQ",
