@@ -34,7 +34,14 @@ module.exports = grammar({
 
     statement: ($) => choice($.assignment),
 
-    expression: ($) => choice($._literal, $.identifier, $.predicate),
+    expression: ($) => choice($._literal, $.identifier, $.predicate, $.call),
+
+    call: ($) =>
+      seq(
+        field("receiver", choice($.call, $.identifier)),
+        ".",
+        field("method", $.identifier)
+      ),
 
     assignment: ($) =>
       seq(

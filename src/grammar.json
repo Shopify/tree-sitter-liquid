@@ -130,6 +130,44 @@
         {
           "type": "SYMBOL",
           "name": "predicate"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "call"
+        }
+      ]
+    },
+    "call": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "receiver",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "call"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "FIELD",
+          "name": "method",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
         }
       ]
     },

@@ -104,6 +104,36 @@
     "fields": {}
   },
   {
+    "type": "call",
+    "named": true,
+    "fields": {
+      "method": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "receiver": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "call",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "expression",
     "named": true,
     "fields": {},
@@ -113,6 +143,10 @@
       "types": [
         {
           "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "call",
           "named": true
         },
         {
@@ -339,6 +373,10 @@
   },
   {
     "type": "-",
+    "named": false
+  },
+  {
+    "type": ".",
     "named": false
   },
   {

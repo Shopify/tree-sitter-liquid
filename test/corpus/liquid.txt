@@ -114,3 +114,37 @@ Filters precedence
     name: (identifier))
   name: (identifier)
   (argument_list (string))))
+
+==================
+Method Call
+==================
+
+{{ page.title }}
+
+---
+
+(program
+ (expression
+  (call
+   receiver: (identifier)
+   method: (identifier))))
+
+==================
+Compound Method Call With Filter
+==================
+
+{{ data.page.title | reverse}}
+
+---
+
+(program
+ (filter
+  body:
+   (expression
+    (call
+     receiver:
+       (call
+        receiver: (identifier)
+        method: (identifier))
+     method: (identifier)))
+  name: (identifier)))
