@@ -1,150 +1,150 @@
-==================
+================================================================================
 Literal
-==================
+================================================================================
 
 {{ 'string' }}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (expression
-  (string)))
+  (string))
 
-==================
+================================================================================
 Filter
-==================
+================================================================================
 
 {{ 'string two' | split: " " }}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (filter
-  body: (expression (string))
-  name: (identifier)
-  (argument_list (string))))
+  (filter
+    body: (string)
+    name: (identifier)
+    (argument_list
+      (string))))
 
-==================
+================================================================================
 Filter w/ variable
-==================
+================================================================================
 
 {% assign space = " " %}
 {{ 'string two' | split: space }}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (statement
-  (assignment
-   variable_name: (identifier)
-   value: (expression (string))))
- (filter
-  body: (expression (string))
-  name: (identifier)
-  (argument_list (identifier))))
+  (statement
+    (assignment
+      variable_name: (identifier)
+      value: (string)))
+  (filter
+    body: (string)
+    name: (identifier)
+    (argument_list
+      (identifier))))
 
-==================
+================================================================================
 Many filters
-==================
+================================================================================
 
 {{ 'string two' | split: space | first }}
 
----
-
-(program
- (filter
-  body:
-   (filter
-    body: (expression (string))
-    name: (identifier)
-    (argument_list (identifier)))
-  name: (identifier)))
-
-==================
-Filters with many arguments
-==================
-
-{% assign kitchen_products = products | where: "type", "kitchen" %}
-
----
-
-(program
- (statement
-  (assignment
-   variable_name: (identifier)
-   value:
-    (filter
-     body: (expression (identifier))
-     name: (identifier)
-     (argument_list (string) (string))))))
-
-==================
-Filters argument hash
-==================
-
-{{ display_price | default: true, allow_false: true }}
-
----
+--------------------------------------------------------------------------------
 
 (program
   (filter
-    body: (expression (identifier))
+    body: (filter
+      body: (string)
+      name: (identifier)
+      (argument_list
+        (identifier)))
+    name: (identifier)))
+
+================================================================================
+Filters with many arguments
+================================================================================
+
+{% assign kitchen_products = products | where: "type", "kitchen" %}
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement
+    (assignment
+      variable_name: (identifier)
+      value: (filter
+        body: (identifier)
+        name: (identifier)
+        (argument_list
+          (string)
+          (string))))))
+
+================================================================================
+Filters argument hash
+================================================================================
+
+{{ display_price | default: true, allow_false: true }}
+
+--------------------------------------------------------------------------------
+
+(program
+  (filter
+    body: (identifier)
     name: (identifier)
     (argument_list
-     (boolean)
-     (argument key: (identifier) value: (boolean)))))
+      (boolean)
+      (argument
+        key: (identifier)
+        value: (boolean)))))
 
-==================
+================================================================================
 Filters precedence
-==================
+================================================================================
 
 {{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (filter
-  body:
-   (filter
-    body:
-     (filter
-      body: (expression (string))
-      name: (identifier)
-      (argument_list (string)))
-    name: (identifier))
-  name: (identifier)
-  (argument_list (string))))
+  (filter
+    body: (filter
+      body: (filter
+        body: (string)
+        name: (identifier)
+        (argument_list
+          (string)))
+      name: (identifier))
+    name: (identifier)
+    (argument_list
+      (string))))
 
-==================
+================================================================================
 Method Call
-==================
+================================================================================
 
 {{ page.title }}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (expression
   (call
-   receiver: (identifier)
-   method: (identifier))))
+    receiver: (identifier)
+    method: (identifier)))
 
-==================
+================================================================================
 Compound Method Call With Filter
-==================
+================================================================================
 
 {{ data.page.title | reverse}}
 
----
+--------------------------------------------------------------------------------
 
 (program
- (filter
-  body:
-   (expression
-    (call
-     receiver:
-       (call
+  (filter
+    body: (call
+      receiver: (call
         receiver: (identifier)
         method: (identifier))
-     method: (identifier)))
-  name: (identifier)))
+      method: (identifier))
+    name: (identifier)))

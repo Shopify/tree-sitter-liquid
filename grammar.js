@@ -19,14 +19,14 @@ module.exports = grammar({
       repeat1(
         seq(
           choice("{{", "{%"),
-          choice($.filter, $.expression, $.statement),
+          choice($.filter, $._expression, $.statement),
           choice("}}", "%}")
         )
       ),
 
     filter: ($) =>
       seq(
-        field("body", choice($.expression, $.filter)),
+        field("body", choice($._expression, $.filter)),
         "|",
         field("name", $.identifier),
         optional(seq(":", $.argument_list))
@@ -34,7 +34,12 @@ module.exports = grammar({
 
     statement: ($) => choice($.assignment),
 
-    expression: ($) => choice($._literal, $.identifier, $.predicate, $.call),
+    _expression: ($) => choice(
+      $._literal,
+      $.identifier,
+      $.predicate,
+      $.call
+    ),
 
     call: ($) =>
       seq(
@@ -48,13 +53,12 @@ module.exports = grammar({
         "assign",
         field("variable_name", $.identifier),
         "=",
-        field("value", choice($.filter, $.expression))
+        field("value", choice($.filter, $._expression))
       ),
 
     _literal: ($) => choice($.string, $.number, $.boolean),
 
     string: (_) => choice(seq("'", /[^']*/, "'"), seq('"', /[^"]*/, '"')),
-
     number: (_) => /\d+/,
 
     boolean: (_) => choice("true", "false"),
@@ -95,9 +99,9 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field("left", $.expression),
+              field("left", $._expression),
               field("operator", operator),
-              field("right", $.expression)
+              field("right", $._expression)
             )
           )
         )

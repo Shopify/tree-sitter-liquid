@@ -77,11 +77,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "call",
             "named": true
           },
           {
             "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -134,41 +154,6 @@
     }
   },
   {
-    "type": "expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "call",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "predicate",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "filter",
     "named": true,
     "fields": {
@@ -177,11 +162,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "call",
             "named": true
           },
           {
             "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -217,7 +222,27 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "call",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -289,7 +314,27 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "call",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -305,7 +350,11 @@
       "required": true,
       "types": [
         {
-          "type": "expression",
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "call",
           "named": true
         },
         {
@@ -313,7 +362,23 @@
           "named": true
         },
         {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
           "type": "statement",
+          "named": true
+        },
+        {
+          "type": "string",
           "named": true
         }
       ]
