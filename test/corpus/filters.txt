@@ -34,10 +34,9 @@ Filter w/ variable
 --------------------------------------------------------------------------------
 
 (program
-  (statement
-    (assignment
-      variable_name: (identifier)
-      value: (string)))
+  (assignment
+    variable_name: (identifier)
+    value: (string))
   (filter
     body: (string)
     name: (identifier)
@@ -70,15 +69,14 @@ Filters with many arguments
 --------------------------------------------------------------------------------
 
 (program
-  (statement
-    (assignment
-      variable_name: (identifier)
-      value: (filter
-        body: (identifier)
-        name: (identifier)
-        (argument_list
-          (string)
-          (string))))))
+  (assignment
+    variable_name: (identifier)
+    value: (filter
+      body: (identifier)
+      name: (identifier)
+      (argument_list
+        (string)
+        (string)))))
 
 ================================================================================
 Filters argument hash

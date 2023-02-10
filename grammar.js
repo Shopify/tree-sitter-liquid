@@ -19,9 +19,9 @@ module.exports = grammar({
       repeat1(
         seq(
           choice("{{", "{%"),
-          choice($.filter, $._expression, $.statement),
-          choice("}}", "%}")
-        )
+          choice($.filter, $._expression, $._statement),
+          choice("}}", "%}"),
+        ),
       ),
 
     filter: ($) =>
@@ -32,7 +32,7 @@ module.exports = grammar({
         optional(seq(":", $.argument_list))
       ),
 
-    statement: ($) => choice($.assignment),
+    _statement: ($) => choice($.assignment),
 
     _expression: ($) => choice(
       $._literal,
