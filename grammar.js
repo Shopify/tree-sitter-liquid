@@ -1,7 +1,12 @@
 module.exports = grammar({
   name: "liquid",
 
-  precedences: ($) => [
+  externals: $ => [
+    $.raw_content,
+    $.comment_content,
+  ],
+
+  precedences: (_) => [
     [
       "unary_not",
       "binary_exp",
@@ -20,6 +25,7 @@ module.exports = grammar({
     _template: $ => choice(
       $.directive,
       $.output_directive,
+      $.comment_directive,
       $.content
     ),
 
@@ -35,6 +41,16 @@ module.exports = grammar({
       choice('}}', '-}}'),
     ),
 
+    comment_directive: $ => seq(
+      "{%",
+      "comment",
+      "%}",
+      field("body", alias($.comment_content, $.content)),
+      "{%",
+      "endcomment",
+      "%}",
+    ),
+
     content: _ => prec.right(repeat1(choice(/[^{]+|\{/, '{%%'))),
 
     code: $ => repeat1(
@@ -42,7 +58,8 @@ module.exports = grammar({
         $.filter,
         $.assignment,
         $.for,
-        $._expression,
+        $.call,
+        $.raw,
       ),
     ),
 
@@ -77,17 +94,23 @@ module.exports = grammar({
       "in",
       field("iterator", $._expression),
       "%}",
-      choice(
-        seq(
-          field("body", repeat1($._template)),
-          "{%",
-          "endfor",
-        ),
-        seq(
-          "{%",
-          "endfor",
-        ),
-      ),
+      field("body", repeat($._template)),
+      "{%",
+      "endfor",
+    ),
+
+    call: ($) => seq(
+      field("receiver", choice($.call, $.identifier)),
+      ".",
+      field("method", $.identifier)
+    ),
+
+    raw: ($) => seq(
+      "raw",
+      "%}",
+      field("body", alias($.raw_content, $.content)),
+      "{%",
+      "endraw",
     ),
 
     _expression: ($) => choice(
@@ -95,12 +118,6 @@ module.exports = grammar({
       $.binary_expression,
       $.identifier,
       $._literal,
-    ),
-
-    call: ($) => seq(
-      field("receiver", choice($.call, $.identifier)),
-      ".",
-      field("method", $.identifier)
     ),
 
     binary_expression: ($) => choice(

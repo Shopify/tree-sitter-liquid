@@ -294,14 +294,6 @@
           "named": true
         },
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
           "type": "call",
           "named": true
         },
@@ -314,18 +306,26 @@
           "named": true
         },
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "string",
+          "type": "raw",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "comment_directive",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "content",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -417,6 +417,10 @@
         "required": false,
         "types": [
           {
+            "type": "comment_directive",
+            "named": true
+          },
+          {
             "type": "content",
             "named": true
           },
@@ -488,6 +492,22 @@
     }
   },
   {
+    "type": "raw",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "content",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "string",
     "named": true,
     "fields": {}
@@ -500,6 +520,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "comment_directive",
+          "named": true
+        },
         {
           "type": "content",
           "named": true
@@ -608,7 +632,19 @@
     "named": false
   },
   {
+    "type": "comment",
+    "named": false
+  },
+  {
+    "type": "endcomment",
+    "named": false
+  },
+  {
     "type": "endfor",
+    "named": false
+  },
+  {
+    "type": "endraw",
     "named": false
   },
   {
@@ -633,6 +669,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "raw",
     "named": false
   },
   {
