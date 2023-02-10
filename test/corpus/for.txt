@@ -1,0 +1,37 @@
+================================================================================
+Empty for statement
+================================================================================
+
+{% for product in products %}
+{% endfor %}
+--------------------------------------------------------------------------------
+
+(template
+  (directive
+    (code
+      (for
+        loop_variable: (identifier)
+        iterator: (identifier)))))
+
+================================================================================
+For statement w/ body
+================================================================================
+
+{% for product in products %}
+  <li>{{ product.name }}</li>
+{% endfor %}
+--------------------------------------------------------------------------------
+
+(template
+  (directive
+    (code
+      (for
+        loop_variable: (identifier)
+        iterator: (identifier)
+        body: (content)
+        body: (output_directive
+          (code
+            (call
+              receiver: (identifier)
+              method: (identifier))))
+        body: (content)))))

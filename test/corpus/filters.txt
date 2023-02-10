@@ -3,11 +3,26 @@ Literal
 ================================================================================
 
 {{ 'string' }}
+--------------------------------------------------------------------------------
+
+(template
+  (output_directive
+    (code
+      (string))))
+
+================================================================================
+Literal w/ content
+================================================================================
+
+{{ 'string' }}
 
 --------------------------------------------------------------------------------
 
-(program
-  (string))
+(template
+  (output_directive
+    (code
+      (string)))
+  (content))
 
 ================================================================================
 Filter
@@ -17,12 +32,15 @@ Filter
 
 --------------------------------------------------------------------------------
 
-(program
-  (filter
-    body: (string)
-    name: (identifier)
-    (argument_list
-      (string))))
+(template
+  (output_directive
+    (code
+      (filter
+        body: (string)
+        name: (identifier)
+        (argument_list
+          (string)))))
+  (content))
 
 ================================================================================
 Filter w/ variable
@@ -33,15 +51,20 @@ Filter w/ variable
 
 --------------------------------------------------------------------------------
 
-(program
-  (assignment
-    variable_name: (identifier)
-    value: (string))
-  (filter
-    body: (string)
-    name: (identifier)
-    (argument_list
-      (identifier))))
+(template
+  (directive
+    (code
+      (assignment
+        variable_name: (identifier)
+        value: (string))))
+  (output_directive
+    (code
+      (filter
+        body: (string)
+        name: (identifier)
+        (argument_list
+          (identifier)))))
+  (content))
 
 ================================================================================
 Many filters
@@ -51,14 +74,17 @@ Many filters
 
 --------------------------------------------------------------------------------
 
-(program
-  (filter
-    body: (filter
-      body: (string)
-      name: (identifier)
-      (argument_list
-        (identifier)))
-    name: (identifier)))
+(template
+  (output_directive
+    (code
+      (filter
+        body: (filter
+          body: (string)
+          name: (identifier)
+          (argument_list
+            (identifier)))
+        name: (identifier))))
+  (content))
 
 ================================================================================
 Filters with many arguments
@@ -68,15 +94,18 @@ Filters with many arguments
 
 --------------------------------------------------------------------------------
 
-(program
-  (assignment
-    variable_name: (identifier)
-    value: (filter
-      body: (identifier)
-      name: (identifier)
-      (argument_list
-        (string)
-        (string)))))
+(template
+  (directive
+    (code
+      (assignment
+        variable_name: (identifier)
+        value: (filter
+          body: (identifier)
+          name: (identifier)
+          (argument_list
+            (string)
+            (string))))))
+  (content))
 
 ================================================================================
 Filters argument hash
@@ -86,15 +115,18 @@ Filters argument hash
 
 --------------------------------------------------------------------------------
 
-(program
-  (filter
-    body: (identifier)
-    name: (identifier)
-    (argument_list
-      (boolean)
-      (argument
-        key: (identifier)
-        value: (boolean)))))
+(template
+  (output_directive
+    (code
+      (filter
+        body: (identifier)
+        name: (identifier)
+        (argument_list
+          (boolean)
+          (argument
+            key: (identifier)
+            value: (boolean))))))
+  (content))
 
 ================================================================================
 Filters precedence
@@ -104,18 +136,21 @@ Filters precedence
 
 --------------------------------------------------------------------------------
 
-(program
-  (filter
-    body: (filter
-      body: (filter
-        body: (string)
+(template
+  (output_directive
+    (code
+      (filter
+        body: (filter
+          body: (filter
+            body: (string)
+            name: (identifier)
+            (argument_list
+              (string)))
+          name: (identifier))
         name: (identifier)
         (argument_list
-          (string)))
-      name: (identifier))
-    name: (identifier)
-    (argument_list
-      (string))))
+          (string)))))
+  (content))
 
 ================================================================================
 Method Call
@@ -125,10 +160,13 @@ Method Call
 
 --------------------------------------------------------------------------------
 
-(program
-  (call
-    receiver: (identifier)
-    method: (identifier)))
+(template
+  (output_directive
+    (code
+      (call
+        receiver: (identifier)
+        method: (identifier))))
+  (content))
 
 ================================================================================
 Compound Method Call With Filter
@@ -138,11 +176,14 @@ Compound Method Call With Filter
 
 --------------------------------------------------------------------------------
 
-(program
-  (filter
-    body: (call
-      receiver: (call
-        receiver: (identifier)
-        method: (identifier))
-      method: (identifier))
-    name: (identifier)))
+(template
+  (output_directive
+    (code
+      (filter
+        body: (call
+          receiver: (call
+            receiver: (identifier)
+            method: (identifier))
+          method: (identifier))
+        name: (identifier))))
+  (content))

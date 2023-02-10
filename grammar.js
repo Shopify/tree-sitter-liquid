@@ -15,96 +15,126 @@ module.exports = grammar({
   ],
 
   rules: {
-    program: ($) =>
-      repeat1(
-        seq(
-          choice("{{", "{%"),
-          choice($.filter, $._expression, $._statement),
-          choice("}}", "%}"),
-        ),
-      ),
+    template: $ => repeat($._template),
 
-    filter: ($) =>
-      seq(
-        field("body", choice($._expression, $.filter)),
-        "|",
-        field("name", $.identifier),
-        optional(seq(":", $.argument_list))
-      ),
-
-    _statement: ($) => choice($.assignment),
-
-    _expression: ($) => choice(
-      $._literal,
-      $.identifier,
-      $.predicate,
-      $.call
+    _template: $ => choice(
+      $.directive,
+      $.output_directive,
+      $.content
     ),
 
-    call: ($) =>
-      seq(
-        field("receiver", choice($.call, $.identifier)),
-        ".",
-        field("method", $.identifier)
-      ),
+    directive: $ => seq(
+      choice('{%', '{%-'),
+      optional($.code),
+      choice('%}', '-%}'),
+    ),
 
-    assignment: ($) =>
-      seq(
-        "assign",
-        field("variable_name", $.identifier),
-        "=",
-        field("value", choice($.filter, $._expression))
-      ),
+    output_directive: $ => seq(
+      choice('{{', '{{-'),
+      optional($.code),
+      choice('}}', '-}}'),
+    ),
 
-    _literal: ($) => choice($.string, $.number, $.boolean),
+    content: _ => prec.right(repeat1(choice(/[^{]+|\{/, '{%%'))),
 
-    string: (_) => choice(seq("'", /[^']*/, "'"), seq('"', /[^"]*/, '"')),
-    number: (_) => /\d+/,
-
-    boolean: (_) => choice("true", "false"),
-
-    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
-
-    argument_list: ($) =>
-      seq(
-        choice($._literal, $.identifier, $.argument),
-        repeat(seq(",", choice($._literal, $.identifier, $.argument)))
-      ),
-
-    argument: ($) =>
-      seq(
-        field("key", $.identifier),
-        ":",
-        field("value", choice($._literal, $.identifier))
-      ),
-
-    predicate: ($) =>
+    code: $ => repeat1(
       choice(
-        ...[
-          ["+", "binary_plus"],
-          ["-", "binary_plus"],
-          ["*", "binary_times"],
-          ["/", "binary_times"],
-          ["%", "binary_times"],
-          ["^", "binary_exp"],
-          ["==", "binary_relation"],
-          ["<", "binary_relation"],
-          ["<=", "binary_relation"],
-          ["!=", "binary_relation"],
-          [">=", "binary_relation"],
-          [">", "binary_relation"],
-          ["and", "clause_connective"],
-          ["or", "clause_connective"],
-        ].map(([operator, precedence]) =>
-          prec.left(
-            precedence,
-            seq(
-              field("left", $._expression),
-              field("operator", operator),
-              field("right", $._expression)
-            )
+        $.filter,
+        $.assignment,
+        $.for,
+        $._expression,
+      ),
+    ),
+
+    filter: ($) => seq(
+      field("body", choice($._expression, $.filter)),
+      "|",
+      field("name", $.identifier),
+      optional(seq(":", $.argument_list))
+    ),
+
+    argument_list: ($) => seq(
+      choice($._literal, $.identifier, $.argument),
+      repeat(seq(",", choice($._literal, $.identifier, $.argument)))
+    ),
+
+    argument: ($) => seq(
+      field("key", $.identifier),
+      ":",
+      field("value", choice($._literal, $.identifier))
+    ),
+
+    assignment: ($) => seq(
+      "assign",
+      field("variable_name", $.identifier),
+      "=",
+      field("value", choice($.filter, $._expression))
+    ),
+
+    for: ($) => seq(
+      "for",
+      field("loop_variable", $.identifier),
+      "in",
+      field("iterator", $._expression),
+      "%}",
+      choice(
+        seq(
+          field("body", repeat1($._template)),
+          "{%",
+          "endfor",
+        ),
+        seq(
+          "{%",
+          "endfor",
+        ),
+      ),
+    ),
+
+    _expression: ($) => choice(
+      $.call,
+      $.binary_expression,
+      $.identifier,
+      $._literal,
+    ),
+
+    call: ($) => seq(
+      field("receiver", choice($.call, $.identifier)),
+      ".",
+      field("method", $.identifier)
+    ),
+
+    binary_expression: ($) => choice(
+      ...[
+        ["+", "binary_plus"],
+        ["-", "binary_plus"],
+        ["*", "binary_times"],
+        ["/", "binary_times"],
+        ["%", "binary_times"],
+        ["^", "binary_exp"],
+        ["==", "binary_relation"],
+        ["<", "binary_relation"],
+        ["<=", "binary_relation"],
+        ["!=", "binary_relation"],
+        [">=", "binary_relation"],
+        [">", "binary_relation"],
+        ["and", "clause_connective"],
+        ["or", "clause_connective"],
+      ].map(([operator, precedence]) =>
+        prec.left(
+          precedence,
+          seq(
+            field("left", $._expression),
+            field("operator", operator),
+            field("right", $._expression)
           )
         )
-      ),
+      )
+    ),
+
+    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
+    _literal: ($) => choice($.string, $.number, $.boolean),
+    string: (_) => choice(seq("'", /[^']*/, "'"), seq('"', /[^"]*/, '"')),
+    number: (_) => /\d+/,
+    boolean: (_) => choice("true", "false"),
   },
 });
