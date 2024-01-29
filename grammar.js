@@ -15,13 +15,23 @@ module.exports = grammar({
   ],
 
   rules: {
-    program: ($) =>
-      repeat1(
-        seq(
-          choice("{{", "{%"),
-          choice($.filter, $.expression, $.statement),
-          choice("}}", "%}")
-        )
+
+    template: ($) => 
+      repeat(
+        $._node
+      ),
+
+    _node: ($) => 
+      choice(
+        $.tag,
+        $.content,
+      ),
+
+    tag: ($) =>
+      seq(
+        choice("{{", "{%"),
+        choice($.filter, $.expression, $.statement, $.comment),
+        choice("}}", "%}")
       ),
 
     filter: ($) =>
@@ -36,6 +46,7 @@ module.exports = grammar({
 
     expression: ($) => choice($._literal, $.identifier, $.predicate, $.call),
 
+    // object w method etc
     call: ($) =>
       seq(
         field("receiver", choice($.call, $.identifier)),
@@ -51,9 +62,23 @@ module.exports = grammar({
         field("value", choice($.filter, $.expression))
       ),
 
+    //WIP
+    //need to move tag delimiters into statement - see tag
+    comment: ($) =>
+      seq(
+        "comment",
+        repeat(/.|\s/),
+        "endcomment"
+      )
+    ,
+
     _literal: ($) => choice($.string, $.number, $.boolean),
 
-    string: (_) => choice(seq("'", /[^']*/, "'"), seq('"', /[^"]*/, '"')),
+    string: (_) => 
+      choice(
+        seq("'", /[^']*/, "'"),
+        seq('"', /[^"]*/, '"')
+      ),
 
     number: (_) => /\d+/,
 
@@ -102,5 +127,8 @@ module.exports = grammar({
           )
         )
       ),
+
+    content: ($) => /([^\{]|\{[^{%#])+/
   },
+
 });

@@ -2,149 +2,188 @@
 Literal
 ==================
 
-{{ 'string' }}
+<html>
+  {{ 'string' }}
+</html>
 
 ---
-
-(program
- (expression
-  (string)))
+(template
+ (content)
+ (program
+  (expression
+   (string)))
+ (content))
 
 ==================
 Filter
 ==================
 
-{{ 'string two' | split: " " }}
+<html>
+  {{ 'string two' | split: " " }}
+</html>
 
 ---
-
-(program
- (filter
-  body: (expression (string))
-  name: (identifier)
-  (argument_list (string))))
+(template
+ (content)
+ (program
+  (filter
+   body: (expression (string))
+   name: (identifier)
+   (argument_list (string))))
+ (content))
 
 ==================
 Filter w/ variable
 ==================
 
-{% assign space = " " %}
-{{ 'string two' | split: space }}
+<html>
+  {% assign space = " " %}
+  <div>{{ 'string two' | split: space }}</div>
+</html>
 
 ---
 
-(program
- (statement
-  (assignment
-   variable_name: (identifier)
-   value: (expression (string))))
- (filter
-  body: (expression (string))
-  name: (identifier)
-  (argument_list (identifier))))
+(template
+ (content)
+ (program
+  (statement
+   (assignment
+    variable_name: (identifier)
+    value: (expression (string)))))
+ (content)
+ (program
+  (filter
+   body: (expression (string))
+   name: (identifier)
+   (argument_list (identifier))))
+ (content))
 
 ==================
 Many filters
 ==================
 
-{{ 'string two' | split: space | first }}
+<html>
+  {{ 'string two' | split: space | first }}
+</html>
 
 ---
-
-(program
- (filter
-  body:
+(template
+ (content)
+ (program
+  (filter
+   body:
    (filter
     body: (expression (string))
     name: (identifier)
     (argument_list (identifier)))
-  name: (identifier)))
+   name: (identifier)))
+ (content))
 
 ==================
 Filters with many arguments
 ==================
 
-{% assign kitchen_products = products | where: "type", "kitchen" %}
+<html>
+  {% assign kitchen_products = products | where: "type", "kitchen" %}
+</html>
 
 ---
-
-(program
- (statement
-  (assignment
-   variable_name: (identifier)
-   value:
+(template
+ (content)
+ (program
+  (statement
+   (assignment
+    variable_name: (identifier)
+    value:
     (filter
      body: (expression (identifier))
      name: (identifier)
      (argument_list (string) (string))))))
+ (content))
 
 ==================
 Filters argument hash
 ==================
 
-{{ display_price | default: true, allow_false: true }}
+<html>
+  {{ display_price | default: true, allow_false: true }}
+</html>
 
 ---
-
-(program
+(template
+ (content)
+ (program
   (filter
-    body: (expression (identifier))
-    name: (identifier)
-    (argument_list
-     (boolean)
-     (argument key: (identifier) value: (boolean)))))
+   body: (expression (identifier))
+   name: (identifier)
+   (argument_list
+    (boolean)
+    (argument key: (identifier) value: (boolean)))))
+ (content))
 
 ==================
 Filters precedence
 ==================
 
-{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+<html>
+  {{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
+</html>
 
 ---
-
-(program
- (filter
-  body:
+(template
+ (content)
+ (program
+  (filter
+   body:
    (filter
     body:
-     (filter
-      body: (expression (string))
-      name: (identifier)
-      (argument_list (string)))
+    (filter
+     body: (expression (string))
+     name: (identifier)
+     (argument_list (string)))
     name: (identifier))
-  name: (identifier)
-  (argument_list (string))))
+   name: (identifier)
+   (argument_list (string))))
+ (content))
 
 ==================
 Method Call
 ==================
 
-{{ page.title }}
+<html>
+  {{ page.title }}
+</html>
 
 ---
-
-(program
- (expression
-  (call
-   receiver: (identifier)
-   method: (identifier))))
+(template
+ (content)
+ (program
+  (expression
+   (call
+    receiver: (identifier)
+    method: (identifier))))
+ (content))
 
 ==================
 Compound Method Call With Filter
 ==================
 
-{{ data.page.title | reverse}}
+<html>
+  {{ data.page.title | reverse}}
+</html>
 
 ---
-
-(program
- (filter
-  body:
+(template
+ (content)
+ (program
+  (filter
+   body:
    (expression
     (call
      receiver:
-       (call
-        receiver: (identifier)
-        method: (identifier))
+     (call
+      receiver: (identifier)
+      method: (identifier))
      method: (identifier)))
-  name: (identifier)))
+   name: (identifier)))
+ (content))
