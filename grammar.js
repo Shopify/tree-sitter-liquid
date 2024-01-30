@@ -1,7 +1,7 @@
 module.exports = grammar({
   name: "liquid",
 
-  precedences: ($) => [
+  precedences: (_) => [
     [
       "unary_not",
       "binary_exp",
@@ -21,35 +21,59 @@ module.exports = grammar({
         $._node
       ),
 
+    //handle schemea tags inject json
+    //
+    //include {%- and {- delimiters
     _node: ($) => 
       choice(
         $.tag,
         $.content,
       ),
 
-    tag: ($) =>
+    //move tag delimiters into statement/exp? re: comments highlighting
+    tag: ($) => 
       seq(
         choice("{{", "{%"),
-        choice($.filter, $.expression, $.statement, $.comment),
+        choice($.expression, $.statement, $.comment),
         choice("}}", "%}")
       ),
 
     filter: ($) =>
       seq(
-        field("body", choice($.expression, $.filter)),
-        "|",
-        field("name", $.identifier),
-        optional(seq(":", $.argument_list))
+        seq(
+          field("body", choice($.expression)),
+          "|",
+          field("name", $.identifier),
+          optional(seq(":", $.argument_list))
+        ),
       ),
 
-    statement: ($) => choice($.assignment),
+    //form html gen and style
+    //liquid tag
+    //echo tag
+    //raw tag
+    //decrement / increment
+    statement: ($) =>
+      choice(
+        $.assignment,
+        $.conditional,
+        // $.iteration
+      ),
 
-    expression: ($) => choice($._literal, $.identifier, $.predicate, $.call),
+    expression: ($) => 
+      choice(
+        $._literal,
+        $.filter,
+        $.identifier,
+        $.predicate,
+        $.access,
+        $.include,
+        $.render
+      ),
 
-    // object w method etc
-    call: ($) =>
+    access: ($) =>
       seq(
-        field("receiver", choice($.call, $.identifier)),
+        field("receiver", choice($.access, $.identifier)),
         ".",
         field("method", $.identifier)
       ),
@@ -59,18 +83,17 @@ module.exports = grammar({
         "assign",
         field("variable_name", $.identifier),
         "=",
-        field("value", choice($.filter, $.expression))
+        field("value", choice($.expression))
       ),
 
     //WIP
-    //need to move tag delimiters into statement - see tag
-    comment: ($) =>
+    //inline comment
+    comment: (_) =>
       seq(
         "comment",
         repeat(/.|\s/),
         "endcomment"
-      )
-    ,
+      ),
 
     _literal: ($) => choice($.string, $.number, $.boolean),
 
@@ -85,6 +108,18 @@ module.exports = grammar({
     boolean: (_) => choice("true", "false"),
 
     identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
+
+    include: ($) =>
+      seq(
+        field("include", "include"),
+        field("included_file", $.string)
+      ),
+
+    render: ($) =>
+      seq(
+        field("render", "render"),
+        field("rendered_file", $.string)
+      ),
 
     argument_list: ($) =>
       seq(
@@ -128,7 +163,48 @@ module.exports = grammar({
         )
       ),
 
-    content: ($) => /([^\{]|\{[^{%#])+/
+    // for, cycle, pageinate, range, tablerow - https://shopify.dev/docs/api/liquid/tags/iteration-tags
+    // iteration: () =>, 
+
+    conditional: ($) => choice($.if_tag, $.unless_tag),
+
+    unless_tag: ($) =>
+      seq(
+        seq("unless", field("condition", $.expression)),
+        field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
+        "endunless",
+      ),
+
+    if_tag: ($) =>
+      seq(
+        seq("if", field("condition", $.expression)),
+        field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
+        repeat(field("alternatives", $.elseif_tag)),
+        optional(field("alternatives", $.else_tag)),
+        seq(
+          choice("{{", "{%"),
+          "endif",
+          choice("}}", "%}"),
+        )
+      ),
+
+    elseif_tag: ($) =>
+      prec.left(
+        1,
+        seq(
+          seq("elseif", field("condition", $.expression)),
+          field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
+        ),
+      ),
+
+    else_tag: ($) =>
+      prec.left(
+        1,
+        seq("else", field("consequence", alias(repeat($.statement), $.block))),
+      ),
+
+    //todo: HANDLE {%-
+    content: (_) => /([^\{]|\{[^{%#])+/
   },
 
 });

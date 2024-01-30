@@ -3,6 +3,8 @@
   "}}"
   "{%"
   "%}"
+  ; "{%-"
+  ; "-%}"
 ] @tag.delimiter
 
 [
@@ -21,11 +23,13 @@
  (call)
 ] @variable
 
-(expression) @constant
-(statement) @keyword
-(assignment) @keyword
+[
+  (expression)
+  (statement) 
+  (assignment)
+] @keyword
+
 (string) @string
 (boolean) @boolean
 (number) @number
 (comment) @comment
-
