@@ -133,11 +133,11 @@
       "required": true,
       "types": [
         {
-          "type": "expression",
+          "type": "content",
           "named": true
         },
         {
-          "type": "statement",
+          "type": "tag",
           "named": true
         }
       ]
@@ -488,10 +488,6 @@
         {
           "type": "assignment",
           "named": true
-        },
-        {
-          "type": "conditional",
-          "named": true
         }
       ]
     }
@@ -511,6 +507,10 @@
       "types": [
         {
           "type": "comment",
+          "named": true
+        },
+        {
+          "type": "conditional",
           "named": true
         },
         {
@@ -603,6 +603,14 @@
   },
   {
     "type": "-",
+    "named": false
+  },
+  {
+    "type": "-%}",
+    "named": false
+  },
+  {
+    "type": "-}}",
     "named": false
   },
   {
@@ -722,7 +730,15 @@
     "named": false
   },
   {
+    "type": "{%-",
+    "named": false
+  },
+  {
     "type": "{{",
+    "named": false
+  },
+  {
+    "type": "{{-",
     "named": false
   },
   {

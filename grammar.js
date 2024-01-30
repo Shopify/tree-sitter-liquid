@@ -22,30 +22,32 @@ module.exports = grammar({
       ),
 
     //handle schemea tags inject json
-    //
-    //include {%- and {- delimiters
     _node: ($) => 
       choice(
         $.tag,
         $.content,
       ),
 
-    //move tag delimiters into statement/exp? re: comments highlighting
-    tag: ($) => 
-      seq(
-        choice("{{", "{%"),
-        choice($.expression, $.statement, $.comment),
-        choice("}}", "%}")
+    content: (_) => /([^\{]|\{[^{%#])+/,
+
+    tag: ($) => choice($._unpaired_tag, $._paired_tag),
+
+    _tag_open: (_) => choice("{{", "{{-", "{%", "{%-"),
+
+    _tag_close: (_) => choice("}}", "-}}", "%}", "-%}"),
+
+    _paired_tag: ($) => 
+      choice(
+        $.conditional, 
+        $.comment
+        // $.iteration
       ),
 
-    filter: ($) =>
+    _unpaired_tag: ($) => 
       seq(
-        seq(
-          field("body", choice($.expression)),
-          "|",
-          field("name", $.identifier),
-          optional(seq(":", $.argument_list))
-        ),
+        $._tag_open,
+        choice($.expression, $.statement),
+        $._tag_close,
       ),
 
     //form html gen and style
@@ -56,8 +58,7 @@ module.exports = grammar({
     statement: ($) =>
       choice(
         $.assignment,
-        $.conditional,
-        // $.iteration
+        //...
       ),
 
     expression: ($) => 
@@ -67,8 +68,20 @@ module.exports = grammar({
         $.identifier,
         $.predicate,
         $.access,
+
+        //statements? 
         $.include,
         $.render
+      ),
+
+    filter: ($) =>
+      seq(
+        seq(
+          field("body", choice($.expression)),
+          "|",
+          field("name", $.identifier),
+          optional(seq(":", $.argument_list))
+        ),
       ),
 
     access: ($) =>
@@ -84,15 +97,6 @@ module.exports = grammar({
         field("variable_name", $.identifier),
         "=",
         field("value", choice($.expression))
-      ),
-
-    //WIP
-    //inline comment
-    comment: (_) =>
-      seq(
-        "comment",
-        repeat(/.|\s/),
-        "endcomment"
       ),
 
     _literal: ($) => choice($.string, $.number, $.boolean),
@@ -171,40 +175,47 @@ module.exports = grammar({
     unless_tag: ($) =>
       seq(
         seq("unless", field("condition", $.expression)),
-        field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
-        "endunless",
+        field("consequence", alias(repeat($._node), $.block)),
+        $._tag_open, "endunless", $._tag_close, 
       ),
 
     if_tag: ($) =>
       seq(
-        seq("if", field("condition", $.expression)),
-        field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
+        $._tag_open, "if", field("condition", $.expression), $._tag_close, 
+        field("consequence", alias(repeat($._node), $.block)),
         repeat(field("alternatives", $.elseif_tag)),
         optional(field("alternatives", $.else_tag)),
-        seq(
-          choice("{{", "{%"),
-          "endif",
-          choice("}}", "%}"),
-        )
+        $._tag_open, "endif", $._tag_close, 
       ),
 
     elseif_tag: ($) =>
       prec.left(
         1,
         seq(
-          seq("elseif", field("condition", $.expression)),
-          field("consequence", alias(repeat(choice($.statement, $.expression)), $.block)),
+          $._tag_open, "elseif", field("condition", $.expression), $._tag_close,
+          field("consequence", alias(repeat($._node), $.block)),
         ),
       ),
 
     else_tag: ($) =>
       prec.left(
         1,
-        seq("else", field("consequence", alias(repeat($.statement), $.block))),
+        seq(
+          $._tag_open, "else", $._tag_close,
+          field("consequence", alias(repeat($._node), $.block))
+        ),
       ),
 
-    //todo: HANDLE {%-
-    content: (_) => /([^\{]|\{[^{%#])+/
+    //WIP
+    //erroring on liquid tag block content
+    //inline comment
+    comment: ($) =>
+      seq(
+        $._tag_open, "comment", $._tag_close, 
+        repeat(/.|\s/),
+        $._tag_open, "endcomment", $._tag_close, 
+      ),
+
   },
 
 });

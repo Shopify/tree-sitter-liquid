@@ -208,4 +208,38 @@ If Statement
 </html>
 
 ---
-TODO
+(template
+ (content)
+ (tag
+  (conditional
+   (if_tag
+    condition: (expression
+      (predicate
+       left: (expression 
+         (access
+          receiver: (identifier)
+          method: (identifier)))
+       right: (expression 
+         (identifier))))
+      consequence: (block
+        (content)))))
+   (content))
+
+==================
+Paired Tag Comment
+==================
+
+<html>
+  {{ comment }}
+    {{ data.page.title | reverse }}
+      <div>hi</div>
+  {{ endcomment }}
+</html>
+
+---
+
+
+
+
+
+
