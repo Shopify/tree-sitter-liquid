@@ -137,7 +137,23 @@
           "named": true
         },
         {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "statement",
+          "named": true
+        },
+        {
           "type": "tag",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
           "named": true
         }
       ]
@@ -154,7 +170,12 @@
     "fields": {}
   },
   {
-    "type": "conditional",
+    "type": "content",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "decrement",
     "named": true,
     "fields": {},
     "children": {
@@ -162,14 +183,41 @@
       "required": true,
       "types": [
         {
-          "type": "if_tag",
-          "named": true
-        },
-        {
-          "type": "unless_tag",
+          "type": "identifier",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "echo",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "else_statement",
+    "named": true,
+    "fields": {
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -179,6 +227,32 @@
       "consequence": {
         "multiple": false,
         "required": false,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "elseif_statement",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
         "types": [
           {
             "type": "block",
@@ -239,19 +313,11 @@
           "named": true
         },
         {
-          "type": "include",
-          "named": true
-        },
-        {
           "type": "number",
           "named": true
         },
         {
           "type": "predicate",
-          "named": true
-        },
-        {
-          "type": "render",
           "named": true
         },
         {
@@ -298,6 +364,46 @@
     }
   },
   {
+    "type": "if_statement",
+    "named": true,
+    "fields": {
+      "alternatives": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "else_statement",
+            "named": true
+          },
+          {
+            "type": "elseif_statement",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "if_tag",
     "named": true,
     "fields": {
@@ -340,23 +446,80 @@
   {
     "type": "include",
     "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "increment",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "liquid_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "statement",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "opt_as_expr",
+    "named": true,
     "fields": {
-      "include": {
+      "identifier": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
-            "type": "include",
-            "named": false
+            "type": "identifier",
+            "named": true
           }
         ]
       },
-      "included_file": {
+      "item": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "string",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -455,6 +618,24 @@
     "type": "render",
     "named": true,
     "fields": {
+      "param": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "argument_list",
+            "named": true
+          },
+          {
+            "type": "opt_as_expr",
+            "named": true
+          }
+        ]
+      },
       "render": {
         "multiple": false,
         "required": true,
@@ -478,6 +659,36 @@
     }
   },
   {
+    "type": "section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "sections",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "statement",
     "named": true,
     "fields": {},
@@ -487,6 +698,34 @@
       "types": [
         {
           "type": "assignment",
+          "named": true
+        },
+        {
+          "type": "decrement",
+          "named": true
+        },
+        {
+          "type": "echo",
+          "named": true
+        },
+        {
+          "type": "include",
+          "named": true
+        },
+        {
+          "type": "increment",
+          "named": true
+        },
+        {
+          "type": "render",
+          "named": true
+        },
+        {
+          "type": "section",
+          "named": true
+        },
+        {
+          "type": "sections",
           "named": true
         }
       ]
@@ -510,15 +749,23 @@
           "named": true
         },
         {
-          "type": "conditional",
-          "named": true
-        },
-        {
           "type": "expression",
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
           "type": "statement",
+          "named": true
+        },
+        {
+          "type": "unless_tag",
           "named": true
         }
       ]
@@ -541,6 +788,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "unless_statement",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -568,6 +841,10 @@
         ]
       }
     }
+  },
+  {
+    "type": "",
+    "named": false
   },
   {
     "type": "!=",
@@ -658,6 +935,10 @@
     "named": false
   },
   {
+    "type": "as",
+    "named": false
+  },
+  {
     "type": "assign",
     "named": false
   },
@@ -666,8 +947,12 @@
     "named": false
   },
   {
-    "type": "content",
-    "named": true
+    "type": "decrement",
+    "named": false
+  },
+  {
+    "type": "echo",
+    "named": false
   },
   {
     "type": "else",
@@ -694,6 +979,10 @@
     "named": false
   },
   {
+    "type": "for",
+    "named": false
+  },
+  {
     "type": "identifier",
     "named": true
   },
@@ -703,6 +992,22 @@
   },
   {
     "type": "include",
+    "named": false
+  },
+  {
+    "type": "increment",
+    "named": false
+  },
+  {
+    "type": "layout",
+    "named": false
+  },
+  {
+    "type": "liquid",
+    "named": false
+  },
+  {
+    "type": "none",
     "named": false
   },
   {
@@ -718,6 +1023,14 @@
     "named": false
   },
   {
+    "type": "section",
+    "named": false
+  },
+  {
+    "type": "sections",
+    "named": false
+  },
+  {
     "type": "true",
     "named": false
   },
@@ -726,7 +1039,15 @@
     "named": false
   },
   {
+    "type": "with",
+    "named": false
+  },
+  {
     "type": "{%",
+    "named": false
+  },
+  {
+    "type": "{%%",
     "named": false
   },
   {

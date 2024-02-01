@@ -1,6 +1,8 @@
 module.exports = grammar({
   name: "liquid",
 
+  word: $ => $.identifier,
+
   precedences: (_) => [
     [
       "unary_not",
@@ -16,49 +18,73 @@ module.exports = grammar({
 
   rules: {
 
-    template: ($) => 
+    template: ($) =>
       repeat(
         $._node
       ),
 
-    //handle schemea tags inject json
+    //TODO: handle schemea tags inject json
     _node: ($) => 
       choice(
         $.tag,
         $.content,
       ),
 
-    content: (_) => /([^\{]|\{[^{%#])+/,
+    content: (_) => prec.right(repeat1(choice(/[^{]+|\{/, '{%%'))),
 
     tag: ($) => choice($._unpaired_tag, $._paired_tag),
 
+    //TODO: handle {{ and {% seperately
     _tag_open: (_) => choice("{{", "{{-", "{%", "{%-"),
 
     _tag_close: (_) => choice("}}", "-}}", "%}", "-%}"),
 
+    //TODO:
+    //iteration
+    //raw tag
+    //form tag
+    //javascript tag
+    //stylesheet tag
+    //capture tag
     _paired_tag: ($) => 
       choice(
-        $.conditional, 
-        $.comment
-        // $.iteration
+        $.if_tag,
+        $.unless_tag,
+        $.comment,
       ),
 
     _unpaired_tag: ($) => 
       seq(
         $._tag_open,
-        choice($.expression, $.statement),
+        choice($.expression, $.statement, $.liquid_tag),
         $._tag_close,
       ),
 
-    //form html gen and style
-    //liquid tag
-    //echo tag
-    //raw tag
-    //decrement / increment
+    //TODO: field names are being dropped??
+    liquid_tag: ($) => seq("liquid", $._liquid_block),
+
+    _liquid_block: ($) =>
+      repeat1(
+        seq(
+          choice(
+            $.expression,
+            $.statement,
+            $._paired_statement,
+          ),
+          /(\r\n|\r|\n)/,
+        )
+      ),
+
     statement: ($) =>
       choice(
         $.assignment,
-        //...
+        $.render,
+        $.include,
+        $.section,
+        $.sections,
+        $.echo,
+        $.increment,
+        $.decrement,
       ),
 
     expression: ($) => 
@@ -68,11 +94,60 @@ module.exports = grammar({
         $.identifier,
         $.predicate,
         $.access,
-
-        //statements? 
-        $.include,
-        $.render
       ),
+
+
+    //TODO: handle needed paired tags to statements for liquid tag
+    _paired_statement: ($) =>
+      choice(
+        $.if_statement,
+        $.unless_statement,
+      ),
+
+
+    //should probably just explicitly define these lol
+    ...[
+        ["include", "string"],
+        ["section", "string"],
+        ["sections", "string"],
+        ["echo", "expression"],
+        ["increment", "identifier"],
+        ["decrement", "identifier"],
+    ].reduce(
+      (symbols, [identifier, arg_type]) => 
+        (symbols[identifier] = ($) => 
+          seq(identifier, $[arg_type]),
+          symbols
+        ),
+      {},
+    ),
+    layout: ($) => seq("layout", choice($.string, "none")),
+
+    // ...[
+    //     "include",
+    //     "section",
+    //     "sections",
+    //     "echo",
+    //     "increment",
+    //     "decrement",
+    //     "layout",
+    // ].reduce(
+    //   (symbols, identifier) => 
+    //     (symbols[identifier] = (_) => identifier, symbols),
+    //   {},
+    // ),
+
+    // _unary_statement: ($) => 
+    //   choice(...[
+    //     [$.include, $.string],
+    //     [$.section, $.string ],
+    //     [$.sections, $.string],
+    //     [$.echo, $.expression],
+    //     [$.increment, $.identifier],
+    //     [$.decrement, $.identifier],
+    //     [$.layout, choice($.string, "none")],
+    //   ].map(([fn, arg]) => seq(fn, arg))
+    //   ),
 
     filter: ($) =>
       seq(
@@ -103,26 +178,39 @@ module.exports = grammar({
 
     string: (_) => 
       choice(
-        seq("'", /[^']*/, "'"),
-        seq('"', /[^"]*/, '"')
+        seq("'", repeat(/[^']/), "'"),
+        seq('"', repeat(/[^"]/), '"')
       ),
 
-    number: (_) => /\d+/,
+    number: (_) => /-?\d*\.?\d+/,
 
     boolean: (_) => choice("true", "false"),
 
-    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
-
-    include: ($) =>
-      seq(
-        field("include", "include"),
-        field("included_file", $.string)
-      ),
 
     render: ($) =>
       seq(
         field("render", "render"),
-        field("rendered_file", $.string)
+        field( "rendered_file", $.string),
+        optional(
+          field(
+            "param",
+            choice(
+              seq(",", $.argument_list),
+              $.opt_as_expr)
+          )
+        )
+      ),
+
+    opt_as_expr: ($) => 
+      seq(
+        choice("with", "for"),
+        field("item", $.identifier),
+        optional(
+          seq(
+            "as",
+            field("identifier", $.identifier)
+          )
+        )
       ),
 
     argument_list: ($) =>
@@ -137,6 +225,8 @@ module.exports = grammar({
         ":",
         field("value", choice($._literal, $.identifier))
       ),
+
+    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
 
     predicate: ($) =>
       choice(
@@ -167,10 +257,10 @@ module.exports = grammar({
         )
       ),
 
-    // for, cycle, pageinate, range, tablerow - https://shopify.dev/docs/api/liquid/tags/iteration-tags
+    // for (break, continue), cycle, pageinate, range, tablerow - https://shopify.dev/docs/api/liquid/tags/iteration-tags
+    // should write inner tag logic as expressions for including in liquid tag??
     // iteration: () =>, 
 
-    conditional: ($) => choice($.if_tag, $.unless_tag),
 
     unless_tag: ($) =>
       seq(
@@ -206,16 +296,56 @@ module.exports = grammar({
         ),
       ),
 
-    //WIP
-    //erroring on liquid tag block content
-    //inline comment
-    comment: ($) =>
+    //case: ($) =>,
+
+    ////
+    // paired statements for liquid tag
+    ////
+    unless_statement: ($) =>
       seq(
-        $._tag_open, "comment", $._tag_close, 
-        repeat(/.|\s/),
-        $._tag_open, "endcomment", $._tag_close, 
+        seq("unless", field("condition", $.expression)),
+        field("consequence", alias($._liquid_block, $.block)),
+        "endunless"
       ),
 
+    if_statement: ($) =>
+      seq(
+        "if", field("condition", $.expression),
+        field("consequence", alias($._liquid_block, $.block)),
+        repeat(field("alternatives", $.elseif_statement)),
+        optional(field("alternatives", $.else_statement)),
+        "endif"
+      ),
+
+    elseif_statement: ($) =>
+      prec.left(
+        1,
+        seq(
+          "elseif", field("condition", $.expression),
+          field("consequence", alias($._liquid_block, $.block)),
+        ),
+      ),
+
+    else_statement: ($) =>
+      prec.left(
+        1,
+        seq(
+          "else",
+          field("consequence", alias($._liquid_block, $.block))
+        ),
+      ),
+
+    //case: ($) =>,
+
+    //TODO: inline comments
+    comment: (_) =>
+      seq(
+        alias("{%", ""), "comment", alias("%}", ""), 
+        repeat(/./),
+
+        //hacky way of dealing with {% terminating sequence 
+        "endcomment", alias("%}", ""), 
+      ),
   },
 
 });

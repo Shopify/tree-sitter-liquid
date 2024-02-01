@@ -198,48 +198,204 @@ Compound Method Call With Filter
  (content))
 
 ==================
-If Statement
+Render 
 ==================
 
 <html>
-  {{ if data.page != blank }}
-    hello
-  {{ endif }}
+  {% render 'filename' %}
 </html>
 
 ---
 (template
  (content)
  (tag
-  (conditional
-   (if_tag
-    condition: (expression
-      (predicate
-       left: (expression 
-         (access
-          receiver: (identifier)
-          method: (identifier)))
-       right: (expression 
-         (identifier))))
-      consequence: (block
-        (content)))))
-   (content))
+  (statement
+   (render
+    rendered_file: (string))))
+ (content))
+
+==================
+Render Loop
+==================
+
+<html>
+  {% render 'filename' for array as item %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (statement
+   (render
+    rendered_file: (string)
+      param: (opt_as_expr
+        item: (identifier)
+        identifier: (identifier)))))
+ (content))
+
+==================
+Render With
+==================
+
+<html>
+  {% render 'filename' with object%}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (statement
+   (render
+    rendered_file: (string)
+      param: (opt_as_expr
+        item: (identifier)))))
+ (content))
+
+==================
+Render Variable
+==================
+
+<html>
+  {% render 'filename', variable: value %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (statement
+   (render
+    rendered_file: (string)
+    param: (argument_list
+      (argument
+       key: (identifier)
+       value: (identifier))))))
+ (content))
+
+==================
+Include 
+==================
+
+<html>
+  {% include 'filename' %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (statement
+   (include
+    (string))))
+ (content))
+
+==================
+If Statement
+==================
+
+<html>
+  {% if data.page != blank %}
+    hello
+  {% endif %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (if_tag
+   condition: (expression
+     (predicate
+      left: (expression 
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+      right: (expression 
+        (identifier))))
+   consequence: (block
+     (content))))
+ (content))
 
 ==================
 Paired Tag Comment
 ==================
 
 <html>
-  {{ comment }}
+  {% comment %}
     {{ data.page.title | reverse }}
-      <div>hi</div>
-  {{ endcomment }}
+    {% render "something" %}
+    <div>hi</div>
+    {{ data.page }}
+    asdf
+  {% endcomment %}
 </html>
 
 ---
+()
 
 
+==================
+Liquid Tag
+==================
 
+<html>
+  {% liquid
+    include "file"
+    assign product_type = product.type | downcase
 
+    if product_type != blank
+      echo product_type
+    else
+      assign product_type = "type"
+    endif
+  %}
+</html>
 
+---
+(template
+ (content)
+ (tag
+  (liquid_tag
+   (statement
+    (include
+     (string)))
+   (statement
+    (assignment
+     (identifier)
+     (expression
+      (filter
+       (expression
+        (access
+         (identifier)
+         (identifier)))
+       (identifier)))))
+   (if_statement
+    (expression
+     (predicate
+      (expression
+       (identifier))
+      (expression
+       (identifier))))
+    (block
+     (statement
+      (echo
+       (expression
+        (identifier)))))
+    (else_statement
+     (block
+      (statement
+       (assignment
+        (identifier)
+        (expression
+         (string)))))))))
+(content))
+
+==================
+String Embeded Expression
+==================
+
+<div class="page-width featured-column featured-column-{{ render.asdf }} fadeIn" data-wow-delay="100ms">
+---
 

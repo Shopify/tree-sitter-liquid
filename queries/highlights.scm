@@ -1,12 +1,12 @@
 [
-  "{{"
-  "}}"
-  "{{-"
-  "-}}"
-  "{%"
-  "%}"
-  "{%-"
-  "-%}"
+ "{{"
+ "}}"
+ "{{-"
+ "-}}"
+ "{%"
+ "%}"
+ "{%-"
+ "-%}"
 ] @tag.delimiter
 
 [
@@ -14,14 +14,13 @@
  "."
  ":"
  ","
-  (predicate)
+ (predicate)
 ] @operator
 
-[
-  (filter)
-  (include)
-  (render)
-] @function.call
+(filter
+  body: (identifier)
+  name: (identifier) @function.call
+  )
 
 [
  (statement)
