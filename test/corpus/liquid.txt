@@ -38,7 +38,7 @@ Filter w/ variable
 ==================
 
 <html>
-  {% assign space = " " %}
+  {%assign space = " " %}
   <div>{{ 'string two' | split: space }}</div>
 </html>
 
@@ -177,7 +177,7 @@ Compound Method Call With Filter
 ==================
 
 <html>
-  {{ data.page.title | reverse}}
+  {{ data["page"].title | reverse}}
 </html>
 
 ---
@@ -192,7 +192,7 @@ Compound Method Call With Filter
       receiver:
       (access
        receiver: (identifier)
-       method: (identifier))
+       method: (string))
       method: (identifier)))
     name: (identifier))))
  (content))
@@ -296,7 +296,7 @@ If Statement
 ==================
 
 <html>
-  {% if data.page != blank %}
+  {% if data.url != blank %}
     hello
   {% endif %}
 </html>
@@ -319,13 +319,136 @@ If Statement
  (content))
 
 ==================
+If Contains Statement
+==================
+
+<html>
+  {% if product.tags contains 'healing' %}
+    This potion contains restorative properties.
+  {% endif %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (if_tag
+   condition: (expression
+     (predicate
+      left: (expression 
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+      right: (expression 
+        (string))))
+   consequence: (block
+     (content))))
+ (content))
+
+==================
+Multi Level If
+==================
+
+<html>
+  {%- if template contains 'list' -%}
+    {%- assign limit = section.settings.grid | times: section.settings.rows -%}
+  {% elseif sections.settings.grid == 10 %}
+    {{ render "page" }}
+  {%- else -%}
+    {%- assign limit = 16 -%}
+  {%- endif -%}
+</html>
+
+---
+()
+
+==================
+Unless
+==================
+
+<html>
+  {% unless product.has_only_default_variant %}
+    expression
+  {% endunless %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (unless_tag
+   condition: (expression 
+     (access 
+      receiver: (identifier)
+      method: (identifier)))
+   consequence: (block 
+     (content))))
+ (content))
+
+==================
+Case
+==================
+
+<html>
+  {% case product.type %}
+    {% when 'Love' or "whateva" %}
+      This is a love or luck potion.
+    {% when 'Strength' %}
+      This is a strength or health potion.
+    {% else %}
+      This is a potion.
+  {% endcase %}
+</html>
+
+---
+()
+
+
+==================
+For Loop Reversed
+==================
+
+<html>
+  {% for product in collection.products reversed -%}
+    {{ product.title }}
+  {%- endfor %}
+</html>
+---
+()
+
+==================
+For Loop Offest
+==================
+
+<html>
+  {% for product in collection.products offest: 2 -%}
+    {{ product.title }}
+  {%- endfor %}
+</html>
+---
+()
+
+==================
+For Loop With Range
+==================
+
+<html>
+  {% for i in (1..upper_limit) -%}
+    {{ i }}
+    {{ break }}
+  {%- endfor %}
+</html>
+---
+()
+
+==================
 Paired Tag Comment
 ==================
 
 <html>
   {% comment %}
-    {{ data.page.title | reverse }}
     {% render "something" %}
+    {{ data.page.title | reverse }}
     <div>hi</div>
     {{ data.page }}
     asdf
@@ -333,7 +456,26 @@ Paired Tag Comment
 </html>
 
 ---
-()
+(template
+ (content)
+  (tag
+    (comment))
+ (content))
+
+==================
+Inline Comment
+==================
+
+<html>
+  {% render #comment %}
+</html>
+
+---
+(template
+ (content)
+  (tag
+    (comment))
+ (content))
 
 
 ==================
@@ -393,9 +535,55 @@ Liquid Tag
 (content))
 
 ==================
-String Embeded Expression
+Liquid Tag With Case
 ==================
 
-<div class="page-width featured-column featured-column-{{ render.asdf }} fadeIn" data-wow-delay="100ms">
+<html>
+  {% liquid
+
+    assign product_type = product.type | downcase
+    assign message = ''
+
+    case product_type
+      when 'health'
+        assign message = 'This is a health potion!'
+      when 'love'
+        assign message = 'This is a love potion!'
+      else
+        assign message = 'This is a potion!'
+    endcase
+
+    echo message
+  %}
+</html>
+
 ---
+()
+
+==================
+Liquid Tag With For Loop
+==================
+
+<html>
+  {% liquid
+
+    for product_type in product.types
+      echo product_type
+    endfor
+  %}
+</html>
+
+---
+()
+
+==================
+Embeded String Expression With Statment Keyword As Access
+==================
+
+<html>
+  <div class="width-{{ render.asdf }} fadeIn" data-delay="100ms">
+</html>
+
+---
+()
 

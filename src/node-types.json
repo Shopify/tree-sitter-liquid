@@ -1,5 +1,10 @@
 [
   {
+    "type": "",
+    "named": false,
+    "fields": {}
+  },
+  {
     "type": "access",
     "named": true,
     "fields": {
@@ -9,6 +14,14 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -48,6 +61,10 @@
         "required": true,
         "types": [
           {
+            "type": "access",
+            "named": true
+          },
+          {
             "type": "boolean",
             "named": true
           },
@@ -75,6 +92,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "access",
+          "named": true
+        },
         {
           "type": "argument",
           "named": true
@@ -133,11 +154,19 @@
       "required": true,
       "types": [
         {
+          "type": "case_statment",
+          "named": true
+        },
+        {
           "type": "content",
           "named": true
         },
         {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "for_loop_statement",
           "named": true
         },
         {
@@ -163,6 +192,86 @@
     "type": "boolean",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "case_statment",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "else_statement",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "when_statement",
+            "named": true
+          }
+        ]
+      },
+      "receiver": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "case_tag",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "else_tag",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "when_tag",
+            "named": true
+          }
+        ]
+      },
+      "receiver": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "comment",
@@ -226,7 +335,7 @@
     "fields": {
       "consequence": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "block",
@@ -278,7 +387,7 @@
       },
       "consequence": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "block",
@@ -364,6 +473,218 @@
     }
   },
   {
+    "type": "for_loop_statement",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "case_statment",
+            "named": true
+          },
+          {
+            "type": "expression",
+            "named": true
+          },
+          {
+            "type": "for_loop_statement",
+            "named": true
+          },
+          {
+            "type": "if_statement",
+            "named": true
+          },
+          {
+            "type": "statement",
+            "named": true
+          },
+          {
+            "type": "unless_statement",
+            "named": true
+          }
+        ]
+      },
+      "item": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "iterator": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "modifier": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "range": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "..",
+            "named": false
+          },
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "else_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "for_loop_tag",
+    "named": true,
+    "fields": {
+      "block": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "content",
+            "named": true
+          },
+          {
+            "type": "tag",
+            "named": true
+          }
+        ]
+      },
+      "item": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "iterator": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "modifier": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "range": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "..",
+            "named": false
+          },
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "else_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "if_statement",
     "named": true,
     "fields": {
@@ -433,7 +754,7 @@
       },
       "consequence": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "block",
@@ -482,7 +803,15 @@
       "required": true,
       "types": [
         {
+          "type": "case_statment",
+          "named": true
+        },
+        {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "for_loop_statement",
           "named": true
         },
         {
@@ -594,6 +923,10 @@
           },
           {
             "type": "and",
+            "named": false
+          },
+          {
+            "type": "contains",
             "named": false
           },
           {
@@ -745,11 +1078,19 @@
       "required": true,
       "types": [
         {
+          "type": "case_tag",
+          "named": true
+        },
+        {
           "type": "comment",
           "named": true
         },
         {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "for_loop_tag",
           "named": true
         },
         {
@@ -843,8 +1184,56 @@
     }
   },
   {
-    "type": "",
-    "named": false
+    "type": "when_statement",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "when_tag",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "!=",
@@ -852,6 +1241,10 @@
   },
   {
     "type": "\"",
+    "named": false
+  },
+  {
+    "type": "#",
     "named": false
   },
   {
@@ -864,6 +1257,14 @@
   },
   {
     "type": "'",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
     "named": false
   },
   {
@@ -892,6 +1293,10 @@
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": "..",
     "named": false
   },
   {
@@ -927,6 +1332,14 @@
     "named": false
   },
   {
+    "type": "[",
+    "named": false
+  },
+  {
+    "type": "]",
+    "named": false
+  },
+  {
     "type": "^",
     "named": false
   },
@@ -943,7 +1356,15 @@
     "named": false
   },
   {
+    "type": "case",
+    "named": false
+  },
+  {
     "type": "comment",
+    "named": false
+  },
+  {
+    "type": "contains",
     "named": false
   },
   {
@@ -963,7 +1384,15 @@
     "named": false
   },
   {
+    "type": "endcase",
+    "named": false
+  },
+  {
     "type": "endcomment",
+    "named": false
+  },
+  {
+    "type": "endfor",
     "named": false
   },
   {
@@ -988,6 +1417,10 @@
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "in",
     "named": false
   },
   {
@@ -1039,6 +1472,10 @@
     "named": false
   },
   {
+    "type": "when",
+    "named": false
+  },
+  {
     "type": "with",
     "named": false
   },
@@ -1060,6 +1497,10 @@
   },
   {
     "type": "{{-",
+    "named": false
+  },
+  {
+    "type": "{{{",
     "named": false
   },
   {
