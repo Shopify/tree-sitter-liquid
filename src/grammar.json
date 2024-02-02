@@ -1315,6 +1315,57 @@
         }
       ]
     },
+    "range": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "access"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "number"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ".."
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "access"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "number"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
     "for_loop_tag": {
       "type": "PREC",
       "value": 1,
@@ -1399,7 +1450,7 @@
                     "name": "range",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_range"
+                      "name": "range"
                     }
                   }
                 ]
@@ -1414,7 +1465,7 @@
             "type": "FIELD",
             "name": "block",
             "content": {
-              "type": "REPEAT1",
+              "type": "REPEAT",
               "content": {
                 "type": "SYMBOL",
                 "name": "_node"
@@ -1447,57 +1498,6 @@
           }
         ]
       }
-    },
-    "_range": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "("
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "identifier"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "access"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "number"
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": ".."
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "identifier"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "access"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "number"
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": ")"
-        }
-      ]
     },
     "unless_tag": {
       "type": "SEQ",
@@ -1803,12 +1803,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "alternative",
-          "content": {
-            "type": "SYMBOL",
-            "name": "else_tag"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alternative",
+              "content": {
+                "type": "SYMBOL",
+                "name": "else_tag"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -1904,7 +1912,7 @@
                     "name": "range",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_range"
+                      "name": "range"
                     }
                   }
                 ]
@@ -2168,12 +2176,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "alternative",
-          "content": {
-            "type": "SYMBOL",
-            "name": "else_statement"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alternative",
+              "content": {
+                "type": "SYMBOL",
+                "name": "else_statement"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "STRING",

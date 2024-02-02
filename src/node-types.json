@@ -199,7 +199,7 @@
     "fields": {
       "alternative": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "else_statement",
@@ -239,7 +239,7 @@
     "fields": {
       "alternative": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "else_tag",
@@ -545,31 +545,11 @@
         ]
       },
       "range": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": "..",
-            "named": false
-          },
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "number",
+            "type": "range",
             "named": true
           }
         ]
@@ -592,7 +572,7 @@
     "fields": {
       "block": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "content",
@@ -643,31 +623,11 @@
         ]
       },
       "range": {
-        "multiple": true,
+        "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "(",
-            "named": false
-          },
-          {
-            "type": ")",
-            "named": false
-          },
-          {
-            "type": "..",
-            "named": false
-          },
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "number",
+            "type": "range",
             "named": true
           }
         ]
@@ -945,6 +905,29 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "range",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "access",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
     }
   },
   {

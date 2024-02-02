@@ -41,7 +41,6 @@ module.exports = grammar({
     _tag_close: (_) => choice("}}", "-}}", "%}", "-%}"),
 
     //TODO:
-    //iteration
     //raw tag
     //form tag
     //javascript tag
@@ -246,6 +245,16 @@ module.exports = grammar({
         )
       ),
 
+    range: ($) => 
+      seq(
+        "(", 
+        choice($.identifier, $.access, $.number),
+        "..", 
+        choice($.identifier, $.access, $.number), 
+        ")"
+      ),
+
+
     /////////////////
     // Paired Tags //
     /////////////////
@@ -265,23 +274,14 @@ module.exports = grammar({
                 field("iterator", choice($.identifier, $.access)), 
                 optional(field("modifier", choice($.argument_list, $.identifier))), 
               ),
-              field("range", $._range)
+              field("range", $.range)
             ),
             $._tag_close
           ),
-          field("block", repeat1($._node)),
+          field("block", repeat($._node)),
           optional($.else_tag),
           $._tag_open, "endfor", $._tag_close,
         )
-      ),
-
-    _range: ($) => 
-      seq(
-        "(", 
-        choice($.identifier, $.access, $.number),
-        "..", 
-        choice($.identifier, $.access, $.number), 
-        ")"
       ),
 
     unless_tag: ($) =>
@@ -332,7 +332,7 @@ module.exports = grammar({
       seq(
         $._tag_open, "case", field("receiver", choice($.identifier, $.access)), $._tag_close,
         repeat(field("consequence", $.when_tag)),
-        field("alternative", $.else_tag),
+        optional(field("alternative", $.else_tag)),
         $._tag_open, "endcase", $._tag_close, 
       ),
 
@@ -352,7 +352,7 @@ module.exports = grammar({
                 field("iterator", choice($.identifier, $.access)), 
                 optional(field("modifier", choice($.argument_list, $.identifier))), 
               ),
-              field("range", $._range)
+              field("range", $.range)
             ),
           ),
           field("block", $._liquid_block),
@@ -360,7 +360,7 @@ module.exports = grammar({
           "endfor"
         )
       ),
-    
+
     unless_statement: ($) =>
       seq(
         seq("unless", field("condition", $.expression)),
@@ -409,7 +409,7 @@ module.exports = grammar({
       seq(
         "case", field("receiver", choice($.identifier, $.access)),
         repeat1(field("consequence", $.when_statement)),
-        field("alternative", $.else_statement),
+        optional(field("alternative", $.else_statement)),
         "endcase", 
       ),
 
@@ -417,7 +417,7 @@ module.exports = grammar({
     //////////////
     // Comments //
     //////////////
-    
+
     //TODO: inline comments, may need scanner
     _inline_comment: $ => seq("#", repeat(/./), $._tag_close),
 

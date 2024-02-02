@@ -549,8 +549,6 @@ Liquid Tag With Case
         assign message = 'This is a health potion!'
       when 'love'
         assign message = 'This is a love potion!'
-      else
-        assign message = 'This is a potion!'
     endcase
 
     echo message
@@ -581,7 +579,7 @@ Embeded String Expression With Statment Keyword As Access
 ==================
 
 <html>
-  <div class="width-{{ render.asdf }} fadeIn" data-delay="100ms">
+<div class="width-{{ render.asdf }} fadeIn" data-delay="100ms">
 </html>
 
 ---
