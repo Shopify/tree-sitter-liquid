@@ -353,9 +353,12 @@ Multi Level If
   {%- if template contains 'list' -%}
     {%- assign limit = section.settings.grid | times: section.settings.rows -%}
   {% elseif sections.settings.grid == 10 %}
-    {{ render "page" }}
+    <div class="page -header text-center">
+      {{ render "thing" }}
+    </div>
   {%- else -%}
     {%- assign limit = 16 -%}
+    <div class="collection-hero-{{ limit }}">
   {%- endif -%}
 </html>
 
@@ -392,11 +395,14 @@ Case
 <html>
   {% case product.type %}
     {% when 'Love' or "whateva" %}
+      <div class="collection-hero-{{ product.title }}">
       This is a love or luck potion.
     {% when 'Strength' %}
+      {{ render "file" }}
       This is a strength or health potion.
     {% else %}
       This is a potion.
+      {{ render "file" }}
   {% endcase %}
 </html>
 
@@ -581,6 +587,21 @@ Embeded String Expression With Statment Keyword As Access
 <html>
 <div class="width-{{ render.asdf }} fadeIn" data-delay="100ms">
 </html>
+
+---
+()
+
+==================
+Random Broken Content
+==================
+
+{% if section.settings.show_collection_image and collection.image %}
+  <div class="collection-hero">
+{% else %}
+  <div class="page -header text-center">
+    {{ render "thing" }}
+  </div>
+{% endif %}
 
 ---
 ()
