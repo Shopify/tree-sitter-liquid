@@ -1,21 +1,25 @@
-const PREC = {
+const PRECS = {
     primary: 1,
     else_if: 1,
     else: 2,
 }
 
-// refences
+// refrences
 // https://github.com/ngalaiko/tree-sitter-go-template/
 
 module.exports = grammar({
   name: "liquid",
 
-  word: $ => $.identifier,
+  word: ($) => $.identifier,
 
-  conflicts: $ => [
+  conflicts: ($) => [
     [$.else_tag],
     [$.elseif_tag],
-    [$.when_tag]
+    [$.when_tag],
+
+    [$.else_statement],
+    [$.elseif_statement],
+    [$.when_statement],
   ],
 
   precedences: (_) => [
@@ -45,9 +49,23 @@ module.exports = grammar({
         $.content,
       ),
 
-    content: (_) => prec.right(repeat1(choice(/[^{]+|\{/, '{%%', '{{{'))),
+    content: (_) => 
+      prec.right(
+        repeat1(
+          choice(
+            /[^{]+|\{/, 
+            '{%%', 
+            '{{{'
+          )
+        )
+      ),
 
-    tag: ($) => prec(2, choice($._unpaired_tag, $._paired_tag)),
+    tag: ($) => 
+      //not sure if i need this prec -- do some testing
+      prec(
+        2, 
+        choice($._unpaired_tag, $._paired_tag)
+      ),
 
 
     //TODO:
@@ -56,7 +74,7 @@ module.exports = grammar({
     //javascript tag
     //stylesheet tag
     //capture tag
-    //handle schemea tags inject json
+    //schemea tags, and inject json
     _paired_tag: ($) => 
       choice(
         $.if_tag,
@@ -73,10 +91,9 @@ module.exports = grammar({
         $._tag_close,
       ),
 
-    liquid_tag: ($) => seq("liquid", $._liquid_block),
+    liquid_tag: ($) => seq("liquid", repeat($._liquid_node)),
 
-    _liquid_block: ($) =>
-      repeat1(
+    _liquid_node: ($) =>
         seq(
           choice(
             $.expression,
@@ -84,7 +101,6 @@ module.exports = grammar({
             $._paired_statement,
           ),
           /(\r\n|\r|\n)/,
-        )
       ),
 
     statement: ($) =>
@@ -106,6 +122,9 @@ module.exports = grammar({
         $.identifier,
         $.predicate,
         $.access,
+
+        //currently not working
+        alias($._inline_comment, $.comment),
       ),
 
 
@@ -127,66 +146,72 @@ module.exports = grammar({
     //
     // cleanup precs and test further, esp with mulit node else/ifelse blocks
     for_loop_tag: ($) => 
-      prec(1,
+      prec(
+        1,
         seq(
-          seq(
-            $._tag_open,
-            "for",
-            field("item", $.identifier),
-            "in", 
-            choice(
-              seq(
-                field("iterator", choice($.identifier, $.access)), 
-                optional(field("modifier", choice($.argument_list, $.identifier))), 
-              ),
-              field("range", $.range)
-            ),
-            $._tag_close
-          ),
-          field("block", repeat($._node)),
-          optional($.else_tag),
-          $._tag_open, "endfor", $._tag_close,
+          $._tag_open, 
+          "for", field("item", $.identifier), "in", 
+          field("iterator", choice($.identifier, $.access, $.range)), 
+          optional(field("modifier", choice($.argument_list, $.identifier))), 
+          $._tag_close,
+
+          field("body", alias(repeat($._node), $.block)),
+          optional(field("alternative", $.else_tag)),
+
+          prec.right(0, seq($._tag_open, "endfor", $._tag_close)),
         )
       ),
 
     unless_tag: ($) =>
       seq(
-        $._tag_open, "unless", field("condition", $.expression), $._tag_close,
+        $._tag_open, 
+        "unless", field("condition", $.expression), 
+        $._tag_close,
+
         field("consequence", alias(repeat($._node), $.block)),
+
         $._tag_open, "endunless", $._tag_close, 
       ),
 
     if_tag: ($) =>
       seq(
-        $._tag_open, "if", field("condition", $.expression), $._tag_close, 
-        repeat($._node),
-        repeat($.elseif_tag),
-        optional($.else_tag),
+        $._tag_open, 
+        "if", field("condition", $.expression), 
+        $._tag_close, 
+
+        field("consequence", alias(repeat($._node), $.block)),
+        repeat(field("alternative", $.elseif_tag)),
+        optional(field("alternative", $.else_tag)),
+
         prec.right(0, seq($._tag_open, "endif", $._tag_close)), 
       ),
 
     elseif_tag: ($) =>
       prec.dynamic(
-        PREC.else_if,
+        PRECS.else_if,
         seq(
-          $._tag_open, "elseif", field("condition", $.expression), $._tag_close,
+          $._tag_open, 
+          "elseif", field("condition", $.expression), 
+          $._tag_close,
+
           alias(repeat($._node), $.block),
         ),
       ),
 
     else_tag: ($) =>
       prec.dynamic(
-        PREC.else,
+        PRECS.else,
         seq(
           $._tag_open, "else", $._tag_close,
+
           alias(repeat($._node), $.block),
       )),
 
     when_tag: ($) => 
       prec.dynamic(
-        PREC.else_if,
+        PRECS.else_if,
         seq(
-          //condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
+          // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
           $._tag_open, "when", field("condition", $.expression), $._tag_close,
           field("consequence", alias(repeat($._node), $.block)),
         ),
@@ -194,9 +219,13 @@ module.exports = grammar({
 
     case_tag: ($) =>
       seq(
-        $._tag_open, "case", field("receiver", choice($.identifier, $.access)), $._tag_close,
-        repeat(field("consequence", $.when_tag)),
+        $._tag_open, 
+        "case", field("receiver", choice($.identifier, $.access)), 
+        $._tag_close,
+
+        field("conditions", alias(repeat($.when_tag), $.block)),
         optional(field("alternative", $.else_tag)),
+
         prec.right(0, seq($._tag_open, "endcase", $._tag_close)),
       ),
 
@@ -204,100 +233,119 @@ module.exports = grammar({
     //////////////////////////////////////
     // Paired Statements For Liquid Tag //
     //////////////////////////////////////
-    //
-    //TODO: test / handle multi node if/case and set precs, re: paired tags
     
     for_loop_statement: ($) => 
-      prec(1,
+      prec(
+        1,
         seq(
-          seq(
-            "for",
-            field("item", $.identifier),
-            "in", 
-            choice(
-              seq(
-                field("iterator", choice($.identifier, $.access)), 
-                optional(field("modifier", choice($.argument_list, $.identifier))), 
-              ),
-              field("range", $.range)
-            ),
-          ),
-          field("block", $._liquid_block),
-          optional($.else_statement),
-          "endfor"
+          "for", field("item", $.identifier), "in", 
+          field("iterator", choice($.identifier, $.access, $.range)), 
+          optional(field("modifier", choice($.argument_list, $.identifier))), 
+
+          field("body", alias(repeat($._liquid_node), $.block)),
+          optional(field("alternative", $.else_statement)),
+
+          prec.right(0, "endfor"),
         )
       ),
 
     unless_statement: ($) =>
       seq(
-        seq("unless", field("condition", $.expression)),
-        field("consequence", alias($._liquid_block, $.block)),
-        "endunless"
+        "unless", field("condition", $.expression),
+
+        field("consequence", alias(repeat($._liquid_node), $.block)),
+
+        "endunless",
       ),
 
     if_statement: ($) =>
       seq(
         "if", field("condition", $.expression),
-        field("consequence", alias($._liquid_block, $.block)),
-        repeat(field("alternatives", $.elseif_statement)),
-        optional(field("alternatives", $.else_statement)),
-        "endif"
+
+        field("consequence", alias(repeat($._liquid_node), $.block)),
+        repeat(field("alternative", $.elseif_statement)),
+        optional(field("alternative", $.else_statement)),
+
+        prec.right(0, "endif"), 
       ),
 
     elseif_statement: ($) =>
-      prec.left(
-        1,
+      prec.dynamic(
+        PRECS.else_if,
         seq(
           "elseif", field("condition", $.expression),
-          field("consequence", alias($._liquid_block, $.block)),
+          alias(repeat($._liquid_node), $.block),
         ),
       ),
 
     else_statement: ($) =>
-      prec.left(
-        1,
+      prec.dynamic(
+        PRECS.else,
         seq(
           "else",
-          field("consequence", alias($._liquid_block, $.block))
-        ),
+          alias(repeat($._liquid_node), $.block),
+        )
       ),
 
     when_statement: ($) => 
-      prec.left(
-        1,
+      prec.dynamic(
+        PRECS.else_if,
         seq(
-          //condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
+          // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
           "when", field("condition", $.expression),
-          field("consequence", alias($._liquid_block, $.block)),
+          field("consequence", alias(repeat($._liquid_node), $.block)),
         ),
       ),
 
     case_statment: ($) =>
       seq(
         "case", field("receiver", choice($.identifier, $.access)),
-        repeat1(field("consequence", $.when_statement)),
+
+        field("conditions", alias(repeat($.when_statement), $.block)),
         optional(field("alternative", $.else_statement)),
-        "endcase", 
+
+        prec.right(0, "endcase"),
       ),
 
-    //should probably just explicitly define these lol
-    ...[
-      ["include", "string"],
-      ["section", "string"],
-      ["sections", "string"],
-      ["echo", "expression"],
-      ["increment", "identifier"],
-      ["decrement", "identifier"],
-    ].reduce(
-      (symbols, [identifier, arg_type]) => 
-        (symbols[identifier] = ($) => 
-          seq(identifier, $[arg_type]),
-          symbols
-        ),
-      {},
-    ),
+
+    /////////////////////////////////////////
+    // Unpaired Expressions And Statements //
+    /////////////////////////////////////////
+
+    // TODO: fix namespace conflicts between below keyword identifiers and access/method calls
+    echo: $ => seq("echo", $.expression),
+    include: $ => seq("include", $.string),
+    section: $ => seq("section", $.string),
+    sections: $ => seq("sections", $.string),
+    increment: $ => seq("increment", $.identifier),
+    decrement: $ => seq("decrement", $.identifier),
     layout: ($) => seq("layout", choice($.string, "none")),
 
+    render: ($) =>
+      seq(
+        "render",
+        field( "file", $.string),
+        optional(
+          field(
+            "modifier",
+            choice(
+              seq(",", $.argument_list),
+              $.opt_as_expr)
+          )
+        )
+      ),
+
+    opt_as_expr: ($) => 
+      seq(
+        choice("with", "for"),
+        field("item", $.identifier),
+        optional(
+          seq(
+            "as",
+            field("identifier", $.identifier)
+          )
+        )
+      ),
 
     filter: ($) =>
       seq(
@@ -344,6 +392,15 @@ module.exports = grammar({
         field("value", $.expression)
       ),
 
+    range: ($) => 
+      seq(
+        "(", 
+        field("start", choice($.identifier, $.access, $.number)),
+        "..", 
+        field("end", choice($.identifier, $.access, $.number)),
+        ")"
+      ),
+
     _literal: ($) => choice($.string, $.number, $.boolean),
 
     string: (_) => 
@@ -355,33 +412,6 @@ module.exports = grammar({
     number: (_) => /-?\d*\.?\d+/,
 
     boolean: (_) => choice("true", "false"),
-
-
-    render: ($) =>
-      seq(
-        field("render", "render"),
-        field( "rendered_file", $.string),
-        optional(
-          field(
-            "param",
-            choice(
-              seq(",", $.argument_list),
-              $.opt_as_expr)
-          )
-        )
-      ),
-
-    opt_as_expr: ($) => 
-      seq(
-        choice("with", "for"),
-        field("item", $.identifier),
-        optional(
-          seq(
-            "as",
-            field("identifier", $.identifier)
-          )
-        )
-      ),
 
     identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
 
@@ -402,8 +432,8 @@ module.exports = grammar({
           [">", "binary_relation"],
           ["and", "clause_connective"],
           ["or", "clause_connective"],
-
-          //special case?
+          
+          //TODO: is contains a special case?
           ["contains", "contains"],
         ].map(([operator, precedence]) =>
           prec.left(
@@ -415,15 +445,6 @@ module.exports = grammar({
             )
           )
         )
-      ),
-
-    range: ($) => 
-      seq(
-        "(", 
-        choice($.identifier, $.access, $.number),
-        "..", 
-        choice($.identifier, $.access, $.number), 
-        ")"
       ),
 
 
@@ -438,10 +459,15 @@ module.exports = grammar({
       seq(
         alias($._tag_open, ""), "comment", alias($._tag_close, ""), 
         repeat(/./),
+
         //hacky way of dealing with {% terminating sequence 
         "endcomment", alias($._tag_close, ""), 
       ),
 
+
+    ///////////////
+    // Delmiters //
+    ///////////////
 
     // TODO: distinguish between "{{" and "{%" delmiters
     _tag_open: (_) => choice("{{", "{{-", "{%", "{%-"),
@@ -450,3 +476,5 @@ module.exports = grammar({
   },
 
 });
+
+

@@ -211,7 +211,7 @@ Render
  (tag
   (statement
    (render
-    rendered_file: (string))))
+    file: (string))))
  (content))
 
 ==================
@@ -228,10 +228,10 @@ Render Loop
  (tag
   (statement
    (render
-    rendered_file: (string)
-      param: (opt_as_expr
-        item: (identifier)
-        identifier: (identifier)))))
+    file: (string)
+    modifier: (opt_as_expr
+      item: (identifier)
+      identifier: (identifier)))))
  (content))
 
 ==================
@@ -248,9 +248,9 @@ Render With
  (tag
   (statement
    (render
-    rendered_file: (string)
-      param: (opt_as_expr
-        item: (identifier)))))
+    file: (string)
+    modifier: (opt_as_expr
+      item: (identifier)))))
  (content))
 
 ==================
@@ -267,8 +267,8 @@ Render Variable
  (tag
   (statement
    (render
-    rendered_file: (string)
-    param: (argument_list
+    file: (string)
+    modifier: (argument_list
       (argument
        key: (identifier)
        value: (identifier))))))
@@ -351,7 +351,9 @@ Multi Level If
 
 <html>
   {%- if template contains 'list' -%}
-    {%- assign limit = section.settings.grid | times: section.settings.rows -%}
+    <div class="collection-hero-{{ product.title }}">
+      {{ product.color }}
+    </div>
   {% elseif sections.settings.grid == 10 %}
     <div class="page -header text-center">
       {{ render "thing" }}
@@ -363,7 +365,59 @@ Multi Level If
 </html>
 
 ---
-()
+(template
+ (content)
+ (tag
+  (if_tag
+   condition: (expression
+     (predicate 
+      left: (expression (identifier)) 
+      right: (expression (string))))
+   consequence: (block (content)
+     (tag 
+      (expression
+       (access 
+        receiver: (identifier) 
+        method: (identifier))))
+     (content)
+     (tag
+      (expression
+       (access
+        receiver: (identifier)
+        method: (identifier))))
+     (content))
+   alternative: (elseif_tag
+     condition: (expression
+       (predicate
+        left: (expression
+          (access
+           receiver: (access
+             receiver: (identifier)
+             method: (identifier))
+           method: (identifier)))
+        right: (expression
+          (number))))
+     (block
+      (content)
+      (tag
+       (statement
+        (render
+         file: (string))))
+      (content)))
+   alternative: (else_tag
+       (block
+        (tag
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression
+             (number)))))
+        (content)
+        (tag
+         (expression
+          (identifier)))
+        (content)))))
+(content))
 
 ==================
 Unless
@@ -371,7 +425,8 @@ Unless
 
 <html>
   {% unless product.has_only_default_variant %}
-    expression
+    {% assign title = product.name %}
+    <div>{{ title }}</div>
   {% endunless %}
 </html>
 
@@ -385,8 +440,20 @@ Unless
       receiver: (identifier)
       method: (identifier)))
    consequence: (block 
+     (tag 
+      (statement 
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content) 
+     (tag 
+      (expression 
+       (identifier))) 
      (content))))
- (content))
+(content))
 
 ==================
 Case
@@ -394,45 +461,174 @@ Case
 
 <html>
   {% case product.type %}
-    {% when 'Love' or "whateva" %}
-      <div class="collection-hero-{{ product.title }}">
-      This is a love or luck potion.
+    {% when "Love" or "whateva" %}
+      <div class="collection-{{ product.title }}">
+        {{ product.color }}
+      </div>
     {% when 'Strength' %}
       {{ render "file" }}
-      This is a strength or health potion.
+      <p>This is a strength or health potion.</p>
     {% else %}
-      This is a potion.
       {{ render "file" }}
+      <div>content</div>
   {% endcase %}
 </html>
 
 ---
-()
-
+  (template
+   (content)
+   (tag
+    (case_tag
+     receiver: (access
+       receiver: (identifier)
+       method: (identifier))
+     conditions: (block 
+       (when_tag
+        condition: (expression
+          (predicate
+           left: (expression
+             (string))
+           right: (expression
+             (string))))
+        consequence: (block
+          (content)
+          (tag
+           (expression
+            (access
+             receiver: (identifier)
+             method: (identifier))))
+          (content)
+          (tag
+           (expression
+            (access
+             receiver: (identifier)
+             method: (identifier))))
+          (content)))
+       (when_tag
+        condition: (expression
+          (string))
+        consequence: (block
+          (tag
+           (statement
+            (render
+             file: (string))))
+          (content))))
+  alternative: (else_tag
+      (block
+       (tag
+        (statement
+         (render
+          file: (string))))
+       (content)))))
+(content))
 
 ==================
-For Loop Reversed
+Empty Case
 ==================
 
 <html>
-  {% for product in collection.products reversed -%}
-    {{ product.title }}
-  {%- endfor %}
+  {% case product.type %}
+  {% endcase %}
 </html>
+
 ---
-()
+  (template
+   (content)
+   (tag 
+    (case_tag
+     receiver: (access
+       receiver: (identifier)
+       method: (identifier))))
+   (content))
 
 ==================
-For Loop Offest
+For Loop
+==================
+
+<html>
+  {% for product in collection.products -%}
+    {% assign name = product.title %}
+    <div>{{ name }}</div>
+    {{ echo name }}
+  {%- endfor %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (for_loop_tag
+   item: (identifier)
+   iterator: (access
+     receiver: (identifier)
+     method: (identifier))
+   body: (block
+     (tag
+      (statement
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content)
+     (tag
+      (expression
+       (identifier)))
+     (content)
+     (tag
+      (statement
+       (echo
+        (expression
+         (identifier))))))))
+(content))
+
+==================
+For Loop With Offest
 ==================
 
 <html>
   {% for product in collection.products offest: 2 -%}
-    {{ product.title }}
+    {% assign name = product.title %}
+    <div>{{ name }}</div>
+    {{ echo name }}
   {%- endfor %}
 </html>
+
 ---
-()
+
+(template
+ (content)
+ (tag
+  (for_loop_tag
+   item: (identifier)
+   iterator: (access
+     receiver: (identifier)
+     method: (identifier))
+   modifier: (argument_list
+    (argument
+      key: (identifier)
+      value: (number)))
+   body: (block
+     (tag
+      (statement
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content)
+     (tag
+      (expression
+       (identifier)))
+     (content)
+     (tag
+      (statement
+       (echo
+        (expression
+         (identifier))))))))
+(content))
 
 ==================
 For Loop With Range
@@ -444,8 +640,82 @@ For Loop With Range
     {{ break }}
   {%- endfor %}
 </html>
+
 ---
-()
+(template
+ (content)
+ (tag
+  (for_loop_tag
+   item: (identifier)
+   iterator: (range
+    start: (number)
+    end: (identifier))
+   body: (block
+     (tag
+      (expression
+       (identifier)))
+     (tag
+      (expression
+       (identifier))))))
+(content))
+
+==================
+For Loop With Else
+==================
+
+<html>
+  {% for i in array -%}
+    {% assign name = i %}
+    <div>{{ name }}</div>
+    {{ echo name }}
+  {% else %}
+    {% assign name = "cool" %}
+    <div>{{ name }}</div>
+    {{ echo name }}
+  {%- endfor %}
+</html>
+
+---
+  (template
+   (content)
+   (tag
+    (for_loop_tag
+     item: (identifier)
+     iterator: (identifier)
+     body: (block
+       (tag
+        (statement
+         (assignment
+          variable_name: (identifier)
+          value: (expression (identifier)))))
+       (content)
+       (tag
+        (expression
+         (identifier)))
+       (content)
+       (tag
+        (statement
+         (echo
+          (expression
+           (identifier))))))
+     alternative: (else_tag
+       (block
+        (tag
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression (string)))))
+        (content)
+        (tag
+         (expression
+          (identifier)))
+        (content)
+        (tag
+         (statement
+          (echo
+           (expression
+            (identifier)))))))))
+(content))
 
 ==================
 Paired Tag Comment
@@ -469,23 +739,7 @@ Paired Tag Comment
  (content))
 
 ==================
-Inline Comment
-==================
-
-<html>
-  {% render #comment %}
-</html>
-
----
-(template
- (content)
-  (tag
-    (comment))
- (content))
-
-
-==================
-Liquid Tag
+Liquid Tag With If
 ==================
 
 <html>
@@ -494,6 +748,7 @@ Liquid Tag
     assign product_type = product.type | downcase
 
     if product_type != blank
+      product_type | trim
       echo product_type
     else
       assign product_type = "type"
@@ -511,32 +766,37 @@ Liquid Tag
      (string)))
    (statement
     (assignment
-     (identifier)
+     variable_name: (identifier)
+     value: (expression
+      (filter
+       body: (expression
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+       name: (identifier)))))
+   (if_statement
+    condition: (expression
+     (predicate
+      left: (expression
+       (identifier))
+      right: (expression
+       (identifier))))
+    consequence: (block
      (expression
       (filter
-       (expression
-        (access
-         (identifier)
-         (identifier)))
-       (identifier)))))
-   (if_statement
-    (expression
-     (predicate
-      (expression
-       (identifier))
-      (expression
-       (identifier))))
-    (block
+       body: (expression
+        (identifier))
+       name: (identifier)))
      (statement
       (echo
        (expression
         (identifier)))))
-    (else_statement
+    alternative: (else_statement
      (block
       (statement
        (assignment
-        (identifier)
-        (expression
+        variable_name: (identifier)
+        value: (expression
          (string)))))))))
 (content))
 
@@ -553,8 +813,12 @@ Liquid Tag With Case
     case product_type
       when 'health'
         assign message = 'This is a health potion!'
+        echo message | trim
       when 'love'
         assign message = 'This is a love potion!'
+      else
+        render "page"
+        product_type | json
     endcase
 
     echo message
@@ -562,7 +826,72 @@ Liquid Tag With Case
 </html>
 
 ---
-()
+  (template
+   (content)
+   (tag
+    (liquid_tag
+
+     (statement
+      (assignment
+       variable_name: (identifier)
+       value: (expression
+        (filter
+         body: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier)))
+         name: (identifier)))))
+
+     (statement
+      (assignment
+       variable_name: (identifier)
+       value: (expression
+        (string))))
+
+     (case_statment
+      receiver: (identifier)
+      conditions: (block
+       (when_statement
+        condition: (expression
+         (string))
+        consequence: (block
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression
+            (string))))
+         (statement
+          (echo
+           (expression
+            (filter
+             body: (expression
+              (identifier))
+             name: (identifier)))))))
+       (when_statement
+        condition: (expression
+         (string))
+        consequence: (block
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression
+            (string)))))))
+  alternative: (else_statement
+   (block
+    (statement
+     (render
+      file: (string)))
+    (expression
+     (filter
+      body: (expression
+       (identifier))
+      name: (identifier))))))
+
+  (statement
+   (echo
+    (expression
+     (identifier))))))
+(content))
 
 ==================
 Liquid Tag With For Loop
@@ -570,39 +899,59 @@ Liquid Tag With For Loop
 
 <html>
   {% liquid
-
     for product_type in product.types
-      echo product_type
+      assign data = product_type
+      echo data
     endfor
   %}
 </html>
 
 ---
-()
+  (template
+   (content)
+   (tag
+    (liquid_tag
+     (for_loop_statement
+      item: (identifier)
+      iterator: (access
+       receiver: (identifier)
+       method: (identifier))
+      body: (block
+       (statement
+        (assignment
+         variable_name: (identifier)
+         value: (expression
+          (identifier))))
+       (statement
+        (echo
+         (expression
+          (identifier))))))))
+   (content))
 
 ==================
-Embeded String Expression With Statment Keyword As Access
+Statment Keyword As Access Expression
 ==================
 
 <html>
-<div class="width-{{ render.asdf }} fadeIn" data-delay="100ms">
+<div class="width-{{ section.page }} fadeIn" data-delay="100ms">
 </html>
 
 ---
 ()
 
 ==================
-Random Broken Content
+Inline Comment
 ==================
 
-{% if section.settings.show_collection_image and collection.image %}
-  <div class="collection-hero">
-{% else %}
-  <div class="page -header text-center">
-    {{ render "thing" }}
-  </div>
-{% endif %}
+<html>
+  {% render #comment %}
+</html>
 
 ---
-()
+(template
+ (content)
+  (tag
+    (comment))
+ (content))
+
 
