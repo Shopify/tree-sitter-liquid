@@ -4,6 +4,7 @@ const PRECS = {
     else: 2,
 }
 
+
 // refrences
 // https://github.com/ngalaiko/tree-sitter-go-template/
 
@@ -60,27 +61,21 @@ module.exports = grammar({
         )
       ),
 
-    tag: ($) => 
-      //not sure if i need this prec -- do some testing
-      prec(
-        2, 
-        choice($._unpaired_tag, $._paired_tag)
-      ),
-
+    tag: ($) => choice($._unpaired_tag, $._paired_tag),
 
     //TODO:
     //raw tag
     //form tag
+    //schemea tags, and inject json
     //javascript tag
     //stylesheet tag
-    //capture tag
-    //schemea tags, and inject json
     _paired_tag: ($) => 
       choice(
         $.if_tag,
         $.unless_tag,
         $.case_tag,
         $.for_loop_tag,
+        $.capture_tag,
         alias($._paired_comment, $.comment),
       ),
 
@@ -134,7 +129,8 @@ module.exports = grammar({
         $.if_statement,
         $.unless_statement,
         $.case_statment,
-        $.for_loop_statement
+        $.for_loop_statement,
+        $.capture_statement,
       ),
 
     /////////////////
@@ -143,24 +139,30 @@ module.exports = grammar({
 
     //TODO: cycle, pageinate, tablerow.. handle break & continue explicitly?
     // https://shopify.dev/docs/api/liquid/tags/iteration-tags
-    //
-    // cleanup precs and test further, esp with mulit node else/ifelse blocks
-    for_loop_tag: ($) => 
-      prec(
-        1,
-        seq(
-          $._tag_open, 
-          "for", field("item", $.identifier), "in", 
-          field("iterator", choice($.identifier, $.access, $.range)), 
-          optional(field("modifier", choice($.argument_list, $.identifier))), 
-          $._tag_close,
+    
+     for_loop_tag: ($) => 
+       prec(
+         1,
+         seq(
+           $._tag_open, 
+           "for", field("item", $.identifier), "in", 
+           field("iterator", choice($.identifier, $.access, $.range)), 
+           optional(field("modifier", choice($.argument_list, $.identifier))), 
+           $._tag_close,
 
-          field("body", alias(repeat($._node), $.block)),
-          optional(field("alternative", $.else_tag)),
+           field("body", alias(repeat($._node), $.block)),
+           optional(field("alternative", $.else_tag)),
 
-          prec.right(0, seq($._tag_open, "endfor", $._tag_close)),
-        )
-      ),
+           prec.right(
+             seq(
+               $._tag_open, 
+               "endfor", 
+               $._tag_close
+             )
+           )
+         )
+       ),
+    
 
     unless_tag: ($) =>
       seq(
@@ -170,7 +172,9 @@ module.exports = grammar({
 
         field("consequence", alias(repeat($._node), $.block)),
 
-        $._tag_open, "endunless", $._tag_close, 
+        $._tag_open,
+        "endunless", 
+        $._tag_close, 
       ),
 
     if_tag: ($) =>
@@ -183,7 +187,13 @@ module.exports = grammar({
         repeat(field("alternative", $.elseif_tag)),
         optional(field("alternative", $.else_tag)),
 
-        prec.right(0, seq($._tag_open, "endif", $._tag_close)), 
+        prec.right(
+          seq(
+            $._tag_open, 
+            "endif", 
+            $._tag_close
+          )
+        ), 
       ),
 
     elseif_tag: ($) =>
@@ -202,17 +212,23 @@ module.exports = grammar({
       prec.dynamic(
         PRECS.else,
         seq(
-          $._tag_open, "else", $._tag_close,
+          $._tag_open, 
+          "else",
+          $._tag_close,
 
           alias(repeat($._node), $.block),
-      )),
+        )
+      ),
 
     when_tag: ($) => 
       prec.dynamic(
         PRECS.else_if,
         seq(
           // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
-          $._tag_open, "when", field("condition", $.expression), $._tag_close,
+          $._tag_open, "when", 
+          field("condition", $.expression), 
+          $._tag_close,
+
           field("consequence", alias(repeat($._node), $.block)),
         ),
       ),
@@ -226,7 +242,31 @@ module.exports = grammar({
         field("conditions", alias(repeat($.when_tag), $.block)),
         optional(field("alternative", $.else_tag)),
 
-        prec.right(0, seq($._tag_open, "endcase", $._tag_close)),
+        prec.right(
+          seq(
+            $._tag_open, 
+            "endcase", 
+            $._tag_close
+          )
+        ),
+      ),
+
+
+    capture_tag: ($) => 
+      seq(
+        $._tag_open,
+        "capture", field("variable", $.identifier),
+        $._tag_close,
+
+        field("value", alias(repeat($._node), $.block)),
+
+        prec.right(
+          seq(
+            $._tag_open, 
+            "endcapture", 
+            $._tag_close
+          )
+        ),
       ),
 
 
@@ -245,7 +285,7 @@ module.exports = grammar({
           field("body", alias(repeat($._liquid_node), $.block)),
           optional(field("alternative", $.else_statement)),
 
-          prec.right(0, "endfor"),
+          prec.right("endfor"),
         )
       ),
 
@@ -266,7 +306,7 @@ module.exports = grammar({
         repeat(field("alternative", $.elseif_statement)),
         optional(field("alternative", $.else_statement)),
 
-        prec.right(0, "endif"), 
+        prec.right("endif"), 
       ),
 
     elseif_statement: ($) =>
@@ -293,6 +333,7 @@ module.exports = grammar({
         seq(
           // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
           "when", field("condition", $.expression),
+
           field("consequence", alias(repeat($._liquid_node), $.block)),
         ),
       ),
@@ -304,7 +345,16 @@ module.exports = grammar({
         field("conditions", alias(repeat($.when_statement), $.block)),
         optional(field("alternative", $.else_statement)),
 
-        prec.right(0, "endcase"),
+        prec.right("endcase"),
+      ),
+
+    capture_statement: ($) => 
+      seq(
+        "capture", field("variable", $.identifier),
+
+        field("value", alias(repeat($._liquid_node), $.block)),
+
+        prec.right("endcapture"),
       ),
 
 
@@ -319,18 +369,20 @@ module.exports = grammar({
     sections: $ => seq("sections", $.string),
     increment: $ => seq("increment", $.identifier),
     decrement: $ => seq("decrement", $.identifier),
-    layout: ($) => seq("layout", choice($.string, "none")),
+    layout: $ => seq("layout", choice($.string, "none")),
 
+    // -- may need to handle embeded tags here - https://liquidjs.com/tags/render.html
     render: ($) =>
       seq(
         "render",
-        field( "file", $.string),
+        field("file", $.string),
         optional(
           field(
             "modifier",
             choice(
               seq(",", $.argument_list),
-              $.opt_as_expr)
+              $.opt_as_expr
+            )
           )
         )
       ),
@@ -401,8 +453,15 @@ module.exports = grammar({
         ")"
       ),
 
-    _literal: ($) => choice($.string, $.number, $.boolean),
 
+    ////////////////
+    // Primitives //
+    ////////////////
+    
+    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
+
+    _literal: ($) => choice($.string, $.number, $.boolean),
+    
     string: (_) => 
       choice(
         seq("'", /[^']*/, "'"),
@@ -413,7 +472,7 @@ module.exports = grammar({
 
     boolean: (_) => choice("true", "false"),
 
-    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
+    nil: (_) => "nil",
 
     predicate: ($) =>
       choice(

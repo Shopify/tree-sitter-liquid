@@ -718,25 +718,94 @@ For Loop With Else
 (content))
 
 ==================
-Paired Tag Comment
+Nested For / If
 ==================
 
 <html>
-  {% comment %}
-    {% render "something" %}
-    {{ data.page.title | reverse }}
-    <div>hi</div>
-    {{ data.page }}
-    asdf
-  {% endcomment %}
+  {% for i in list %}
+    {% if i != blank %}
+      {% for j in list %}
+        <div>{{ i }}</div>
+      {% endfor %}
+    {% else %}
+      <div>{{ i }}</div>
+    {% endif %}
+  {% endfor %}
 </html>
 
 ---
 (template
  (content)
-  (tag
-    (comment))
- (content))
+ (tag 
+  (for_loop_tag
+   item: (identifier)
+   iterator: (identifier)
+   body: (block
+     (tag 
+      (if_tag
+       condition: (expression
+         (predicate
+          left: (expression 
+            (identifier))
+          right: (expression 
+            (identifier))))
+       consequence: (block
+         (tag
+          (for_loop_tag
+           item: (identifier)
+           iterator: (identifier)
+           body: (block
+             (content)
+             (tag 
+              (expression
+               (identifier)))
+             (content)))))
+       alternative: (else_tag
+         (block
+          (content)
+          (tag 
+           (expression
+            (identifier)))
+          (content))))))))
+  (content))
+
+==================
+Capture
+==================
+
+<html>
+  {%- capture title -%}
+    {% if show_up_title -%}
+      Upcase title: {{ up_title }}
+    {%- else -%}
+      Downcase title: {{ down_title }}
+    {%- endif %}
+  {%- endcapture %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (capture_tag
+   variable: (identifier)
+   value: (block
+    (tag
+     (if_tag
+      condition: (expression
+       (identifier))
+      consequence: (block
+       (content)
+       (tag
+        (expression
+         (identifier))))
+      alternative: (else_tag
+       (block
+        (content)
+        (tag
+         (expression
+          (identifier))))))))))
+  (content))
 
 ==================
 Liquid Tag With If
@@ -798,7 +867,7 @@ Liquid Tag With If
         variable_name: (identifier)
         value: (expression
          (string)))))))))
-(content))
+  (content))
 
 ==================
 Liquid Tag With Case
@@ -929,6 +998,42 @@ Liquid Tag With For Loop
    (content))
 
 ==================
+Liquid Tag With Capture
+==================
+
+<html>
+  {% liquid
+     capture title
+      if show_up_title
+         up_title
+      else
+        down_title
+      endif
+    endcapture
+  %}
+</html>
+
+---
+(template
+ (content)
+ (tag
+  (liquid_tag
+   (capture_statement
+    variable: (identifier)
+    value: (block
+       (if_statement
+        condition: (expression
+          (identifier))
+        consequence: (block
+           (expression
+            (identifier)))
+        alternative: (else_statement
+          (block
+            (expression
+             (identifier)))))))))
+  (content))
+
+==================
 Statment Keyword As Access Expression
 ==================
 
@@ -954,4 +1059,24 @@ Inline Comment
     (comment))
  (content))
 
+==================
+Paired Tag Comment
+==================
+
+<html>
+  {% comment %}
+    {% render "something" %}
+    {{ data.page.title | reverse }}
+    <div>hi</div>
+    {{ data.page }}
+    asdf
+  {% endcomment %}
+</html>
+
+---
+(template
+ (content)
+  (tag
+    (comment))
+ (content))
 
