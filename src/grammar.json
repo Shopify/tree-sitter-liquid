@@ -1,6 +1,5 @@
 {
   "name": "liquid",
-  "word": "identifier",
   "rules": {
     "template": {
       "type": "REPEAT",
@@ -23,28 +22,21 @@
       ]
     },
     "content": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[^{]+|\\{"
-            },
-            {
-              "type": "STRING",
-              "value": "{%%"
-            },
-            {
-              "type": "STRING",
-              "value": "{{{"
-            }
-          ]
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[^{]+|\\{|%"
+        },
+        {
+          "type": "STRING",
+          "value": "{%%"
+        },
+        {
+          "type": "STRING",
+          "value": "{{{"
         }
-      }
+      ]
     },
     "tag": {
       "type": "CHOICE",
@@ -81,6 +73,10 @@
         {
           "type": "SYMBOL",
           "name": "capture_tag"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "schema_tag"
         },
         {
           "type": "ALIAS",
@@ -261,13 +257,6 @@
         }
       ]
     },
-    "block": {
-      "type": "REPEAT",
-      "content": {
-        "type": "SYMBOL",
-        "name": "_node"
-      }
-    },
     "for_loop_tag": {
       "type": "PREC",
       "value": 1,
@@ -348,8 +337,16 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "block"
+              "type": "ALIAS",
+              "content": {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_node"
+                }
+              },
+              "named": true,
+              "value": "block"
             }
           },
           {
@@ -491,7 +488,7 @@
             "name": "alternative",
             "content": {
               "type": "SYMBOL",
-              "name": "elseif_tag"
+              "name": "elsif_tag"
             }
           }
         },
@@ -534,7 +531,7 @@
         }
       ]
     },
-    "elseif_tag": {
+    "elsif_tag": {
       "type": "PREC_DYNAMIC",
       "value": 1,
       "content": {
@@ -546,7 +543,7 @@
           },
           {
             "type": "STRING",
-            "value": "elseif"
+            "value": "elsif"
           },
           {
             "type": "FIELD",
@@ -802,6 +799,39 @@
         }
       ]
     },
+    "schema_tag": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_tag_open"
+        },
+        {
+          "type": "STRING",
+          "value": "schema"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_tag_close"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "content"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_tag_open"
+        },
+        {
+          "type": "STRING",
+          "value": "endschema"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_tag_close"
+        }
+      ]
+    },
     "for_loop_statement": {
       "type": "PREC",
       "value": 1,
@@ -988,7 +1018,7 @@
             "name": "alternative",
             "content": {
               "type": "SYMBOL",
-              "name": "elseif_statement"
+              "name": "elsif_statement"
             }
           }
         },
@@ -1018,7 +1048,7 @@
         }
       ]
     },
-    "elseif_statement": {
+    "elsif_statement": {
       "type": "PREC_DYNAMIC",
       "value": 1,
       "content": {
@@ -1026,7 +1056,7 @@
         "members": [
           {
             "type": "STRING",
-            "value": "elseif"
+            "value": "elsif"
           },
           {
             "type": "FIELD",
@@ -2332,26 +2362,31 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_tag_open"
-          },
-          "named": false,
-          "value": ""
-        },
-        {
-          "type": "STRING",
-          "value": "comment"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_tag_close"
-          },
-          "named": false,
-          "value": ""
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_tag_open"
+              },
+              "named": false,
+              "value": ""
+            },
+            {
+              "type": "STRING",
+              "value": "comment"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_tag_close"
+              },
+              "named": false,
+              "value": ""
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -2361,19 +2396,57 @@
           }
         },
         {
-          "type": "STRING",
-          "value": "endcomment"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_tag_close"
-          },
-          "named": false,
-          "value": ""
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "endcomment"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_tag_close"
+            }
+          ]
         }
       ]
+    },
+    "_end_comment": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "{{"
+              },
+              {
+                "type": "STRING",
+                "value": "{%"
+              }
+            ]
+          },
+          {
+            "type": "STRING",
+            "value": "endcomment"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "}}"
+              },
+              {
+                "type": "STRING",
+                "value": "%}"
+              }
+            ]
+          }
+        ]
+      }
     },
     "_tag_open": {
       "type": "CHOICE",
@@ -2429,7 +2502,7 @@
       "else_tag"
     ],
     [
-      "elseif_tag"
+      "elsif_tag"
     ],
     [
       "when_tag"
@@ -2438,7 +2511,7 @@
       "else_statement"
     ],
     [
-      "elseif_statement"
+      "elsif_statement"
     ],
     [
       "when_statement"

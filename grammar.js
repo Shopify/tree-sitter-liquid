@@ -1,9 +1,8 @@
 const PRECS = {
-    primary: 1,
-    else_if: 1,
-    else: 2,
+  primary: 1,
+  else_if: 1,
+  else: 2,
 }
-
 
 // refrences
 // https://github.com/ngalaiko/tree-sitter-go-template/
@@ -11,15 +10,12 @@ const PRECS = {
 module.exports = grammar({
   name: "liquid",
 
-  word: ($) => $.identifier,
-
   conflicts: ($) => [
     [$.else_tag],
-    [$.elseif_tag],
+    [$.elsif_tag],
     [$.when_tag],
-
     [$.else_statement],
-    [$.elseif_statement],
+    [$.elsif_statement],
     [$.when_statement],
   ],
 
@@ -51,14 +47,10 @@ module.exports = grammar({
       ),
 
     content: (_) => 
-      prec.right(
-        repeat1(
-          choice(
-            /[^{]+|\{/, 
-            '{%%', 
-            '{{{'
-          )
-        )
+      choice(
+        /[^{]+|\{|%/, 
+        '{%%', 
+        '{{{'
       ),
 
     tag: ($) => choice($._unpaired_tag, $._paired_tag),
@@ -66,7 +58,6 @@ module.exports = grammar({
     //TODO:
     //raw tag
     //form tag
-    //schemea tags, and inject json
     //javascript tag
     //stylesheet tag
     _paired_tag: ($) => 
@@ -76,6 +67,7 @@ module.exports = grammar({
         $.case_tag,
         $.for_loop_tag,
         $.capture_tag,
+        $.schema_tag,
         alias($._paired_comment, $.comment),
       ),
 
@@ -89,13 +81,13 @@ module.exports = grammar({
     liquid_tag: ($) => seq("liquid", repeat($._liquid_node)),
 
     _liquid_node: ($) =>
-        seq(
-          choice(
-            $.expression,
-            $.statement,
-            $._paired_statement,
-          ),
-          /(\r\n|\r|\n)/,
+      seq(
+        choice(
+          $.expression,
+          $.statement,
+          $._paired_statement,
+        ),
+        /(\r\n|\r|\n)/,
       ),
 
     statement: ($) =>
@@ -122,8 +114,6 @@ module.exports = grammar({
         alias($._inline_comment, $.comment),
       ),
 
-
-    //TODO: handle needed paired tags -> statements for liquid tag
     _paired_statement: ($) =>
       choice(
         $.if_statement,
@@ -137,32 +127,31 @@ module.exports = grammar({
     // Paired Tags //
     /////////////////
 
-    //TODO: cycle, pageinate, tablerow.. handle break & continue explicitly?
+    // TODO: cycle, pageinate, tablerow.. handle break & continue explicitly?
     // https://shopify.dev/docs/api/liquid/tags/iteration-tags
-    
-     for_loop_tag: ($) => 
-       prec(
-         1,
-         seq(
-           $._tag_open, 
-           "for", field("item", $.identifier), "in", 
-           field("iterator", choice($.identifier, $.access, $.range)), 
-           optional(field("modifier", choice($.argument_list, $.identifier))), 
-           $._tag_close,
+    for_loop_tag: ($) => 
+      prec(
+        1,
+        seq(
+          $._tag_open, 
+          "for", field("item", $.identifier), "in", 
+          field("iterator", choice($.identifier, $.access, $.range)), 
+          optional(field("modifier", choice($.argument_list, $.identifier))), 
+          $._tag_close,
 
-           field("body", alias(repeat($._node), $.block)),
-           optional(field("alternative", $.else_tag)),
+          field("body", alias(repeat($._node), $.block)),
+          optional(field("alternative", $.else_tag)),
 
-           prec.right(
-             seq(
-               $._tag_open, 
-               "endfor", 
-               $._tag_close
-             )
-           )
-         )
-       ),
-    
+          prec.right(
+            seq(
+              $._tag_open, 
+              "endfor", 
+              $._tag_close
+            )
+          )
+        )
+      ),
+
 
     unless_tag: ($) =>
       seq(
@@ -184,7 +173,7 @@ module.exports = grammar({
         $._tag_close, 
 
         field("consequence", alias(repeat($._node), $.block)),
-        repeat(field("alternative", $.elseif_tag)),
+        repeat(field("alternative", $.elsif_tag)),
         optional(field("alternative", $.else_tag)),
 
         prec.right(
@@ -196,12 +185,12 @@ module.exports = grammar({
         ), 
       ),
 
-    elseif_tag: ($) =>
+    elsif_tag: ($) =>
       prec.dynamic(
         PRECS.else_if,
         seq(
           $._tag_open, 
-          "elseif", field("condition", $.expression), 
+          "elsif", field("condition", $.expression), 
           $._tag_close,
 
           alias(repeat($._node), $.block),
@@ -269,11 +258,24 @@ module.exports = grammar({
         ),
       ),
 
+    schema_tag: ($) =>
+      seq(
+        $._tag_open,
+        "schema",
+        $._tag_close,
+
+        $.content,
+
+        $._tag_open, 
+        "endschema", 
+        $._tag_close
+      ),
+
 
     //////////////////////////////////////
     // Paired Statements For Liquid Tag //
     //////////////////////////////////////
-    
+
     for_loop_statement: ($) => 
       prec(
         1,
@@ -303,17 +305,17 @@ module.exports = grammar({
         "if", field("condition", $.expression),
 
         field("consequence", alias(repeat($._liquid_node), $.block)),
-        repeat(field("alternative", $.elseif_statement)),
+        repeat(field("alternative", $.elsif_statement)),
         optional(field("alternative", $.else_statement)),
 
         prec.right("endif"), 
       ),
 
-    elseif_statement: ($) =>
+    elsif_statement: ($) =>
       prec.dynamic(
         PRECS.else_if,
         seq(
-          "elseif", field("condition", $.expression),
+          "elsif", field("condition", $.expression),
           alias(repeat($._liquid_node), $.block),
         ),
       ),
@@ -457,11 +459,11 @@ module.exports = grammar({
     ////////////////
     // Primitives //
     ////////////////
-    
+
     identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
 
     _literal: ($) => choice($.string, $.number, $.boolean),
-    
+
     string: (_) => 
       choice(
         seq("'", /[^']*/, "'"),
@@ -491,7 +493,7 @@ module.exports = grammar({
           [">", "binary_relation"],
           ["and", "clause_connective"],
           ["or", "clause_connective"],
-          
+
           //TODO: is contains a special case?
           ["contains", "contains"],
         ].map(([operator, precedence]) =>
@@ -516,22 +518,38 @@ module.exports = grammar({
 
     _paired_comment: ($) =>
       seq(
-        alias($._tag_open, ""), "comment", alias($._tag_close, ""), 
+        seq(alias($._tag_open, ""),"comment", alias($._tag_close, "")), 
         repeat(/./),
 
         //hacky way of dealing with {% terminating sequence 
-        "endcomment", alias($._tag_close, ""), 
+        seq("endcomment", $._tag_close)
+        // $._end_comment
       ),
 
+    // trying to fix end commment..
+    _end_comment: $ => 
+      token(seq(choice("{{", "{%"),"endcomment", choice("}}", "%}"))), 
 
     ///////////////
     // Delmiters //
     ///////////////
 
     // TODO: distinguish between "{{" and "{%" delmiters
-    _tag_open: (_) => choice("{{", "{{-", "{%", "{%-"),
+    _tag_open: (_) => 
+      choice(
+        "{{",
+        "{{-",
+        "{%",
+        "{%-"
+      ),
 
-    _tag_close: (_) => choice("}}", "-}}", "%}", "-%}"),
+    _tag_close: (_) => 
+      choice(
+        "}}",
+        "-}}",
+        "%}",
+        "-%}"
+      ),
   },
 
 });

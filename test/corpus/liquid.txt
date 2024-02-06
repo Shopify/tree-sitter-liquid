@@ -354,7 +354,7 @@ Multi Level If
     <div class="collection-hero-{{ product.title }}">
       {{ product.color }}
     </div>
-  {% elseif sections.settings.grid == 10 %}
+  {% elsif sections.settings.grid == 10 %}
     <div class="page -header text-center">
       {{ render "thing" }}
     </div>
@@ -386,7 +386,7 @@ Multi Level If
         receiver: (identifier)
         method: (identifier))))
      (content))
-   alternative: (elseif_tag
+   alternative: (elsif_tag
      condition: (expression
        (predicate
         left: (expression
@@ -945,16 +945,16 @@ Liquid Tag With Case
            variable_name: (identifier)
            value: (expression
             (string)))))))
-  alternative: (else_statement
-   (block
-    (statement
-     (render
-      file: (string)))
-    (expression
-     (filter
-      body: (expression
-       (identifier))
-      name: (identifier))))))
+      alternative: (else_statement
+       (block
+        (statement
+         (render
+          file: (string)))
+        (expression
+         (filter
+          body: (expression
+           (identifier))
+          name: (identifier))))))
 
   (statement
    (echo
@@ -976,26 +976,26 @@ Liquid Tag With For Loop
 </html>
 
 ---
-  (template
-   (content)
-   (tag
-    (liquid_tag
-     (for_loop_statement
-      item: (identifier)
-      iterator: (access
-       receiver: (identifier)
-       method: (identifier))
-      body: (block
-       (statement
-        (assignment
-         variable_name: (identifier)
-         value: (expression
-          (identifier))))
-       (statement
-        (echo
-         (expression
-          (identifier))))))))
-   (content))
+(template
+ (content)
+ (tag
+  (liquid_tag
+   (for_loop_statement
+    item: (identifier)
+    iterator: (access
+     receiver: (identifier)
+     method: (identifier))
+    body: (block
+     (statement
+      (assignment
+       variable_name: (identifier)
+       value: (expression
+        (identifier))))
+     (statement
+      (echo
+       (expression
+        (identifier))))))))
+ (content))
 
 ==================
 Liquid Tag With Capture
@@ -1003,7 +1003,7 @@ Liquid Tag With Capture
 
 <html>
   {% liquid
-     capture title
+    capture title
       if show_up_title
          up_title
       else
@@ -1038,7 +1038,7 @@ Statment Keyword As Access Expression
 ==================
 
 <html>
-<div class="width-{{ section.page }} fadeIn" data-delay="100ms">
+  <div class="width-{{ section.page }} fadeIn" data-delay="100ms">
 </html>
 
 ---
@@ -1069,7 +1069,7 @@ Paired Tag Comment
     {{ data.page.title | reverse }}
     <div>hi</div>
     {{ data.page }}
-    asdf
+    content
   {% endcomment %}
 </html>
 
