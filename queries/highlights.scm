@@ -7,26 +7,30 @@
  "%}"
  "{%-"
  "-%}"
-] @tag.delimiter (#set! priority 101))
+] @tag.delimiter 
+ (#set! priority 101))
 
 ([
  "]"
  "["
  ")"
  "("
-] @punctuation.bracket (#set! priority 101))
+] @punctuation.bracket 
+ (#set! priority 101))
 
 ([
  ","
  "."
-] @punctuation.delimiter (#set! priority 101))
+] @punctuation.delimiter 
+ (#set! priority 101))
 
 ([
  "|"
  ":"
  "="
  (predicate)
-] @operator (#set! priority 101))
+] @operator 
+ (#set! priority 101))
 
 ([
  "as"
@@ -42,6 +46,7 @@
  "endcase"
 
  "for"
+ "in"
  "endfor"
 
  "capture"
@@ -59,14 +64,13 @@
  "endschema"
 
  (statement)
-] @keyword (#set! priority 101))
+] @keyword 
+ (#set! priority 101))
 
 ((identifier) @variable (#set! priority 101))
 ((string) @string (#set! priority 101))
 ((boolean) @boolean (#set! priority 101))
 ((number) @number (#set! priority 101))
-((nil) @constant.builtin (#set! priority 101))
-
 (filter
   name: (identifier) @function.call (#set! priority 101))
 

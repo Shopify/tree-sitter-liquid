@@ -9,7 +9,7 @@ Literal
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (string)))
  (content))
@@ -25,7 +25,7 @@ Filter
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (filter
     body: (expression (string))
@@ -45,13 +45,13 @@ Filter w/ variable
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (assignment
     variable_name: (identifier)
     value: (expression (string)))))
  (content)
- (tag
+ (directive
   (expression
    (filter
     body: (expression (string))
@@ -70,7 +70,7 @@ Many filters
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (filter
     body:
@@ -93,7 +93,7 @@ Filters with many arguments
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (assignment
     variable_name: (identifier)
@@ -116,7 +116,7 @@ Filters argument hash
 ---
 (template
  (content)
- (tag
+ (directive
  (expression
   (filter
    body: (expression (identifier))
@@ -137,7 +137,7 @@ Filters precedence
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (filter
     body:
@@ -165,7 +165,7 @@ Method Call
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (access
     receiver: (identifier)
@@ -183,7 +183,7 @@ Compound Method Call With Filter
 ---
 (template
  (content)
- (tag
+ (directive
   (expression
    (filter
     body:
@@ -208,7 +208,7 @@ Render
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (render
     file: (string))))
@@ -225,7 +225,7 @@ Render Loop
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (render
     file: (string)
@@ -245,7 +245,7 @@ Render With
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (render
     file: (string)
@@ -264,7 +264,7 @@ Render Variable
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (render
     file: (string)
@@ -285,7 +285,7 @@ Include
 ---
 (template
  (content)
- (tag
+ (directive
   (statement
    (include
     (string))))
@@ -304,7 +304,7 @@ If Statement
 ---
 (template
  (content)
- (tag
+ (directive
   (if_tag
    condition: (expression
      (predicate
@@ -331,7 +331,7 @@ If Contains Statement
 ---
 (template
  (content)
- (tag
+ (directive
   (if_tag
    condition: (expression
      (predicate
@@ -356,7 +356,7 @@ Multi Level If
     </div>
   {% elsif sections.settings.grid == 10 %}
     <div class="page -header text-center">
-      {{ render "thing" }}
+      {% render "thing" %}
     </div>
   {%- else -%}
     {%- assign limit = 16 -%}
@@ -367,20 +367,20 @@ Multi Level If
 ---
 (template
  (content)
- (tag
+ (directive
   (if_tag
    condition: (expression
      (predicate 
       left: (expression (identifier)) 
       right: (expression (string))))
    consequence: (block (content)
-     (tag 
+     (directive 
       (expression
        (access 
         receiver: (identifier) 
         method: (identifier))))
      (content)
-     (tag
+     (directive
       (expression
        (access
         receiver: (identifier)
@@ -399,21 +399,21 @@ Multi Level If
           (number))))
      (block
       (content)
-      (tag
+      (directive
        (statement
         (render
          file: (string))))
       (content)))
    alternative: (else_tag
        (block
-        (tag
+        (directive
          (statement
           (assignment
            variable_name: (identifier)
            value: (expression
              (number)))))
         (content)
-        (tag
+        (directive
          (expression
           (identifier)))
         (content)))))
@@ -433,14 +433,14 @@ Unless
 ---
 (template
  (content)
- (tag
+ (directive
   (unless_tag
    condition: (expression 
      (access 
       receiver: (identifier)
       method: (identifier)))
    consequence: (block 
-     (tag 
+     (directive 
       (statement 
        (assignment
         variable_name: (identifier)
@@ -449,7 +449,7 @@ Unless
            receiver: (identifier)
            method: (identifier))))))
      (content) 
-     (tag 
+     (directive 
       (expression 
        (identifier))) 
      (content))))
@@ -466,10 +466,10 @@ Case
         {{ product.color }}
       </div>
     {% when 'Strength' %}
-      {{ render "file" }}
+      {% render "file" %}
       <p>This is a strength or health potion.</p>
     {% else %}
-      {{ render "file" }}
+      {% render "file" %}
       <div>content</div>
   {% endcase %}
 </html>
@@ -477,7 +477,7 @@ Case
 ---
   (template
    (content)
-   (tag
+   (directive
     (case_tag
      receiver: (access
        receiver: (identifier)
@@ -492,13 +492,13 @@ Case
              (string))))
         consequence: (block
           (content)
-          (tag
+          (directive
            (expression
             (access
              receiver: (identifier)
              method: (identifier))))
           (content)
-          (tag
+          (directive
            (expression
             (access
              receiver: (identifier)
@@ -508,14 +508,14 @@ Case
         condition: (expression
           (string))
         consequence: (block
-          (tag
+          (directive
            (statement
             (render
              file: (string))))
           (content))))
   alternative: (else_tag
       (block
-       (tag
+       (directive
         (statement
          (render
           file: (string))))
@@ -534,7 +534,7 @@ Empty Case
 ---
   (template
    (content)
-   (tag 
+   (directive 
     (case_tag
      receiver: (access
        receiver: (identifier)
@@ -549,21 +549,21 @@ For Loop
   {% for product in collection.products -%}
     {% assign name = product.title %}
     <div>{{ name }}</div>
-    {{ echo name }}
+    {% echo name %}
   {%- endfor %}
 </html>
 
 ---
 (template
  (content)
- (tag
+ (directive
   (for_loop_tag
    item: (identifier)
    iterator: (access
      receiver: (identifier)
      method: (identifier))
    body: (block
-     (tag
+     (directive
       (statement
        (assignment
         variable_name: (identifier)
@@ -572,11 +572,11 @@ For Loop
            receiver: (identifier)
            method: (identifier))))))
      (content)
-     (tag
+     (directive
       (expression
        (identifier)))
      (content)
-     (tag
+     (directive
       (statement
        (echo
         (expression
@@ -591,7 +591,7 @@ For Loop With Offest
   {% for product in collection.products offest: 2 -%}
     {% assign name = product.title %}
     <div>{{ name }}</div>
-    {{ echo name }}
+    {% echo name %}
   {%- endfor %}
 </html>
 
@@ -599,7 +599,7 @@ For Loop With Offest
 
 (template
  (content)
- (tag
+ (directive
   (for_loop_tag
    item: (identifier)
    iterator: (access
@@ -610,7 +610,7 @@ For Loop With Offest
       key: (identifier)
       value: (number)))
    body: (block
-     (tag
+     (directive
       (statement
        (assignment
         variable_name: (identifier)
@@ -619,11 +619,11 @@ For Loop With Offest
            receiver: (identifier)
            method: (identifier))))))
      (content)
-     (tag
+     (directive
       (expression
        (identifier)))
      (content)
-     (tag
+     (directive
       (statement
        (echo
         (expression
@@ -644,17 +644,17 @@ For Loop With Range
 ---
 (template
  (content)
- (tag
+ (directive
   (for_loop_tag
    item: (identifier)
    iterator: (range
     start: (number)
     end: (identifier))
    body: (block
-     (tag
+     (directive
       (expression
        (identifier)))
-     (tag
+     (directive
       (expression
        (identifier))))))
 (content))
@@ -667,50 +667,50 @@ For Loop With Else
   {% for i in array -%}
     {% assign name = i %}
     <div>{{ name }}</div>
-    {{ echo name }}
+    {% echo name %}
   {% else %}
     {% assign name = "cool" %}
     <div>{{ name }}</div>
-    {{ echo name }}
+    {% echo name %}
   {%- endfor %}
 </html>
 
 ---
   (template
    (content)
-   (tag
+   (directive
     (for_loop_tag
      item: (identifier)
      iterator: (identifier)
      body: (block
-       (tag
+       (directive
         (statement
          (assignment
           variable_name: (identifier)
           value: (expression (identifier)))))
        (content)
-       (tag
+       (directive
         (expression
          (identifier)))
        (content)
-       (tag
+       (directive
         (statement
          (echo
           (expression
            (identifier))))))
      alternative: (else_tag
        (block
-        (tag
+        (directive
          (statement
           (assignment
            variable_name: (identifier)
            value: (expression (string)))))
         (content)
-        (tag
+        (directive
          (expression
           (identifier)))
         (content)
-        (tag
+        (directive
          (statement
           (echo
            (expression
@@ -736,12 +736,12 @@ Nested For / If
 ---
 (template
  (content)
- (tag 
+ (directive 
   (for_loop_tag
    item: (identifier)
    iterator: (identifier)
    body: (block
-     (tag 
+     (directive 
       (if_tag
        condition: (expression
          (predicate
@@ -750,20 +750,20 @@ Nested For / If
           right: (expression 
             (identifier))))
        consequence: (block
-         (tag
+         (directive
           (for_loop_tag
            item: (identifier)
            iterator: (identifier)
            body: (block
              (content)
-             (tag 
+             (directive 
               (expression
                (identifier)))
              (content)))))
        alternative: (else_tag
          (block
           (content)
-          (tag 
+          (directive 
            (expression
             (identifier)))
           (content))))))))
@@ -786,23 +786,23 @@ Capture
 ---
 (template
  (content)
- (tag
+ (directive
   (capture_tag
    variable: (identifier)
    value: (block
-    (tag
+    (directive
      (if_tag
       condition: (expression
        (identifier))
       consequence: (block
        (content)
-       (tag
+       (directive
         (expression
          (identifier))))
       alternative: (else_tag
        (block
         (content)
-        (tag
+        (directive
          (expression
           (identifier))))))))))
   (content))
@@ -828,7 +828,7 @@ Liquid Tag With If
 ---
 (template
  (content)
- (tag
+ (directive
   (liquid_tag
    (statement
     (include
@@ -897,7 +897,7 @@ Liquid Tag With Case
 ---
   (template
    (content)
-   (tag
+   (directive
     (liquid_tag
 
      (statement
@@ -978,7 +978,7 @@ Liquid Tag With For Loop
 ---
 (template
  (content)
- (tag
+ (directive
   (liquid_tag
    (for_loop_statement
     item: (identifier)
@@ -1016,7 +1016,7 @@ Liquid Tag With Capture
 ---
 (template
  (content)
- (tag
+ (directive
   (liquid_tag
    (capture_statement
     variable: (identifier)
@@ -1034,7 +1034,7 @@ Liquid Tag With Capture
   (content))
 
 ==================
-Statment Keyword As Access Expression
+Keyword Conflict
 ==================
 
 <html>
@@ -1042,21 +1042,30 @@ Statment Keyword As Access Expression
 </html>
 
 ---
-()
+(template
+(content)
+  (directive
+    (expression
+      (access
+        receiver: (identifier)
+        method: (identifier))))
+(content))
 
 ==================
 Inline Comment
 ==================
 
 <html>
-  {% render #comment %}
+  {% # render "string"
+     # this renders a string
+     # cool
+  %}
 </html>
 
 ---
 (template
  (content)
-  (tag
-    (comment))
+ (comment)
  (content))
 
 ==================
@@ -1064,19 +1073,41 @@ Paired Tag Comment
 ==================
 
 <html>
-  {% comment %}
+  {% if true %}
+    {% comment %}
+      {% render "something" %}
+      {{ data.page.title | reverse }}
+      <div>hi</div>
+      {{ data.page }}
+      content
+    {% endcomment %}
+  {% endif %}
+</html>
+
+---
+(template
+  (content)
+  (directive
+   (if_tag
+    condition: (expression 
+      (boolean))
+    consequence: (block
+      (comment))))
+    (content))
+
+==================
+Raw Tag
+==================
+
+<html>
+  {% raw %}
     {% render "something" %}
     {{ data.page.title | reverse }}
     <div>hi</div>
     {{ data.page }}
     content
-  {% endcomment %}
+  {% endraw %}
 </html>
 
 ---
-(template
- (content)
-  (tag
-    (comment))
- (content))
-
+()

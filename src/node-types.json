@@ -1,10 +1,5 @@
 [
   {
-    "type": "",
-    "named": false,
-    "fields": {}
-  },
-  {
     "type": "access",
     "named": true,
     "fields": {
@@ -162,7 +157,15 @@
           "named": true
         },
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "content",
+          "named": true
+        },
+        {
+          "type": "directive",
           "named": true
         },
         {
@@ -179,10 +182,6 @@
         },
         {
           "type": "statement",
-          "named": true
-        },
-        {
-          "type": "tag",
           "named": true
         },
         {
@@ -345,7 +344,25 @@
   {
     "type": "content",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "content",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "decrement",
@@ -357,6 +374,57 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "directive",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "capture_tag",
+          "named": true
+        },
+        {
+          "type": "case_tag",
+          "named": true
+        },
+        {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "for_loop_tag",
+          "named": true
+        },
+        {
+          "type": "if_tag",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
+          "type": "raw_tag",
+          "named": true
+        },
+        {
+          "type": "schema_tag",
+          "named": true
+        },
+        {
+          "type": "statement",
+          "named": true
+        },
+        {
+          "type": "unless_tag",
           "named": true
         }
       ]
@@ -473,10 +541,6 @@
         },
         {
           "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "comment",
           "named": true
         },
         {
@@ -984,6 +1048,21 @@
     }
   },
   {
+    "type": "raw_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "render",
     "named": true,
     "fields": {
@@ -1075,6 +1154,10 @@
           "named": true
         },
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "decrement",
           "named": true
         },
@@ -1111,57 +1194,6 @@
     "fields": {}
   },
   {
-    "type": "tag",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "capture_tag",
-          "named": true
-        },
-        {
-          "type": "case_tag",
-          "named": true
-        },
-        {
-          "type": "comment",
-          "named": true
-        },
-        {
-          "type": "expression",
-          "named": true
-        },
-        {
-          "type": "for_loop_tag",
-          "named": true
-        },
-        {
-          "type": "if_tag",
-          "named": true
-        },
-        {
-          "type": "liquid_tag",
-          "named": true
-        },
-        {
-          "type": "schema_tag",
-          "named": true
-        },
-        {
-          "type": "statement",
-          "named": true
-        },
-        {
-          "type": "unless_tag",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "template",
     "named": true,
     "fields": {},
@@ -1170,11 +1202,15 @@
       "required": false,
       "types": [
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "content",
           "named": true
         },
         {
-          "type": "tag",
+          "type": "directive",
           "named": true
         }
       ]
@@ -1285,6 +1321,10 @@
     }
   },
   {
+    "type": "",
+    "named": false
+  },
+  {
     "type": "!=",
     "named": false
   },
@@ -1298,10 +1338,6 @@
   },
   {
     "type": "%",
-    "named": false
-  },
-  {
-    "type": "%}",
     "named": false
   },
   {
@@ -1330,14 +1366,6 @@
   },
   {
     "type": "-",
-    "named": false
-  },
-  {
-    "type": "-%}",
-    "named": false
-  },
-  {
-    "type": "-}}",
     "named": false
   },
   {
@@ -1457,6 +1485,10 @@
     "named": false
   },
   {
+    "type": "endraw",
+    "named": false
+  },
+  {
     "type": "endschema",
     "named": false
   },
@@ -1513,6 +1545,10 @@
     "named": false
   },
   {
+    "type": "raw",
+    "named": false
+  },
+  {
     "type": "render",
     "named": false
   },
@@ -1545,23 +1581,7 @@
     "named": false
   },
   {
-    "type": "{%",
-    "named": false
-  },
-  {
     "type": "{%%",
-    "named": false
-  },
-  {
-    "type": "{%-",
-    "named": false
-  },
-  {
-    "type": "{{",
-    "named": false
-  },
-  {
-    "type": "{{-",
     "named": false
   },
   {
@@ -1570,10 +1590,6 @@
   },
   {
     "type": "|",
-    "named": false
-  },
-  {
-    "type": "}}",
     "named": false
   }
 ]
