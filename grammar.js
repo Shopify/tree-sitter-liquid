@@ -60,7 +60,6 @@ module.exports = grammar({
       choice($._unpaired_tag, $._paired_tag, $._output_directive),
 
     //TODO:
-    //raw tag
     //form tag
     //javascript tag
     //stylesheet tag
@@ -71,6 +70,8 @@ module.exports = grammar({
         $.case_tag,
         $.for_loop_tag,
         $.capture_tag,
+        $.tablerow_tag,
+        $.paginate_tag,
         $.schema_tag,
         $.raw_tag,
       ),
@@ -130,37 +131,78 @@ module.exports = grammar({
         $.case_statment,
         $.for_loop_statement,
         $.capture_statement,
+        $.tablerow_statement,
       ),
+
+    _iterator: ($) => 
+      prec.left(
+        1, 
+        seq(
+          field(
+            "iterator", choice($.identifier, $.access, $.range)
+          ), 
+          optional(
+            field("modifier", choice($.argument_list, $.identifier))
+          ), 
+        )
+      ),
+
+    _page_iterator: ($) => 
+      prec.left(
+        1,
+        seq(
+          field(
+            "iterator", choice($.identifier, $.access, $.number)
+          ), 
+          optional(
+            field(
+              "modifier", 
+              seq(",", choice($.argument_list, $.identifier))
+            )
+          )
+        )
+      ), 
+
 
     /////////////////
     // Paired Tags //
     /////////////////
 
-    // TODO: cycle, pageinate, tablerow.. handle break & continue explicitly?
-    // https://shopify.dev/docs/api/liquid/tags/iteration-tags
     for_loop_tag: ($) => 
-      prec(
-        1,
-        seq(
-          $._tag_delimiter_open, 
-          "for", field("item", $.identifier), "in", 
-          field("iterator", choice($.identifier, $.access, $.range)), 
-          optional(field("modifier", choice($.argument_list, $.identifier))), 
-          $._tag_delimiter_close,
+      seq(
+        $._tag_delimiter_open, 
+        "for", 
+        field("item", $.identifier), 
+        "in", 
+        $._iterator,
+        $._tag_delimiter_close,
 
-          field("body", alias(repeat($._node), $.block)),
-          optional(field("alternative", $.else_tag)),
+        field("body", 
+          alias(
+            repeat(
+              choice(
+                $._node,
+                seq(
+                  $._tag_delimiter_open, 
+                  $.cycle, 
+                  $._tag_delimiter_close
+                )
+              )
+            ), 
+            $.block
+          )
+        ),
 
-          prec.right(
-            seq(
-              $._tag_delimiter_open, 
-              "endfor", 
-              $._tag_delimiter_close
-            )
+        optional(field("alternative", $.else_tag)),
+
+        prec.right(
+          seq(
+            $._tag_delimiter_open, 
+            "endfor", 
+            $._tag_delimiter_close
           )
         )
       ),
-
 
     unless_tag: ($) =>
       seq(
@@ -249,7 +291,6 @@ module.exports = grammar({
         ),
       ),
 
-
     capture_tag: ($) => 
       seq(
         $._tag_delimiter_open,
@@ -267,13 +308,53 @@ module.exports = grammar({
         ),
       ),
 
+    tablerow_tag: ($) =>
+      seq(
+        $._tag_delimiter_open,
+        "tablerow",
+        field("item", $.identifier),
+        "in",
+        $._iterator,
+        $._tag_delimiter_close,
+
+        field("body", alias(repeat($._node), $.block)),
+
+        prec.right(
+          seq(
+            $._tag_delimiter_open,
+            "endtablerow",
+            $._tag_delimiter_close
+          )
+        )
+      ),
+
+    paginate_tag: ($) => 
+      seq(
+        $._tag_delimiter_open,
+        "paginate",
+        field("item", choice($.identifier, $.access)),
+        "by",
+        $._page_iterator,
+        $._tag_delimiter_close,
+
+        field("body", alias(repeat($._node), $.block)),
+
+        prec.right(
+          seq(
+            $._tag_delimiter_open,
+            "endpaginate",
+            $._tag_delimiter_close,
+          )
+        )
+      ),
+
     schema_tag: ($) =>
       seq(
         $._tag_delimiter_open,
         "schema",
         $._tag_delimiter_close,
 
-        $.content,
+        repeat($.content),
 
         $._tag_delimiter_open, 
         "endschema", 
@@ -299,18 +380,27 @@ module.exports = grammar({
     //////////////////////////////////////
 
     for_loop_statement: ($) => 
-      prec(
-        1,
-        seq(
-          "for", field("item", $.identifier), "in", 
-          field("iterator", choice($.identifier, $.access, $.range)), 
-          optional(field("modifier", choice($.argument_list, $.identifier))), 
+      seq(
+        "for", 
+        field("item", $.identifier), 
+        "in", 
+        $._iterator,
 
-          field("body", alias(repeat($._liquid_node), $.block)),
-          optional(field("alternative", $.else_statement)),
+        field("body", 
+          alias(
+            repeat(
+              choice(
+                $._liquid_node,
+                $.cycle,
+              )
+            ), 
+            $.block
+          )
+        ),
 
-          prec.right("endfor"),
-        )
+        optional(field("alternative", $.else_statement)),
+
+        prec.right("endfor"),
       ),
 
     unless_statement: ($) =>
@@ -381,12 +471,23 @@ module.exports = grammar({
         prec.right("endcapture"),
       ),
 
+    tablerow_statement: ($) =>
+      seq(
+        "tablerow",
+        field("item", $.identifier),
+        "in",
+        $._iterator,
+
+        field("body", alias(repeat($._liquid_node), $.block)),
+
+        prec.right("endtablerow"),
+      ),
+
 
     /////////////////////////////////////////
     // Unpaired Expressions And Statements //
     /////////////////////////////////////////
 
-    // TODO: fix namespace conflicts between below keyword identifiers and access/method calls
     echo: $ => seq("echo", $.expression),
     include: $ => seq("include", $.string),
     section: $ => seq("section", $.string),
@@ -477,6 +578,23 @@ module.exports = grammar({
         ")"
       ),
 
+    cycle: ($) => 
+      seq(
+        "cycle",
+        optional(
+          field("group_name", seq($.string, ":"))
+        ),
+        field(
+          "group_item", 
+          seq(
+            choice($.string, $.access, $.identifier),
+            repeat(
+              seq(",", choice($.string, $.access, $.identifier))
+            )
+          )
+        )
+      ),
+
 
     ////////////////
     // Primitives //
@@ -495,9 +613,6 @@ module.exports = grammar({
     number: (_) => /-?\d*\.?\d+/,
 
     boolean: (_) => choice("true", "false"),
-
-    //???
-    //nil: (_) => "nil",
 
     predicate: ($) =>
       choice(
@@ -566,13 +681,13 @@ module.exports = grammar({
     // Delmiters //
     ///////////////
 
-    _output_delimiter_open: (_) => token(choice("{{", "{{-")),
+    _output_delimiter_open: (_) => choice("{{", "{{-"),
 
-    _output_delimiter_close: (_) => token(choice("}}", "-}}")),
+    _output_delimiter_close: (_) =>choice("}}", "-}}"),
 
-    _tag_delimiter_open: (_) => token(choice("{%", "{%-")),
+    _tag_delimiter_open: (_) => choice("{%", "{%-"),
 
-    _tag_delimiter_close: (_) => token(choice("%}", "-%}")),
+    _tag_delimiter_close: (_) => choice("%}", "-%}"),
 
   },
 });

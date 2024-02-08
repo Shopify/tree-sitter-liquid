@@ -718,6 +718,35 @@ For Loop With Else
 (content))
 
 ==================
+For Loop with Cycle
+==================
+
+<html>
+  {% for product in collection.products -%}
+    {% cycle "group": "one", string, access.string %}
+  {%- endfor %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (for_loop_tag
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       method: (identifier))
+     body: (block
+       (cycle
+        group_name: (string)
+        group_item: (string)
+        group_item: (identifier)
+        group_item: (access
+          receiver: (identifier)
+          method: (identifier))))))
+   (content))
+
+==================
 Nested For / If
 ==================
 
@@ -806,6 +835,76 @@ Capture
          (expression
           (identifier))))))))))
   (content))
+
+==================
+Tablerow
+==================
+
+<html>
+  {%- tablerow item in arr -%}
+    {{ item }}
+  {%- endtablerow %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (tablerow_tag
+     item: (identifier)
+     iterator: (identifier)
+     body: (block
+       (directive
+        (expression
+         (identifier))))))
+   (content))
+
+==================
+Paginate
+==================
+
+<html>
+  {% paginate collection.products by 3, window_size: 1 %}
+    {% for product in collection.products -%}
+      {{ product.title }}
+    {%- endfor %}
+    {{- paginate | default_pagination }}
+  {% endpaginate %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (paginate_tag
+     item: (access
+       receiver: (identifier)
+       method: (identifier))
+     iterator: (number)
+     modifier: (argument_list
+       (argument
+        key: (identifier)
+        value: (number)))
+     body: (block
+       (directive
+        (for_loop_tag
+         item: (identifier)
+         iterator: (access
+           receiver: (identifier)
+           method: (identifier))
+         body: (block
+           (directive
+            (expression
+             (access
+              receiver: (identifier)
+              method: (identifier)))))))
+       (directive
+        (expression
+         (filter
+          body: (expression
+            (identifier))
+          name: (identifier)))))))
+(content))
 
 ==================
 Liquid Tag With If
@@ -970,32 +1069,40 @@ Liquid Tag With For Loop
   {% liquid
     for product_type in product.types
       assign data = product_type
+      cycle "group": "one", string, access.string
       echo data
     endfor
   %}
 </html>
 
 ---
-(template
- (content)
- (directive
-  (liquid_tag
-   (for_loop_statement
-    item: (identifier)
-    iterator: (access
-     receiver: (identifier)
-     method: (identifier))
-    body: (block
-     (statement
-      (assignment
-       variable_name: (identifier)
-       value: (expression
-        (identifier))))
-     (statement
-      (echo
-       (expression
-        (identifier))))))))
- (content))
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (for_loop_statement
+      item: (identifier)
+      iterator: (access
+        receiver: (identifier)
+        method: (identifier))
+      body: (block
+        (statement
+         (assignment
+          variable_name: (identifier)
+          value: (expression
+            (identifier))))
+        (cycle
+         group_name: (string)
+         group_item: (string)
+         group_item: (identifier)
+         group_item: (access
+           receiver: (identifier)
+           method: (identifier)))
+        (statement
+         (echo
+          (expression
+           (identifier))))))))
+(content))
 
 ==================
 Liquid Tag With Capture
@@ -1032,6 +1139,41 @@ Liquid Tag With Capture
             (expression
              (identifier)))))))))
   (content))
+
+==================
+Liquid Tag With Tablerow
+==================
+
+<html>
+  {% liquid
+    tablerow product_type in product.types
+      assign data = product_type
+      echo data
+    endtablerow
+  %}
+</html>
+
+---
+  (template
+    (content)
+    (directive
+      (liquid_tag
+        (tablerow_statement
+          item: (identifier)
+          iterator: (access
+            receiver: (identifier)
+            method: (identifier))
+          body: (block
+           (statement
+            (assignment
+             variable_name: (identifier)
+             value: (expression
+              (identifier))))
+           (statement
+            (echo
+             (expression
+              (identifier))))))))
+    (content))
 
 ==================
 Keyword Conflict
