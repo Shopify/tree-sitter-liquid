@@ -21,6 +21,15 @@ module.exports = grammar({
     [$.when_statement],
   ],
 
+  // supertypes: $ => [
+  //   $.statement,
+  //   $.expression,
+  // ],
+
+  externals: ($) => [
+    $._comment_content
+  ],
+
   precedences: (_) => [
     [
       "unary_not",
@@ -46,12 +55,12 @@ module.exports = grammar({
       choice(
         $.directive,
         $.content,
-        alias($._paired_comment, $.comment),
+        $.comment,
       ),
 
     content: (_) => 
       choice(
-        /[^{]+|\{|%/, 
+        /[^{]+|\{[^{%]/, 
         '{%%', 
         '{{{'
       ),
@@ -98,6 +107,7 @@ module.exports = grammar({
           $.expression,
           $.statement,
           $._paired_statement,
+          alias($._inline_comment, $.comment)
         ),
         /(\r\n|\r|\n)/,
       ),
@@ -112,7 +122,6 @@ module.exports = grammar({
         $.echo,
         $.increment,
         $.decrement,
-        alias($._inline_comment, $.comment),
       ),
 
     expression: ($) => 
@@ -211,10 +220,16 @@ module.exports = grammar({
         $._tag_delimiter_close,
 
         field("consequence", alias(repeat($._node), $.block)),
+        repeat(field("alternative", $.elsif_tag)),
+        optional(field("alternative", $.else_tag)),
 
-        $._tag_delimiter_open,
-        "endunless", 
-        $._tag_delimiter_close, 
+        prec.right(
+          seq(
+            $._tag_delimiter_open,
+            "endunless", 
+            $._tag_delimiter_close, 
+          )
+        )
       ),
 
     if_tag: ($) =>
@@ -408,8 +423,10 @@ module.exports = grammar({
         "unless", field("condition", $.expression),
 
         field("consequence", alias(repeat($._liquid_node), $.block)),
+        repeat(field("alternative", $.elsif_statement)),
+        optional(field("alternative", $.else_statement)),
 
-        "endunless",
+        prec.right("endunless"),
       ),
 
     if_statement: ($) =>
@@ -489,11 +506,17 @@ module.exports = grammar({
     /////////////////////////////////////////
 
     echo: $ => seq("echo", $.expression),
+
     include: $ => seq("include", $.string),
+
     section: $ => seq("section", $.string),
+
     sections: $ => seq("sections", $.string),
+
     increment: $ => seq("increment", $.identifier),
+
     decrement: $ => seq("decrement", $.identifier),
+
     layout: $ => seq("layout", choice($.string, "none")),
 
     // -- may need to handle embeded tags here - https://liquidjs.com/tags/render.html
@@ -651,30 +674,35 @@ module.exports = grammar({
     // Comments //
     //////////////
 
-    //TODO: inline comments, may need scanner
-    _inline_comment: (_) => 
-      repeat1(seq(
-        "#", 
-        repeat(/./),
-      )),
+    comment: ($) => choice($._inline_comment, $._paired_comment),
+
+    _inline_comment: ($) => 
+      choice(
+        seq(
+          $._tag_delimiter_open, 
+          prec.left(
+            repeat1(seq("#", /.*/))
+          ), 
+          $._tag_delimiter_close
+        ),
+        prec.left(
+          repeat1(seq("#", /.*/))
+        )
+      ),
 
     _paired_comment: ($) =>
       seq(
-        alias($._tag_delimiter_open, ""),
+        $._tag_delimiter_open,
         "comment", 
-        alias($._tag_delimiter_close, ""), 
+        $._tag_delimiter_close,
 
-        repeat(/./),
+        $._comment_content,
+        optional($._paired_comment),
 
-        //hacky way of dealing with opening delimiter terminating sequence 
+        $._tag_delimiter_open,
         "endcomment", 
-        $._tag_delimiter_close
-        // $._end_comment
+        $._tag_delimiter_close,
       ),
-
-    // trying to fix end commment..
-    _end_comment: (_) => 
-      token(seq(choice("{%", "{%-"),"endcomment", choice("%}", "-%}"))), 
 
 
     ///////////////
@@ -691,5 +719,3 @@ module.exports = grammar({
 
   },
 });
-
-

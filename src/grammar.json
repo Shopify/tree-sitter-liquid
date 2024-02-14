@@ -21,13 +21,8 @@
           "name": "content"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_paired_comment"
-          },
-          "named": true,
-          "value": "comment"
+          "type": "SYMBOL",
+          "name": "comment"
         }
       ]
     },
@@ -36,7 +31,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^{]+|\\{|%"
+          "value": "[^{]+|\\{[^{%]"
         },
         {
           "type": "STRING",
@@ -182,6 +177,15 @@
             {
               "type": "SYMBOL",
               "name": "_paired_statement"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_inline_comment"
+              },
+              "named": true,
+              "value": "comment"
             }
           ]
         },
@@ -225,15 +229,6 @@
         {
           "type": "SYMBOL",
           "name": "decrement"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_inline_comment"
-          },
-          "named": true,
-          "value": "comment"
         }
       ]
     },
@@ -558,16 +553,52 @@
           }
         },
         {
-          "type": "SYMBOL",
-          "name": "_tag_delimiter_open"
+          "type": "REPEAT",
+          "content": {
+            "type": "FIELD",
+            "name": "alternative",
+            "content": {
+              "type": "SYMBOL",
+              "name": "elsif_tag"
+            }
+          }
         },
         {
-          "type": "STRING",
-          "value": "endunless"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alternative",
+              "content": {
+                "type": "SYMBOL",
+                "name": "else_tag"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
-          "type": "SYMBOL",
-          "name": "_tag_delimiter_close"
+          "type": "PREC_RIGHT",
+          "value": 0,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_tag_delimiter_open"
+              },
+              {
+                "type": "STRING",
+                "value": "endunless"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_tag_delimiter_close"
+              }
+            ]
+          }
         }
       ]
     },
@@ -1260,8 +1291,39 @@
           }
         },
         {
-          "type": "STRING",
-          "value": "endunless"
+          "type": "REPEAT",
+          "content": {
+            "type": "FIELD",
+            "name": "alternative",
+            "content": {
+              "type": "SYMBOL",
+              "name": "elsif_statement"
+            }
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alternative",
+              "content": {
+                "type": "SYMBOL",
+                "name": "else_statement"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "PREC_RIGHT",
+          "value": 0,
+          "content": {
+            "type": "STRING",
+            "value": "endunless"
+          }
         }
       ]
     },
@@ -2757,56 +2819,111 @@
         }
       ]
     },
+    "comment": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_inline_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_paired_comment"
+        }
+      ]
+    },
     "_inline_comment": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "#"
-          },
-          {
-            "type": "REPEAT",
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_tag_delimiter_open"
+            },
+            {
+              "type": "PREC_LEFT",
+              "value": 0,
+              "content": {
+                "type": "REPEAT1",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": "#"
+                    },
+                    {
+                      "type": "PATTERN",
+                      "value": ".*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_tag_delimiter_close"
+            }
+          ]
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 0,
+          "content": {
+            "type": "REPEAT1",
             "content": {
-              "type": "PATTERN",
-              "value": "."
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "#"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": ".*"
+                }
+              ]
             }
           }
-        ]
-      }
+        }
+      ]
     },
     "_paired_comment": {
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_tag_delimiter_open"
-          },
-          "named": false,
-          "value": ""
+          "type": "SYMBOL",
+          "name": "_tag_delimiter_open"
         },
         {
           "type": "STRING",
           "value": "comment"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_tag_delimiter_close"
-          },
-          "named": false,
-          "value": ""
+          "type": "SYMBOL",
+          "name": "_tag_delimiter_close"
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "PATTERN",
-            "value": "."
-          }
+          "type": "SYMBOL",
+          "name": "_comment_content"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_paired_comment"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_tag_delimiter_open"
         },
         {
           "type": "STRING",
@@ -2817,44 +2934,6 @@
           "name": "_tag_delimiter_close"
         }
       ]
-    },
-    "_end_comment": {
-      "type": "TOKEN",
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "{%"
-              },
-              {
-                "type": "STRING",
-                "value": "{%-"
-              }
-            ]
-          },
-          {
-            "type": "STRING",
-            "value": "endcomment"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "STRING",
-                "value": "%}"
-              },
-              {
-                "type": "STRING",
-                "value": "-%}"
-              }
-            ]
-          }
-        ]
-      }
     },
     "_output_delimiter_open": {
       "type": "CHOICE",
@@ -2975,7 +3054,12 @@
       }
     ]
   ],
-  "externals": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "_comment_content"
+    }
+  ],
   "inline": [],
   "supertypes": []
 }

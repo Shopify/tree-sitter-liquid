@@ -1,10 +1,5 @@
 [
   {
-    "type": "",
-    "named": false,
-    "fields": {}
-  },
-  {
     "type": "access",
     "named": true,
     "fields": {
@@ -928,6 +923,10 @@
           "named": true
         },
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "expression",
           "named": true
         },
@@ -1287,10 +1286,6 @@
           "named": true
         },
         {
-          "type": "comment",
-          "named": true
-        },
-        {
           "type": "decrement",
           "named": true
         },
@@ -1469,6 +1464,20 @@
     "type": "unless_statement",
     "named": true,
     "fields": {
+      "alternative": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "else_statement",
+            "named": true
+          },
+          {
+            "type": "elsif_statement",
+            "named": true
+          }
+        ]
+      },
       "condition": {
         "multiple": false,
         "required": true,
@@ -1495,6 +1504,20 @@
     "type": "unless_tag",
     "named": true,
     "fields": {
+      "alternative": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "else_tag",
+            "named": true
+          },
+          {
+            "type": "elsif_tag",
+            "named": true
+          }
+        ]
+      },
       "condition": {
         "multiple": false,
         "required": true,

@@ -1,0 +1,615 @@
+==================
+If 
+==================
+
+<html>
+  {% if data.url != blank %}
+    hello
+  {% endif %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (if_tag
+   condition: (expression
+     (predicate
+      left: (expression 
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+      right: (expression 
+        (identifier))))
+   consequence: (block
+     (content))))
+ (content))
+
+==================
+If Contains
+==================
+
+<html>
+  {% if product.tags contains 'healing' %}
+    This potion contains restorative properties.
+  {% endif %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (if_tag
+   condition: (expression
+     (predicate
+      left: (expression 
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+      right: (expression 
+        (string))))
+   consequence: (block
+     (content))))
+ (content))
+
+==================
+If Elsif Else
+==================
+
+<html>
+  {%- if template contains 'list' -%}
+    <div class="collection-hero-{{ product.title }}">
+      {{ product.color }}
+    </div>
+  {% elsif sections.settings.grid == 10 %}
+    <div class="page -header text-center">
+      {% render "thing" %}
+    </div>
+  {%- else -%}
+    {%- assign limit = 16 -%}
+    <div class="collection-hero-{{ limit }}">
+  {%- endif -%}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (if_tag
+   condition: (expression
+     (predicate 
+      left: (expression (identifier)) 
+      right: (expression (string))))
+   consequence: (block (content)
+     (directive 
+      (expression
+       (access 
+        receiver: (identifier) 
+        method: (identifier))))
+     (content)
+     (directive
+      (expression
+       (access
+        receiver: (identifier)
+        method: (identifier))))
+     (content))
+   alternative: (elsif_tag
+     condition: (expression
+       (predicate
+        left: (expression
+          (access
+           receiver: (access
+             receiver: (identifier)
+             method: (identifier))
+           method: (identifier)))
+        right: (expression
+          (number))))
+     (block
+      (content)
+      (directive
+       (statement
+        (render
+         file: (string))))
+      (content)))
+   alternative: (else_tag
+       (block
+        (directive
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression
+             (number)))))
+        (content)
+        (directive
+         (expression
+          (identifier)))
+        (content)))))
+(content))
+
+==================
+Unless
+==================
+
+<html>
+  {% unless product.has_only_default_variant %}
+    {% assign title = product.name %}
+    <div>{{ title }}</div>
+  {% endunless %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (unless_tag
+   condition: (expression 
+     (access 
+      receiver: (identifier)
+      method: (identifier)))
+   consequence: (block 
+     (directive 
+      (statement 
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content) 
+     (directive 
+      (expression 
+       (identifier))) 
+     (content))))
+(content))
+
+==================
+Case
+==================
+
+<html>
+  {% case product.type %}
+    {% when "Love" or "whateva" %}
+      <div class="collection-{{ product.title }}">
+        {{ product.color }}
+      </div>
+    {% when 'Strength' %}
+      {% render "file" %}
+      <p>This is a strength or health potion.</p>
+    {% else %}
+      {% render "file" %}
+      <div>content</div>
+  {% endcase %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (case_tag
+     receiver: (access
+       receiver: (identifier)
+       method: (identifier))
+     conditions: (block 
+       (when_tag
+        condition: (expression
+          (predicate
+           left: (expression
+             (string))
+           right: (expression
+             (string))))
+        consequence: (block
+          (content)
+          (directive
+           (expression
+            (access
+             receiver: (identifier)
+             method: (identifier))))
+          (content)
+          (directive
+           (expression
+            (access
+             receiver: (identifier)
+             method: (identifier))))
+          (content)))
+       (when_tag
+        condition: (expression
+          (string))
+        consequence: (block
+          (directive
+           (statement
+            (render
+             file: (string))))
+          (content))))
+  alternative: (else_tag
+      (block
+       (directive
+        (statement
+         (render
+          file: (string))))
+       (content)))))
+(content))
+
+==================
+Empty Case
+==================
+
+<html>
+  {% case product.type %}
+  {% endcase %}
+</html>
+
+---
+  (template
+   (content)
+   (directive 
+    (case_tag
+     receiver: (access
+       receiver: (identifier)
+       method: (identifier))))
+   (content))
+
+==================
+For Loop
+==================
+
+<html>
+  {% for product in collection.products -%}
+    {% assign name = product.title %}
+    <div>{{ name }}</div>
+    {% echo name %}
+  {%- endfor %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (for_loop_tag
+   item: (identifier)
+   iterator: (access
+     receiver: (identifier)
+     method: (identifier))
+   body: (block
+     (directive
+      (statement
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content)
+     (directive
+      (expression
+       (identifier)))
+     (content)
+     (directive
+      (statement
+       (echo
+        (expression
+         (identifier))))))))
+(content))
+
+==================
+For Loop wtih Offest
+==================
+
+<html>
+  {% for product in collection.products offest: 2 -%}
+    {% assign name = product.title %}
+    <div>{{ name }}</div>
+    {% echo name %}
+  {%- endfor %}
+</html>
+
+---
+
+(template
+ (content)
+ (directive
+  (for_loop_tag
+   item: (identifier)
+   iterator: (access
+     receiver: (identifier)
+     method: (identifier))
+   modifier: (argument_list
+    (argument
+      key: (identifier)
+      value: (number)))
+   body: (block
+     (directive
+      (statement
+       (assignment
+        variable_name: (identifier)
+        value: (expression
+          (access
+           receiver: (identifier)
+           method: (identifier))))))
+     (content)
+     (directive
+      (expression
+       (identifier)))
+     (content)
+     (directive
+      (statement
+       (echo
+        (expression
+         (identifier))))))))
+(content))
+
+==================
+For Loop wtih Range
+==================
+
+<html>
+  {% for i in (1..upper_limit) -%}
+    {{ i }}
+    {{ break }}
+  {%- endfor %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (for_loop_tag
+   item: (identifier)
+   iterator: (range
+    start: (number)
+    end: (identifier))
+   body: (block
+     (directive
+      (expression
+       (identifier)))
+     (directive
+      (expression
+       (identifier))))))
+(content))
+
+==================
+For Loop wtih Else
+==================
+
+<html>
+  {% for i in array -%}
+    {% assign name = i %}
+    <div>{{ name }}</div>
+    {% echo name %}
+  {% else %}
+    {% assign name = "cool" %}
+    <div>{{ name }}</div>
+    {% echo name %}
+  {%- endfor %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (for_loop_tag
+     item: (identifier)
+     iterator: (identifier)
+     body: (block
+       (directive
+        (statement
+         (assignment
+          variable_name: (identifier)
+          value: (expression (identifier)))))
+       (content)
+       (directive
+        (expression
+         (identifier)))
+       (content)
+       (directive
+        (statement
+         (echo
+          (expression
+           (identifier))))))
+     alternative: (else_tag
+       (block
+        (directive
+         (statement
+          (assignment
+           variable_name: (identifier)
+           value: (expression (string)))))
+        (content)
+        (directive
+         (expression
+          (identifier)))
+        (content)
+        (directive
+         (statement
+          (echo
+           (expression
+            (identifier)))))))))
+(content))
+
+==================
+For Loop with Cycle
+==================
+
+<html>
+  {% for product in collection.products -%}
+    {% cycle "group": "one", string, access.string %}
+  {%- endfor %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (for_loop_tag
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       method: (identifier))
+     body: (block
+       (cycle
+        group_name: (string)
+        group_item: (string)
+        group_item: (identifier)
+        group_item: (access
+          receiver: (identifier)
+          method: (identifier))))))
+   (content))
+
+==================
+Nested For / If
+==================
+
+<html>
+  {% for i in list %}
+    {% if i != blank %}
+      {% for j in list %}
+        <div>{{ i }}</div>
+      {% endfor %}
+    {% else %}
+      <div>{{ i }}</div>
+    {% endif %}
+  {% endfor %}
+</html>
+
+---
+(template
+ (content)
+ (directive 
+  (for_loop_tag
+   item: (identifier)
+   iterator: (identifier)
+   body: (block
+     (directive 
+      (if_tag
+       condition: (expression
+         (predicate
+          left: (expression 
+            (identifier))
+          right: (expression 
+            (identifier))))
+       consequence: (block
+         (directive
+          (for_loop_tag
+           item: (identifier)
+           iterator: (identifier)
+           body: (block
+             (content)
+             (directive 
+              (expression
+               (identifier)))
+             (content)))))
+       alternative: (else_tag
+         (block
+          (content)
+          (directive 
+           (expression
+            (identifier)))
+          (content))))))))
+  (content))
+
+==================
+Capture
+==================
+
+<html>
+  {%- capture title -%}
+    {% if show_up_title -%}
+      Upcase title: {{ up_title }}
+    {%- else -%}
+      Downcase title: {{ down_title }}
+    {%- endif %}
+  {%- endcapture %}
+</html>
+
+---
+(template
+ (content)
+ (directive
+  (capture_tag
+   variable: (identifier)
+   value: (block
+    (directive
+     (if_tag
+      condition: (expression
+       (identifier))
+      consequence: (block
+       (content)
+       (directive
+        (expression
+         (identifier))))
+      alternative: (else_tag
+       (block
+        (content)
+        (directive
+         (expression
+          (identifier))))))))))
+  (content))
+
+==================
+Tablerow
+==================
+
+<html>
+  {%- tablerow item in arr -%}
+    {{ item }}
+  {%- endtablerow %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (tablerow_tag
+     item: (identifier)
+     iterator: (identifier)
+     body: (block
+       (directive
+        (expression
+         (identifier))))))
+   (content))
+
+==================
+Paginate
+==================
+
+<html>
+  {% paginate collection.products by 3, window_size: 1 %}
+    {% for product in collection.products -%}
+      {{ product.title }}
+    {%- endfor %}
+    {{- paginate | default_pagination }}
+  {% endpaginate %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (paginate_tag
+     item: (access
+       receiver: (identifier)
+       method: (identifier))
+     iterator: (number)
+     modifier: (argument_list
+       (argument
+        key: (identifier)
+        value: (number)))
+     body: (block
+       (directive
+        (for_loop_tag
+         item: (identifier)
+         iterator: (access
+           receiver: (identifier)
+           method: (identifier))
+         body: (block
+           (directive
+            (expression
+             (access
+              receiver: (identifier)
+              method: (identifier)))))))
+       (directive
+        (expression
+         (filter
+          body: (expression
+            (identifier))
+          name: (identifier)))))))
+(content))
+

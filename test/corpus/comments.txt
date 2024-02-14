@@ -1,0 +1,121 @@
+==================
+Inline Comment
+==================
+
+<html>
+  {% # render "string"
+     # this renders a string
+     # cool
+  %}
+</html>
+
+---
+(template
+ (content)
+ (comment)
+ (content))
+
+==================
+Paired Tag Comment
+==================
+
+<html>
+  {% if true %}
+    {% comment %}
+      {% render "file" %}
+      {{ data.page.title | reverse }}
+      <div>hi</div>
+      {{ data.page }}
+      content
+    {%- endcomment %}
+  {% endif %}
+</html>
+
+---
+(template
+  (content)
+  (directive
+   (if_tag
+    condition: (expression 
+      (boolean))
+    consequence: (block
+      (comment))))
+    (content))
+
+==================
+Nested Comments
+==================
+
+{% comment %}
+{% comment %}
+{% comment %}
+{% render "file" %}
+{% endcomment %}
+{% endcomment %}
+{% endcomment %}
+
+---
+  (template
+   (comment)
+   (content))
+
+==================
+Comment Error
+==================
+
+{% comment %}
+{% comment %}
+{% endcomment %}
+
+---
+  (template
+   (ERROR))
+
+==================
+Liquid Inline Comment
+==================
+
+<html>
+  {% liquid
+    assign value = "string"
+    # render "file1"
+    # this renders a string
+    # cool
+    render "file2"
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (statement
+      (assignment
+       (identifier)
+       (expression
+        (string))))
+     (comment)
+     (comment)
+     (comment)
+     (statement
+      (render
+       (string)))))
+   (content))
+
+==================
+Raw Tag
+==================
+
+<html>
+  {% raw %}
+    {% render "something" %}
+    {{ data.page.title | reverse }}
+    <div>hi</div>
+    {{ data.page }}
+    content
+  {% endraw %}
+</html>
+
+---
+()
