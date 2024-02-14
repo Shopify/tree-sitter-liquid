@@ -27,7 +27,8 @@ module.exports = grammar({
   // ],
 
   externals: ($) => [
-    $._comment_content
+    $._comment_content,
+    $.raw_content
   ],
 
   precedences: (_) => [
@@ -382,7 +383,8 @@ module.exports = grammar({
         "raw",
         $._tag_delimiter_close,
 
-        alias(repeat($._node), $.content),
+        $.raw_content,
+        optional($.raw_tag),
 
         $._tag_delimiter_open, 
         "endraw", 

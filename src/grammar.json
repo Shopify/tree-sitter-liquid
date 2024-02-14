@@ -1160,16 +1160,20 @@
           "name": "_tag_delimiter_close"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "REPEAT",
-            "content": {
+          "type": "SYMBOL",
+          "name": "raw_content"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
               "type": "SYMBOL",
-              "name": "_node"
+              "name": "raw_tag"
+            },
+            {
+              "type": "BLANK"
             }
-          },
-          "named": true,
-          "value": "content"
+          ]
         },
         {
           "type": "SYMBOL",
@@ -3058,6 +3062,10 @@
     {
       "type": "SYMBOL",
       "name": "_comment_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "raw_content"
     }
   ],
   "inline": [],

@@ -118,4 +118,55 @@ Raw Tag
 </html>
 
 ---
-()
+  (template
+   (content)
+   (directive
+    (raw_tag
+     (raw_content)))
+   (content))
+
+==================
+Nested Raw
+==================
+
+{% raw %}
+{% raw %}
+{% raw %}
+{% render "file" %}
+{% endraw %}
+{% endraw %}
+{% endraw %}
+
+---
+
+(template
+ (directive
+  (raw_tag
+   (raw_content)
+   (raw_tag
+    (raw_content)
+    (raw_tag
+     (raw_content)))))
+ (content))
+
+==================
+Raw/Comment Nesting
+==================
+
+{% comment %}
+{% raw %}
+{% endraw %}
+{% endcomment %}
+{% raw %}
+{% comment %}
+{% endcomment %}
+{% endraw %}
+
+---
+  (template
+   (comment)
+   (directive
+    (raw_tag
+     (raw_content)))
+   (content))
+

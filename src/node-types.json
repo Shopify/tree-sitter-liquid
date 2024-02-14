@@ -352,25 +352,7 @@
   {
     "type": "content",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "comment",
-          "named": true
-        },
-        {
-          "type": "content",
-          "named": true
-        },
-        {
-          "type": "directive",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "cycle",
@@ -1184,11 +1166,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": false,
+      "multiple": true,
+      "required": true,
       "types": [
         {
-          "type": "content",
+          "type": "raw_content",
+          "named": true
+        },
+        {
+          "type": "raw_tag",
           "named": true
         }
       ]
@@ -1847,6 +1833,10 @@
   {
     "type": "raw",
     "named": false
+  },
+  {
+    "type": "raw_content",
+    "named": true
   },
   {
     "type": "render",
