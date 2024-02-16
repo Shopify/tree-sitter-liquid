@@ -4,9 +4,6 @@ const PRECS = {
   else: 2,
 }
 
-// refrences
-// https://github.com/ngalaiko/tree-sitter-go-template/
-
 module.exports = grammar({
   name: "liquid",
 
@@ -21,14 +18,17 @@ module.exports = grammar({
     [$.when_statement],
   ],
 
-  // supertypes: $ => [
-  //   $.statement,
-  //   $.expression,
-  // ],
+  supertypes: $ => [
+    $.statement,
+    $.expression,
+  ],
 
   externals: ($) => [
     $._comment_content,
-    $.raw_content
+    $.raw_content,
+
+    // check if scanner is in error recovery mode
+    $.error_sentinel,
   ],
 
   precedences: (_) => [
@@ -41,7 +41,7 @@ module.exports = grammar({
       "binary_compare",
       "binary_relation",
       "clause_connective",
-      "contains"
+      "contains",
     ],
   ],
 
@@ -67,23 +67,10 @@ module.exports = grammar({
       ),
 
     directive: ($) => 
-      choice($._unpaired_tag, $._paired_tag, $._output_directive),
-
-    //TODO:
-    //form tag
-    //javascript tag
-    //stylesheet tag
-    _paired_tag: ($) => 
       choice(
-        $.if_tag,
-        $.unless_tag,
-        $.case_tag,
-        $.for_loop_tag,
-        $.capture_tag,
-        $.tablerow_tag,
-        $.paginate_tag,
-        $.schema_tag,
-        $.raw_tag,
+        $._unpaired_tag,
+        $._paired_tag,
+        $._output_directive,
       ),
 
     _unpaired_tag: ($) => 
@@ -100,7 +87,16 @@ module.exports = grammar({
         $._output_delimiter_close,
       ),
 
-    liquid_tag: ($) => seq("liquid", repeat($._liquid_node)),
+    liquid_tag: ($) => 
+      seq(
+        "liquid", 
+        repeat(
+          choice(
+            $._liquid_node,
+            alias($._liquid_comment, $.comment)
+          )
+        )
+      ),
 
     _liquid_node: ($) =>
       seq(
@@ -123,16 +119,10 @@ module.exports = grammar({
         $.echo,
         $.increment,
         $.decrement,
+        $.layout,
+        $.cycle,
       ),
 
-    expression: ($) => 
-      choice(
-        $._literal,
-        $.filter,
-        $.identifier,
-        $.predicate,
-        $.access,
-      ),
 
     _paired_statement: ($) =>
       choice(
@@ -142,6 +132,33 @@ module.exports = grammar({
         $.for_loop_statement,
         $.capture_statement,
         $.tablerow_statement,
+      ),
+
+    //TODO:
+    //form tag
+    _paired_tag: ($) => 
+      choice(
+        $.if_tag,
+        $.unless_tag,
+        $.case_tag,
+        $.for_loop_tag,
+        $.capture_tag,
+        $.tablerow_tag,
+        $.paginate_tag,
+        $.schema_tag,
+        $.raw_tag,
+        $.style_tag,
+        $.javascript_tag,
+        $.form_tag,
+      ),
+
+    expression: ($) => 
+      choice(
+        $._literal,
+        $.filter,
+        $.identifier,
+        $.predicate,
+        $.access,
       ),
 
     _iterator: ($) => 
@@ -190,14 +207,7 @@ module.exports = grammar({
         field("body", 
           alias(
             repeat(
-              choice(
-                $._node,
-                seq(
-                  $._tag_delimiter_open, 
-                  $.cycle, 
-                  $._tag_delimiter_close
-                )
-              )
+              $._node,
             ), 
             $.block
           )
@@ -391,6 +401,56 @@ module.exports = grammar({
         $._tag_delimiter_close
       ),
 
+    // TODO: WIP & test
+    style_tag: ($) =>
+      seq(
+        $._tag_delimiter_open,
+        "style",
+        $._tag_delimiter_close,
+
+        repeat($._node),
+
+        $._tag_delimiter_open, 
+        "endstyle", 
+        $._tag_delimiter_close
+      ),
+
+    // TODO: WIP & test
+    javascript_tag: ($) =>
+      seq(
+        $._tag_delimiter_open,
+        "javascript",
+        $._tag_delimiter_close,
+
+        repeat($.content),
+
+        $._tag_delimiter_open, 
+        "endjavascript", 
+        $._tag_delimiter_close
+      ),
+
+    // TODO: WIP & test
+    form_tag: ($) =>
+      seq(
+        $._tag_delimiter_open,
+        "form",
+        field("type", $.string),
+        optional(
+          field(
+            "parameters", 
+            seq(",", $.argument_list
+            )
+          )
+        ),
+        $._tag_delimiter_close,
+
+        repeat($.content),
+
+        $._tag_delimiter_open, 
+        "endform", 
+        $._tag_delimiter_close
+      ),
+
 
     //////////////////////////////////////
     // Paired Statements For Liquid Tag //
@@ -406,10 +466,7 @@ module.exports = grammar({
         field("body", 
           alias(
             repeat(
-              choice(
-                $._liquid_node,
-                $.cycle,
-              )
+              $._liquid_node,
             ), 
             $.block
           )
@@ -612,9 +669,9 @@ module.exports = grammar({
         field(
           "group_item", 
           seq(
-            choice($.string, $.access, $.identifier),
+            choice($.number, $.string, $.access, $.identifier),
             repeat(
-              seq(",", choice($.string, $.access, $.identifier))
+              seq(",", choice($.number, $.string, $.access, $.identifier))
             )
           )
         )
@@ -625,7 +682,7 @@ module.exports = grammar({
     // Primitives //
     ////////////////
 
-    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_-]*)/,
+    identifier: (_) => /([a-zA-Z][0-9a-zA-Z_\?-]*)/,
 
     _literal: ($) => choice($.string, $.number, $.boolean),
 
@@ -644,6 +701,7 @@ module.exports = grammar({
         ...[
           ["+", "binary_plus"],
           ["-", "binary_plus"],
+          //
           ["*", "binary_times"],
           ["/", "binary_times"],
           ["%", "binary_times"],
@@ -678,18 +736,14 @@ module.exports = grammar({
 
     comment: ($) => choice($._inline_comment, $._paired_comment),
 
+    // TODO: this is broken
     _inline_comment: ($) => 
-      choice(
-        seq(
-          $._tag_delimiter_open, 
-          prec.left(
-            repeat1(seq("#", /.*/))
-          ), 
-          $._tag_delimiter_close
-        ),
+      seq(
+        $._tag_delimiter_open, 
         prec.left(
           repeat1(seq("#", /.*/))
-        )
+        ), 
+        $._tag_delimiter_close
       ),
 
     _paired_comment: ($) =>
@@ -704,6 +758,12 @@ module.exports = grammar({
         $._tag_delimiter_open,
         "endcomment", 
         $._tag_delimiter_close,
+      ),
+
+    // TODO: probably also broken
+    _liquid_comment: (_) => 
+      prec.left(
+        repeat1(seq("#", /.*/))
       ),
 
 

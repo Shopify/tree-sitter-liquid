@@ -13,14 +13,11 @@ If
  (content)
  (directive
   (if_tag
-   condition: (expression
-     (predicate
-      left: (expression 
-        (access
+   condition: (predicate
+      left: (access
          receiver: (identifier)
-         method: (identifier)))
-      right: (expression 
-        (identifier))))
+         method: (identifier))
+      right: (identifier))
    consequence: (block
      (content))))
  (content))
@@ -36,21 +33,18 @@ If Contains
 </html>
 
 ---
-(template
- (content)
- (directive
-  (if_tag
-   condition: (expression
-     (predicate
-      left: (expression 
-        (access
+  (template
+   (content)
+   (directive
+    (if_tag
+     condition: (predicate
+       left: (access
          receiver: (identifier)
-         method: (identifier)))
-      right: (expression 
-        (string))))
-   consequence: (block
-     (content))))
- (content))
+         method: (identifier))
+       right: (string))
+     consequence: (block
+       (content))))
+   (content))
 
 ==================
 If Elsif Else
@@ -72,58 +66,49 @@ If Elsif Else
 </html>
 
 ---
-(template
- (content)
- (directive
-  (if_tag
-   condition: (expression
-     (predicate 
-      left: (expression (identifier)) 
-      right: (expression (string))))
-   consequence: (block (content)
-     (directive 
-      (expression
-       (access 
-        receiver: (identifier) 
-        method: (identifier))))
-     (content)
-     (directive
-      (expression
-       (access
-        receiver: (identifier)
-        method: (identifier))))
-     (content))
-   alternative: (elsif_tag
-     condition: (expression
-       (predicate
-        left: (expression
-          (access
+  (template
+   (content)
+   (directive
+    (if_tag
+     condition: (predicate 
+       left: (identifier)
+       right: (string))
+     consequence: (block 
+       (content)
+       (directive 
+        (access 
+         receiver: (identifier) 
+         method: (identifier)))
+       (content)
+       (directive
+        (access
+         receiver: (identifier)
+         method: (identifier)))
+       (content))
+     alternative: (elsif_tag
+       condition: (predicate
+         left: (access
            receiver: (access
              receiver: (identifier)
              method: (identifier))
-           method: (identifier)))
-        right: (expression
-          (number))))
-     (block
-      (content)
-      (directive
-       (statement
-        (render
-         file: (string))))
-      (content)))
-   alternative: (else_tag
+           method: (identifier))
+         right: (number))
        (block
-        (directive
-         (statement
-          (assignment
-           variable_name: (identifier)
-           value: (expression
-             (number)))))
         (content)
         (directive
-         (expression
-          (identifier)))
-        (content)))))
+         (render
+          file: (string)))
+        (content)))
+     alternative: (else_tag
+         (block
+          (directive
+           (assignment
+            variable_name: (identifier)
+            value: (number)))
+          (content)
+          (directive
+           (identifier))
+          (content)))))
 (content))
 
 ==================
@@ -142,23 +127,21 @@ Unless
  (content)
  (directive
   (unless_tag
-   condition: (expression 
+   condition: 
      (access 
       receiver: (identifier)
-      method: (identifier)))
+      method: (identifier))
    consequence: (block 
      (directive 
-      (statement 
        (assignment
         variable_name: (identifier)
-        value: (expression
+        value: 
           (access
            receiver: (identifier)
-           method: (identifier))))))
+           method: (identifier))))
      (content) 
      (directive 
-      (expression 
-       (identifier))) 
+       (identifier))
      (content))))
 (content))
 
@@ -191,41 +174,33 @@ Case
        method: (identifier))
      conditions: (block 
        (when_tag
-        condition: (expression
-          (predicate
-           left: (expression
-             (string))
-           right: (expression
-             (string))))
+        condition: (predicate
+           left: (string)
+           right: (string))
         consequence: (block
           (content)
           (directive
-           (expression
             (access
              receiver: (identifier)
-             method: (identifier))))
+             method: (identifier)))
           (content)
           (directive
-           (expression
             (access
              receiver: (identifier)
-             method: (identifier))))
+             method: (identifier)))
           (content)))
        (when_tag
-        condition: (expression
-          (string))
+        condition: (string)
         consequence: (block
           (directive
-           (statement
             (render
-             file: (string))))
+             file: (string)))
           (content))))
   alternative: (else_tag
       (block
        (directive
-        (statement
          (render
-          file: (string))))
+          file: (string)))
        (content)))))
 (content))
 
@@ -261,33 +236,28 @@ For Loop
 </html>
 
 ---
-(template
- (content)
- (directive
-  (for_loop_tag
-   item: (identifier)
-   iterator: (access
-     receiver: (identifier)
-     method: (identifier))
-   body: (block
-     (directive
-      (statement
-       (assignment
-        variable_name: (identifier)
-        value: (expression
-          (access
+  (template
+   (content)
+   (directive
+    (for_loop_tag
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       method: (identifier))
+     body: (block
+       (directive
+        (assignment
+         variable_name: (identifier)
+         value: (access
            receiver: (identifier)
-           method: (identifier))))))
-     (content)
-     (directive
-      (expression
-       (identifier)))
-     (content)
-     (directive
-      (statement
-       (echo
-        (expression
-         (identifier))))))))
+           method: (identifier))))
+       (content)
+       (directive
+        (identifier))
+       (content)
+       (directive
+        (echo
+         (identifier))))))
 (content))
 
 ==================
@@ -304,37 +274,32 @@ For Loop wtih Offest
 
 ---
 
-(template
- (content)
- (directive
-  (for_loop_tag
-   item: (identifier)
-   iterator: (access
-     receiver: (identifier)
-     method: (identifier))
-   modifier: (argument_list
-    (argument
-      key: (identifier)
-      value: (number)))
-   body: (block
-     (directive
-      (statement
-       (assignment
-        variable_name: (identifier)
-        value: (expression
-          (access
+  (template
+   (content)
+   (directive
+    (for_loop_tag
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       method: (identifier))
+     modifier: (argument_list
+       (argument
+        key: (identifier)
+        value: (number)))
+     body: (block
+       (directive
+        (assignment
+         variable_name: (identifier)
+         value: (access
            receiver: (identifier)
-           method: (identifier))))))
-     (content)
-     (directive
-      (expression
-       (identifier)))
-     (content)
-     (directive
-      (statement
-       (echo
-        (expression
-         (identifier))))))))
+           method: (identifier))))
+       (content)
+       (directive
+        (identifier))
+       (content)
+       (directive
+        (echo
+         (identifier))))))
 (content))
 
 ==================
@@ -359,11 +324,9 @@ For Loop wtih Range
     end: (identifier))
    body: (block
      (directive
-      (expression
-       (identifier)))
+       (identifier))
      (directive
-      (expression
-       (identifier))))))
+       (identifier)))))
 (content))
 
 ==================
@@ -391,37 +354,29 @@ For Loop wtih Else
      iterator: (identifier)
      body: (block
        (directive
-        (statement
-         (assignment
-          variable_name: (identifier)
-          value: (expression (identifier)))))
+        (assignment
+         variable_name: (identifier)
+         value: (identifier)))
        (content)
        (directive
-        (expression
-         (identifier)))
+        (identifier))
        (content)
        (directive
-        (statement
-         (echo
-          (expression
-           (identifier))))))
+        (echo
+         (identifier))))
      alternative: (else_tag
        (block
         (directive
-         (statement
-          (assignment
-           variable_name: (identifier)
-           value: (expression (string)))))
+         (assignment
+          variable_name: (identifier)
+          value: (string)))
         (content)
         (directive
-         (expression
-          (identifier)))
+         (identifier))
         (content)
         (directive
-         (statement
-          (echo
-           (expression
-            (identifier)))))))))
+         (echo
+          (identifier)))))))
 (content))
 
 ==================
@@ -444,13 +399,14 @@ For Loop with Cycle
        receiver: (identifier)
        method: (identifier))
      body: (block
+      (directive
        (cycle
         group_name: (string)
         group_item: (string)
         group_item: (identifier)
         group_item: (access
           receiver: (identifier)
-          method: (identifier))))))
+          method: (identifier)))))))
    (content))
 
 ==================
@@ -470,40 +426,36 @@ Nested For / If
 </html>
 
 ---
-(template
- (content)
- (directive 
-  (for_loop_tag
-   item: (identifier)
-   iterator: (identifier)
-   body: (block
-     (directive 
-      (if_tag
-       condition: (expression
+  (template
+   (content)
+   (directive 
+    (for_loop_tag
+     item: (identifier)
+     iterator: (identifier)
+     body: (block
+       (directive 
+        (if_tag
+         condition: 
          (predicate
-          left: (expression 
-            (identifier))
-          right: (expression 
-            (identifier))))
-       consequence: (block
-         (directive
-          (for_loop_tag
-           item: (identifier)
-           iterator: (identifier)
-           body: (block
-             (content)
-             (directive 
-              (expression
-               (identifier)))
-             (content)))))
-       alternative: (else_tag
-         (block
-          (content)
-          (directive 
-           (expression
-            (identifier)))
-          (content))))))))
-  (content))
+          left: (identifier)
+          right: (identifier))
+         consequence: (block
+           (directive
+            (for_loop_tag
+             item: (identifier)
+             iterator: (identifier)
+             body: (block
+               (content)
+               (directive 
+                (identifier))
+               (content)))))
+         alternative: (else_tag
+           (block
+            (content)
+            (directive 
+             (identifier))
+            (content))))))))
+(content))
 
 ==================
 Capture
@@ -528,19 +480,16 @@ Capture
    value: (block
     (directive
      (if_tag
-      condition: (expression
-       (identifier))
+      condition: (identifier)
       consequence: (block
        (content)
        (directive
-        (expression
-         (identifier))))
+         (identifier)))
       alternative: (else_tag
        (block
         (content)
         (directive
-         (expression
-          (identifier))))))))))
+          (identifier)))))))))
   (content))
 
 ==================
@@ -562,8 +511,7 @@ Tablerow
      iterator: (identifier)
      body: (block
        (directive
-        (expression
-         (identifier))))))
+         (identifier)))))
    (content))
 
 ==================
@@ -601,15 +549,52 @@ Paginate
            method: (identifier))
          body: (block
            (directive
-            (expression
-             (access
-              receiver: (identifier)
-              method: (identifier)))))))
+            (access
+             receiver: (identifier)
+             method: (identifier))))))
        (directive
-        (expression
-         (filter
-          body: (expression
-            (identifier))
-          name: (identifier)))))))
+        (filter
+         body: (identifier)
+         name: (identifier))))))
 (content))
+
+==================
+Form
+==================
+
+{% form 'storefront_password' %}
+  <!-- form content -->
+{% endform %}
+---
+
+==================
+Form with argument
+==================
+
+{% form 'form_type', return_to: string %}
+  content
+{% endform %}
+---
+
+==================
+Form with many arguments
+==================
+
+{% form "product", product, id: 'custom-id', class: 'custom-class', data-example: '100' %}
+  <!-- form content -->
+{% endform %}
+---
+
+==================
+Scanner Error Recovery
+==================
+{% asdf 1, 2, 3, 4, 5, 6 %}
+{%- capture current -%}{%- endcapture -%}
+{%- if collection.empty -%}
+{{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+{%- else -%}
+{% endif %}
+{% comment %}
+{% endcomment %}
+---
 

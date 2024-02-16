@@ -4,7 +4,8 @@
 
 enum TokenType { 
   COMMENT_CONTENT,
-  RAW_CONTENT
+  RAW_CONTENT,
+  NONE
 };
 
 void *tree_sitter_liquid_external_scanner_create() { return NULL; }
@@ -12,10 +13,12 @@ void tree_sitter_liquid_external_scanner_destroy(void *payload) {}
 unsigned tree_sitter_liquid_external_scanner_serialize(void *payload, char *buffer) { return 0; }
 void tree_sitter_liquid_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
 
+static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
+
 bool scan_str(TSLexer *lexer, char *str) {
   for (int i = 0; str[i] != '\0'; i++) {
     if (lexer->lookahead == str[i]) {
-      lexer->advance(lexer, false);
+      advance(lexer);
     } else {
       return false;
     }
@@ -23,19 +26,23 @@ bool scan_str(TSLexer *lexer, char *str) {
   return true;
 }
 
-static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
-
 bool tree_sitter_liquid_external_scanner_scan(
   void *payload, 
   TSLexer *lexer, 
   const bool *valid_symbols
 ) {
 
-  while (iswspace(lexer->lookahead)) {
-    lexer->advance(lexer, true);
+  // error recovery mode check
+  if (valid_symbols[NONE]) {
+    return false;
   }
 
   if (valid_symbols[COMMENT_CONTENT] || valid_symbols[RAW_CONTENT]) {
+
+    while (iswspace(lexer->lookahead)) {
+      lexer->advance(lexer, true);
+    }
+
     while (lexer->lookahead) {
       if (lexer->lookahead == '{') {
 
@@ -64,6 +71,7 @@ bool tree_sitter_liquid_external_scanner_scan(
 
         // consume "end" if exists
         if (lexer->lookahead == 'e' && !scan_str(lexer, end)) {
+          advance(lexer);
           continue;
         }
 
@@ -98,10 +106,11 @@ bool tree_sitter_liquid_external_scanner_scan(
         } 
 
         if (lexer->lookahead == '}') {
+          advance(lexer);
           return true;
+        } else {
+          advance(lexer);
         }
-
-        advance(lexer);
 
       } else {
         advance(lexer);

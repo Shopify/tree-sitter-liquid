@@ -17,48 +17,35 @@ Liquid Tag with If
 </html>
 
 ---
-(template
- (content)
- (directive
-  (liquid_tag
-   (statement
-    (include
-     (string)))
-   (statement
-    (assignment
-     variable_name: (identifier)
-     value: (expression
-      (filter
-       body: (expression
-        (access
-         receiver: (identifier)
-         method: (identifier)))
-       name: (identifier)))))
-   (if_statement
-    condition: (expression
-     (predicate
-      left: (expression
-       (identifier))
-      right: (expression
-       (identifier))))
-    consequence: (block
-     (expression
-      (filter
-       body: (expression
-        (identifier))
-       name: (identifier)))
-     (statement
-      (echo
-       (expression
-        (identifier)))))
-    alternative: (else_statement
-     (block
-      (statement
-       (assignment
-        variable_name: (identifier)
-        value: (expression
-         (string)))))))))
-  (content))
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (include
+      (string))
+     (assignment
+      variable_name: (identifier)
+      value: (filter
+        body: (access
+          receiver: (identifier)
+          method: (identifier))
+        name: (identifier)))
+     (if_statement
+      condition: (predicate
+        left: (identifier)
+        right: (identifier))
+      consequence: (block
+        (filter
+         body: (identifier)
+         name: (identifier))
+        (echo
+         (identifier)))
+      alternative: (else_statement
+        (block
+         (assignment
+          variable_name: (identifier)
+          value: (string)))))))
+(content))
 
 ==================
 Liquid Tag with Case
@@ -90,67 +77,44 @@ Liquid Tag with Case
    (content)
    (directive
     (liquid_tag
-
-     (statement
-      (assignment
-       variable_name: (identifier)
-       value: (expression
-        (filter
-         body: (expression
-          (access
-           receiver: (identifier)
-           method: (identifier)))
-         name: (identifier)))))
-
-     (statement
-      (assignment
-       variable_name: (identifier)
-       value: (expression
-        (string))))
-
+     (assignment
+      variable_name: (identifier)
+      value: (filter
+        body: (access
+          receiver: (identifier)
+          method: (identifier))
+        name: (identifier)))
+     (assignment
+      variable_name: (identifier)
+      value: (string))
      (case_statment
       receiver: (identifier)
       conditions: (block
-       (when_statement
-        condition: (expression
-         (string))
-        consequence: (block
-         (statement
-          (assignment
-           variable_name: (identifier)
-           value: (expression
-            (string))))
-         (statement
-          (echo
-           (expression
+        (when_statement
+         condition: (string)
+         consequence: (block
+           (assignment
+            variable_name: (identifier)
+            value: (string))
+           (echo
             (filter
-             body: (expression
-              (identifier))
-             name: (identifier)))))))
-       (when_statement
-        condition: (expression
-         (string))
-        consequence: (block
-         (statement
-          (assignment
-           variable_name: (identifier)
-           value: (expression
-            (string)))))))
+             body: (identifier)
+             name: (identifier)))))
+        (when_statement
+         condition: (string)
+         consequence: (block
+           (assignment
+            variable_name: (identifier)
+            value: (string)))))
       alternative: (else_statement
-       (block
-        (statement
+        (block
          (render
-          file: (string)))
-        (expression
+          file: (string))
          (filter
-          body: (expression
-           (identifier))
-          name: (identifier))))))
-
-  (statement
-   (echo
-    (expression
-     (identifier))))))
+          body: (identifier)
+          name: (identifier)))))
+  (echo
+   (identifier))))
 (content))
 
 ==================
@@ -178,11 +142,9 @@ Liquid Tag with For Loop
         receiver: (identifier)
         method: (identifier))
       body: (block
-        (statement
-         (assignment
-          variable_name: (identifier)
-          value: (expression
-            (identifier))))
+        (assignment
+         variable_name: (identifier)
+         value: (identifier))
         (cycle
          group_name: (string)
          group_item: (string)
@@ -190,10 +152,8 @@ Liquid Tag with For Loop
          group_item: (access
            receiver: (identifier)
            method: (identifier)))
-        (statement
-         (echo
-          (expression
-           (identifier))))))))
+        (echo
+         (identifier))))))
 (content))
 
 ==================
@@ -221,15 +181,12 @@ Liquid Tag with Capture
     variable: (identifier)
     value: (block
        (if_statement
-        condition: (expression
-          (identifier))
+        condition: (identifier)
         consequence: (block
-           (expression
-            (identifier)))
+            (identifier))
         alternative: (else_statement
           (block
-            (expression
-             (identifier)))))))))
+             (identifier))))))))
   (content))
 
 ==================
@@ -247,23 +204,19 @@ Liquid Tag with Tablerow
 
 ---
   (template
-    (content)
-    (directive
-      (liquid_tag
-        (tablerow_statement
-          item: (identifier)
-          iterator: (access
-            receiver: (identifier)
-            method: (identifier))
-          body: (block
-           (statement
-            (assignment
-             variable_name: (identifier)
-             value: (expression
-              (identifier))))
-           (statement
-            (echo
-             (expression
-              (identifier))))))))
-    (content))
+   (content)
+   (directive
+    (liquid_tag
+     (tablerow_statement
+      item: (identifier)
+      iterator: (access
+        receiver: (identifier)
+        method: (identifier))
+      body: (block
+        (assignment
+         variable_name: (identifier)
+         value: (identifier))
+        (echo
+         (identifier))))))
+   (content))
 

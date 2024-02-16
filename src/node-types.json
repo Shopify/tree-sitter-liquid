@@ -1,5 +1,85 @@
 [
   {
+    "type": "expression",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "access",
+        "named": true
+      },
+      {
+        "type": "boolean",
+        "named": true
+      },
+      {
+        "type": "filter",
+        "named": true
+      },
+      {
+        "type": "identifier",
+        "named": true
+      },
+      {
+        "type": "number",
+        "named": true
+      },
+      {
+        "type": "predicate",
+        "named": true
+      },
+      {
+        "type": "string",
+        "named": true
+      }
+    ]
+  },
+  {
+    "type": "statement",
+    "named": true,
+    "subtypes": [
+      {
+        "type": "assignment",
+        "named": true
+      },
+      {
+        "type": "cycle",
+        "named": true
+      },
+      {
+        "type": "decrement",
+        "named": true
+      },
+      {
+        "type": "echo",
+        "named": true
+      },
+      {
+        "type": "include",
+        "named": true
+      },
+      {
+        "type": "increment",
+        "named": true
+      },
+      {
+        "type": "layout",
+        "named": true
+      },
+      {
+        "type": "render",
+        "named": true
+      },
+      {
+        "type": "section",
+        "named": true
+      },
+      {
+        "type": "sections",
+        "named": true
+      }
+    ]
+  },
+  {
     "type": "access",
     "named": true,
     "fields": {
@@ -162,10 +242,6 @@
         },
         {
           "type": "content",
-          "named": true
-        },
-        {
-          "type": "cycle",
           "named": true
         },
         {
@@ -375,6 +451,10 @@
             "named": true
           },
           {
+            "type": "number",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           }
@@ -436,7 +516,15 @@
           "named": true
         },
         {
+          "type": "form_tag",
+          "named": true
+        },
+        {
           "type": "if_tag",
+          "named": true
+        },
+        {
+          "type": "javascript_tag",
           "named": true
         },
         {
@@ -457,6 +545,10 @@
         },
         {
           "type": "statement",
+          "named": true
+        },
+        {
+          "type": "style_tag",
           "named": true
         },
         {
@@ -562,45 +654,6 @@
       "types": [
         {
           "type": "block",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "expression",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "access",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "filter",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "predicate",
-          "named": true
-        },
-        {
-          "type": "string",
           "named": true
         }
       ]
@@ -779,6 +832,46 @@
     }
   },
   {
+    "type": "form_tag",
+    "named": true,
+    "fields": {
+      "parameters": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "if_statement",
     "named": true,
     "fields": {
@@ -883,6 +976,36 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "javascript_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "layout",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -1260,52 +1383,32 @@
     }
   },
   {
-    "type": "statement",
+    "type": "string",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "style_tag",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": true,
+      "multiple": true,
+      "required": false,
       "types": [
         {
-          "type": "assignment",
+          "type": "comment",
           "named": true
         },
         {
-          "type": "decrement",
+          "type": "content",
           "named": true
         },
         {
-          "type": "echo",
-          "named": true
-        },
-        {
-          "type": "include",
-          "named": true
-        },
-        {
-          "type": "increment",
-          "named": true
-        },
-        {
-          "type": "render",
-          "named": true
-        },
-        {
-          "type": "section",
-          "named": true
-        },
-        {
-          "type": "sections",
+          "type": "directive",
           "named": true
         }
       ]
     }
-  },
-  {
-    "type": "string",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "tablerow_statement",
@@ -1755,7 +1858,15 @@
     "named": false
   },
   {
+    "type": "endform",
+    "named": false
+  },
+  {
     "type": "endif",
+    "named": false
+  },
+  {
+    "type": "endjavascript",
     "named": false
   },
   {
@@ -1768,6 +1879,10 @@
   },
   {
     "type": "endschema",
+    "named": false
+  },
+  {
+    "type": "endstyle",
     "named": false
   },
   {
@@ -1784,6 +1899,10 @@
   },
   {
     "type": "for",
+    "named": false
+  },
+  {
+    "type": "form",
     "named": false
   },
   {
@@ -1804,6 +1923,10 @@
   },
   {
     "type": "increment",
+    "named": false
+  },
+  {
+    "type": "javascript",
     "named": false
   },
   {
@@ -1852,6 +1975,10 @@
   },
   {
     "type": "sections",
+    "named": false
+  },
+  {
+    "type": "style",
     "named": false
   },
   {
