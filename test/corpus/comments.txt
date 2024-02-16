@@ -3,7 +3,25 @@ Inline Comment
 ==================
 
 <html>
-  {% # render "string" %}
+  {% # render "string" % -  -%}
+</html>
+
+---
+(template
+ (content)
+ (comment)
+ (content))
+
+==================
+Multiline Inline Comment
+==================
+
+<html>
+  {% 
+    # this is a comment
+    # render "string" %  
+    # :)
+  %}
 </html>
 
 ---

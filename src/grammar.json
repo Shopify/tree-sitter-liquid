@@ -123,7 +123,7 @@
                 "type": "ALIAS",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "_liquid_comment"
+                  "name": "_inline_comment_content"
                 },
                 "named": true,
                 "value": "comment"
@@ -150,15 +150,6 @@
             {
               "type": "SYMBOL",
               "name": "_paired_statement"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_inline_comment"
-              },
-              "named": true,
-              "value": "comment"
             }
           ]
         },
@@ -2996,23 +2987,10 @@
           "name": "_tag_delimiter_open"
         },
         {
-          "type": "PREC_LEFT",
-          "value": 0,
+          "type": "REPEAT1",
           "content": {
-            "type": "REPEAT1",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "#"
-                },
-                {
-                  "type": "PATTERN",
-                  "value": ".*"
-                }
-              ]
-            }
+            "type": "SYMBOL",
+            "name": "_inline_comment_content"
           }
         },
         {
@@ -3038,7 +3016,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_comment_content"
+          "name": "_paired_comment_content"
         },
         {
           "type": "CHOICE",
@@ -3065,26 +3043,6 @@
           "name": "_tag_delimiter_close"
         }
       ]
-    },
-    "_liquid_comment": {
-      "type": "PREC_LEFT",
-      "value": 0,
-      "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "#"
-            },
-            {
-              "type": "PATTERN",
-              "value": ".*"
-            }
-          ]
-        }
-      }
     },
     "_output_delimiter_open": {
       "type": "CHOICE",
@@ -3208,7 +3166,11 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "_comment_content"
+      "name": "_inline_comment_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_paired_comment_content"
     },
     {
       "type": "SYMBOL",

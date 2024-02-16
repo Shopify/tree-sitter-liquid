@@ -588,10 +588,9 @@ Form with many arguments
 ==================
 Scanner Error Recovery
 ==================
-{% asdf 1, 2, 3, 4, 5, 6 %}
-{%- capture current -%}{%- endcapture -%}
-{%- if collection.empty -%}
-{{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+{%- gif collection.empty -%}
+  {%- capture current -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
+  {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
 {%- else -%}
 {% endif %}
 {% comment %}

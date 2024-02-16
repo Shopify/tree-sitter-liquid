@@ -24,7 +24,8 @@ module.exports = grammar({
   ],
 
   externals: ($) => [
-    $._comment_content,
+    $._inline_comment_content,
+    $._paired_comment_content,
     $.raw_content,
 
     // check if scanner is in error recovery mode
@@ -93,7 +94,7 @@ module.exports = grammar({
         repeat(
           choice(
             $._liquid_node,
-            alias($._liquid_comment, $.comment)
+            alias($._inline_comment_content, $.comment)
           )
         )
       ),
@@ -104,7 +105,6 @@ module.exports = grammar({
           $.expression,
           $.statement,
           $._paired_statement,
-          alias($._inline_comment, $.comment)
         ),
         /(\r\n|\r|\n)/,
       ),
@@ -701,7 +701,6 @@ module.exports = grammar({
         ...[
           ["+", "binary_plus"],
           ["-", "binary_plus"],
-          //
           ["*", "binary_times"],
           ["/", "binary_times"],
           ["%", "binary_times"],
@@ -736,13 +735,10 @@ module.exports = grammar({
 
     comment: ($) => choice($._inline_comment, $._paired_comment),
 
-    // TODO: this is broken
     _inline_comment: ($) => 
       seq(
         $._tag_delimiter_open, 
-        prec.left(
-          repeat1(seq("#", /.*/))
-        ), 
+        repeat1($._inline_comment_content),
         $._tag_delimiter_close
       ),
 
@@ -752,20 +748,13 @@ module.exports = grammar({
         "comment", 
         $._tag_delimiter_close,
 
-        $._comment_content,
+        $._paired_comment_content,
         optional($._paired_comment),
 
         $._tag_delimiter_open,
         "endcomment", 
         $._tag_delimiter_close,
       ),
-
-    // TODO: probably also broken
-    _liquid_comment: (_) => 
-      prec.left(
-        repeat1(seq("#", /.*/))
-      ),
-
 
     ///////////////
     // Delmiters //

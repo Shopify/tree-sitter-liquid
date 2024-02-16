@@ -3,17 +3,21 @@
 #include <wctype.h>
 
 enum TokenType { 
-  COMMENT_CONTENT,
+  INLINE_COMMENT_CONTENT,
+  PAIRED_COMMENT_CONTENT,
   RAW_CONTENT,
   NONE
 };
 
-void *tree_sitter_liquid_external_scanner_create() { return NULL; }
-void tree_sitter_liquid_external_scanner_destroy(void *payload) {}
-unsigned tree_sitter_liquid_external_scanner_serialize(void *payload, char *buffer) { return 0; }
-void tree_sitter_liquid_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
+static void advance(TSLexer *lexer) { 
+  lexer->advance(lexer, false); 
+}
 
-static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
+static void advance_ws(TSLexer *lexer) {
+  while (iswspace(lexer->lookahead)) {
+    lexer->advance(lexer, true);
+  }
+}
 
 bool scan_str(TSLexer *lexer, char *str) {
   for (int i = 0; str[i] != '\0'; i++) {
@@ -37,13 +41,45 @@ bool tree_sitter_liquid_external_scanner_scan(
     return false;
   }
 
-  if (valid_symbols[COMMENT_CONTENT] || valid_symbols[RAW_CONTENT]) {
+  advance_ws(lexer);
 
-    while (iswspace(lexer->lookahead)) {
-      lexer->advance(lexer, true);
+  if (valid_symbols[INLINE_COMMENT_CONTENT]) {
+
+    lexer->result_symbol = INLINE_COMMENT_CONTENT;
+
+    if (lexer->lookahead == '#') {
+      while (lexer->lookahead != 0) {
+
+        lexer->mark_end(lexer);
+
+        if (lexer->lookahead == '\n') {
+          advance(lexer);
+          lexer->mark_end(lexer);
+          return true;
+        }
+        
+        advance_ws(lexer);
+
+        if (lexer->lookahead == '%') {
+          advance(lexer);
+
+          if (lexer->lookahead == '}') {
+            advance(lexer);
+            return true;
+          }
+        }
+
+        advance(lexer);
+      }
     }
+  }
 
-    while (lexer->lookahead) {
+  if (valid_symbols[PAIRED_COMMENT_CONTENT] || valid_symbols[RAW_CONTENT]) {
+
+    while (lexer->lookahead != 0) {
+
+      advance_ws(lexer);
+
       if (lexer->lookahead == '{') {
 
         lexer->mark_end(lexer);
@@ -60,9 +96,7 @@ bool tree_sitter_liquid_external_scanner_scan(
           advance(lexer);
         }
 
-        while (iswspace(lexer->lookahead)) {
-          lexer->advance(lexer, true);
-        }
+        advance_ws(lexer);
 
         // we need to check for a opening tag for nested comments/raw
         const char *end = "end";
@@ -81,8 +115,8 @@ bool tree_sitter_liquid_external_scanner_scan(
         bool is_raw = scan_str(lexer, raw_tag);
         bool is_comment = scan_str(lexer, comment_tag);
 
-        if (is_comment && valid_symbols[COMMENT_CONTENT]) {
-          lexer->result_symbol = COMMENT_CONTENT;
+        if (is_comment && valid_symbols[PAIRED_COMMENT_CONTENT]) {
+          lexer->result_symbol = PAIRED_COMMENT_CONTENT;
         } else if (is_raw && valid_symbols[RAW_CONTENT]) {
           lexer->result_symbol = RAW_CONTENT;
         } else {
@@ -90,9 +124,7 @@ bool tree_sitter_liquid_external_scanner_scan(
           continue;
         }
 
-        while (iswspace(lexer->lookahead)) {
-          lexer->advance(lexer, true);
-        }
+        advance_ws(lexer);
 
         if (lexer->lookahead == '-') {
           advance(lexer);
@@ -111,12 +143,17 @@ bool tree_sitter_liquid_external_scanner_scan(
         } else {
           advance(lexer);
         }
-
-      } else {
-        advance(lexer);
       }
+
+      advance(lexer);
     }
   }
 
   return false;
 }
+
+void *tree_sitter_liquid_external_scanner_create() { return NULL; }
+void tree_sitter_liquid_external_scanner_destroy(void *payload) {}
+unsigned tree_sitter_liquid_external_scanner_serialize(void *payload, char *buffer) { return 0; }
+void tree_sitter_liquid_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
+
