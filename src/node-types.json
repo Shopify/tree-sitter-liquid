@@ -42,6 +42,14 @@
         "named": true
       },
       {
+        "type": "break",
+        "named": true
+      },
+      {
+        "type": "continue",
+        "named": true
+      },
+      {
         "type": "cycle",
         "named": true
       },
@@ -83,7 +91,7 @@
     "type": "access",
     "named": true,
     "fields": {
-      "method": {
+      "property": {
         "multiple": false,
         "required": true,
         "types": [
@@ -229,11 +237,11 @@
       "required": true,
       "types": [
         {
-          "type": "capture_statement",
+          "type": "capture_liq",
           "named": true
         },
         {
-          "type": "case_statment",
+          "type": "case_liq",
           "named": true
         },
         {
@@ -253,11 +261,19 @@
           "named": true
         },
         {
-          "type": "for_loop_statement",
+          "type": "for_loop_liq",
           "named": true
         },
         {
-          "type": "if_statement",
+          "type": "form_liq",
+          "named": true
+        },
+        {
+          "type": "if_liq",
+          "named": true
+        },
+        {
+          "type": "paginate_liq",
           "named": true
         },
         {
@@ -265,15 +281,15 @@
           "named": true
         },
         {
-          "type": "tablerow_statement",
+          "type": "tablerow_liq",
           "named": true
         },
         {
-          "type": "unless_statement",
+          "type": "unless_liq",
           "named": true
         },
         {
-          "type": "when_statement",
+          "type": "when_liq",
           "named": true
         },
         {
@@ -289,7 +305,7 @@
     "fields": {}
   },
   {
-    "type": "capture_statement",
+    "type": "capture_liq",
     "named": true,
     "fields": {
       "value": {
@@ -341,7 +357,7 @@
     }
   },
   {
-    "type": "case_statment",
+    "type": "case_liq",
     "named": true,
     "fields": {
       "alternative": {
@@ -349,7 +365,7 @@
         "required": false,
         "types": [
           {
-            "type": "else_statement",
+            "type": "else_liq",
             "named": true
           }
         ]
@@ -578,7 +594,7 @@
     }
   },
   {
-    "type": "else_statement",
+    "type": "else_liq",
     "named": true,
     "fields": {},
     "children": {
@@ -608,7 +624,7 @@
     }
   },
   {
-    "type": "elsif_statement",
+    "type": "elsif_liq",
     "named": true,
     "fields": {
       "condition": {
@@ -696,7 +712,7 @@
     }
   },
   {
-    "type": "for_loop_statement",
+    "type": "for_loop_liq",
     "named": true,
     "fields": {
       "alternative": {
@@ -704,7 +720,7 @@
         "required": false,
         "types": [
           {
-            "type": "else_statement",
+            "type": "else_liq",
             "named": true
           }
         ]
@@ -832,6 +848,82 @@
     }
   },
   {
+    "type": "form_liq",
+    "named": true,
+    "fields": {
+      "parameters": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "capture_liq",
+          "named": true
+        },
+        {
+          "type": "case_liq",
+          "named": true
+        },
+        {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "for_loop_liq",
+          "named": true
+        },
+        {
+          "type": "form_liq",
+          "named": true
+        },
+        {
+          "type": "if_liq",
+          "named": true
+        },
+        {
+          "type": "paginate_liq",
+          "named": true
+        },
+        {
+          "type": "statement",
+          "named": true
+        },
+        {
+          "type": "tablerow_liq",
+          "named": true
+        },
+        {
+          "type": "unless_liq",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "form_tag",
     "named": true,
     "fields": {
@@ -865,14 +957,22 @@
       "required": false,
       "types": [
         {
+          "type": "comment",
+          "named": true
+        },
+        {
           "type": "content",
+          "named": true
+        },
+        {
+          "type": "directive",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "if_statement",
+    "type": "if_liq",
     "named": true,
     "fields": {
       "alternative": {
@@ -880,11 +980,11 @@
         "required": false,
         "types": [
           {
-            "type": "else_statement",
+            "type": "else_liq",
             "named": true
           },
           {
-            "type": "elsif_statement",
+            "type": "elsif_liq",
             "named": true
           }
         ]
@@ -1020,11 +1120,11 @@
       "required": false,
       "types": [
         {
-          "type": "capture_statement",
+          "type": "capture_liq",
           "named": true
         },
         {
-          "type": "case_statment",
+          "type": "case_liq",
           "named": true
         },
         {
@@ -1036,11 +1136,19 @@
           "named": true
         },
         {
-          "type": "for_loop_statement",
+          "type": "for_loop_liq",
           "named": true
         },
         {
-          "type": "if_statement",
+          "type": "form_liq",
+          "named": true
+        },
+        {
+          "type": "if_liq",
+          "named": true
+        },
+        {
+          "type": "paginate_liq",
           "named": true
         },
         {
@@ -1048,26 +1156,26 @@
           "named": true
         },
         {
-          "type": "tablerow_statement",
+          "type": "tablerow_liq",
           "named": true
         },
         {
-          "type": "unless_statement",
+          "type": "unless_liq",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "opt_as_expr",
+    "type": "paginate_liq",
     "named": true,
     "fields": {
-      "identifier": {
+      "body": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "identifier",
+            "type": "block",
             "named": true
           }
         ]
@@ -1076,6 +1184,46 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "iterator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      },
+      "modifier": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "argument_list",
+            "named": true
+          },
           {
             "type": "identifier",
             "named": true
@@ -1307,17 +1455,7 @@
     "type": "render",
     "named": true,
     "fields": {
-      "file": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "string",
-            "named": true
-          }
-        ]
-      },
-      "modifier": {
+      "arguments": {
         "multiple": true,
         "required": false,
         "types": [
@@ -1328,10 +1466,62 @@
           {
             "type": "argument_list",
             "named": true
+          }
+        ]
+      },
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      },
+      "item": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "iteration": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "as",
+            "named": false
           },
           {
-            "type": "opt_as_expr",
+            "type": "for",
+            "named": false
+          },
+          {
+            "type": "identifier",
             "named": true
+          }
+        ]
+      },
+      "with": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "as",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "with",
+            "named": false
           }
         ]
       }
@@ -1411,7 +1601,7 @@
     }
   },
   {
-    "type": "tablerow_statement",
+    "type": "tablerow_liq",
     "named": true,
     "fields": {
       "body": {
@@ -1550,7 +1740,7 @@
     }
   },
   {
-    "type": "unless_statement",
+    "type": "unless_liq",
     "named": true,
     "fields": {
       "alternative": {
@@ -1558,11 +1748,11 @@
         "required": false,
         "types": [
           {
-            "type": "else_statement",
+            "type": "else_liq",
             "named": true
           },
           {
-            "type": "elsif_statement",
+            "type": "elsif_liq",
             "named": true
           }
         ]
@@ -1630,7 +1820,7 @@
     }
   },
   {
-    "type": "when_statement",
+    "type": "when_liq",
     "named": true,
     "fields": {
       "condition": {
@@ -1638,7 +1828,11 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "argument_list",
+            "named": true
+          },
+          {
+            "type": "predicate",
             "named": true
           }
         ]
@@ -1664,7 +1858,11 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "argument_list",
+            "named": true
+          },
+          {
+            "type": "predicate",
             "named": true
           }
         ]
@@ -1798,6 +1996,10 @@
     "named": false
   },
   {
+    "type": "break",
+    "named": true
+  },
+  {
     "type": "by",
     "named": false
   },
@@ -1816,6 +2018,10 @@
   {
     "type": "contains",
     "named": false
+  },
+  {
+    "type": "continue",
+    "named": true
   },
   {
     "type": "cycle",

@@ -158,7 +158,7 @@ Method Call
    (directive
     (access
      receiver: (identifier)
-     method: (identifier)))
+     property: (identifier)))
    (content))
 
 ==================
@@ -179,8 +179,8 @@ Compound Method Call With Filter
       receiver:
       (access
        receiver: (identifier)
-       method: (string))
-      method: (identifier))
+       property: (string))
+      property: (identifier))
      name: (identifier)))
    (content))
 
@@ -214,10 +214,9 @@ Render Loop
    (directive
     (render
      file: (string)
-     modifier: (opt_as_expr
-       item: (identifier)
-       identifier: (identifier))))
-   (content))
+     iteration: (identifier)
+     item: (identifier)))
+(content))
 
 ==================
 Render With
@@ -233,8 +232,7 @@ Render With
    (directive
     (render
      file: (string)
-     modifier: (opt_as_expr
-       item: (identifier))))
+     with: (identifier)))
    (content))
 
 ==================
@@ -251,7 +249,7 @@ Render Variable
    (directive
     (render
      file: (string)
-     modifier: (argument_list
+     arguments: (argument_list
        (argument
         key: (identifier)
         value: (identifier)))))
@@ -287,6 +285,6 @@ Keyword Conflict
    (directive
     (access
      receiver: (identifier)
-     method: (identifier)))
+     property: (identifier)))
    (content))
 

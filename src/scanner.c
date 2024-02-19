@@ -5,9 +5,14 @@
 enum TokenType { 
   INLINE_COMMENT_CONTENT,
   PAIRED_COMMENT_CONTENT,
+  PAIRED_COMMENT_CONTENT_LIQ,
   RAW_CONTENT,
   NONE
 };
+
+const char *end = "end";
+const char *raw_tag = "raw";
+const char *comment_tag = "comment";
 
 static void advance(TSLexer *lexer) { 
   lexer->advance(lexer, false); 
@@ -19,7 +24,7 @@ static void advance_ws(TSLexer *lexer) {
   }
 }
 
-bool scan_str(TSLexer *lexer, char *str) {
+bool scan_str(TSLexer *lexer, const char *str) {
   for (int i = 0; str[i] != '\0'; i++) {
     if (lexer->lookahead == str[i]) {
       advance(lexer);
@@ -28,6 +33,12 @@ bool scan_str(TSLexer *lexer, char *str) {
     }
   }
   return true;
+}
+
+bool is_next_and_advance(TSLexer *lexer, char c) {
+  bool is_next = lexer->lookahead == c;
+  advance(lexer);
+  return is_next;
 }
 
 bool tree_sitter_liquid_external_scanner_scan(
@@ -45,20 +56,19 @@ bool tree_sitter_liquid_external_scanner_scan(
 
   if (valid_symbols[INLINE_COMMENT_CONTENT]) {
 
-    lexer->result_symbol = INLINE_COMMENT_CONTENT;
-
     if (lexer->lookahead == '#') {
+
+      lexer->result_symbol = INLINE_COMMENT_CONTENT;
+      advance(lexer);
+
       while (lexer->lookahead != 0) {
 
         lexer->mark_end(lexer);
 
-        if (lexer->lookahead == '\n') {
-          advance(lexer);
+        if (is_next_and_advance(lexer, '\n')) {
           lexer->mark_end(lexer);
           return true;
         }
-        
-        advance_ws(lexer);
 
         if (lexer->lookahead == '%') {
           advance(lexer);
@@ -68,84 +78,80 @@ bool tree_sitter_liquid_external_scanner_scan(
             return true;
           }
         }
-
-        advance(lexer);
       }
     }
   }
 
-  if (valid_symbols[PAIRED_COMMENT_CONTENT] || valid_symbols[RAW_CONTENT]) {
+
+  if (
+    valid_symbols[PAIRED_COMMENT_CONTENT] 
+    || valid_symbols[PAIRED_COMMENT_CONTENT_LIQ]
+    || valid_symbols[RAW_CONTENT]
+  ) {
 
     while (lexer->lookahead != 0) {
 
       advance_ws(lexer);
+      lexer->mark_end(lexer);
 
-      if (lexer->lookahead == '{') {
+      if (!valid_symbols[PAIRED_COMMENT_CONTENT_LIQ]) {
 
-        lexer->mark_end(lexer);
-        advance(lexer);
-
-        if (lexer->lookahead == '%') {
-          advance(lexer);
-        } else {
-          advance(lexer);
+        if (!is_next_and_advance(lexer, '{')) {
           continue;
-        } 
+        }
+
+        if (!is_next_and_advance(lexer, '%')) {
+          continue;
+        }
 
         if (lexer->lookahead == '-') {
           advance(lexer);
         }
 
         advance_ws(lexer);
-
-        // we need to check for a opening tag for nested comments/raw
-        const char *end = "end";
-        const char *raw_tag = "raw";
-        const char *comment_tag = "comment";
-
-        // consume "end" if exists
-        if (lexer->lookahead == 'e' && !scan_str(lexer, end)) {
-          advance(lexer);
-          continue;
-        }
-
-        /* this only works because "raw" and "comment" have different starting */
-        /* characters, otherwise we would advance and be unable to correctly match */
-        /* the next option. */
-        bool is_raw = scan_str(lexer, raw_tag);
-        bool is_comment = scan_str(lexer, comment_tag);
-
-        if (is_comment && valid_symbols[PAIRED_COMMENT_CONTENT]) {
-          lexer->result_symbol = PAIRED_COMMENT_CONTENT;
-        } else if (is_raw && valid_symbols[RAW_CONTENT]) {
-          lexer->result_symbol = RAW_CONTENT;
-        } else {
-          advance(lexer);
-          continue;
-        }
-
-        advance_ws(lexer);
-
-        if (lexer->lookahead == '-') {
-          advance(lexer);
-        }
-
-        if (lexer->lookahead == '%') {
-          advance(lexer);
-        } else {
-          advance(lexer);
-          continue;
-        } 
-
-        if (lexer->lookahead == '}') {
-          advance(lexer);
-          return true;
-        } else {
-          advance(lexer);
-        }
       }
 
-      advance(lexer);
+      // consume "end" if exists
+      if (lexer->lookahead == 'e' && !scan_str(lexer, end)) {
+        advance(lexer);
+        continue;
+      }
+
+      /* this only works because "raw" and "comment" have different starting */
+      /* characters, otherwise we would advance and be unable to correctly match */
+      /* the next option. */
+      bool is_raw = scan_str(lexer, raw_tag);
+      bool is_comment = scan_str(lexer, comment_tag);
+
+      if (is_comment && valid_symbols[PAIRED_COMMENT_CONTENT]) {
+        lexer->result_symbol = PAIRED_COMMENT_CONTENT;
+
+      } else if (is_comment && valid_symbols[PAIRED_COMMENT_CONTENT_LIQ]) {
+        lexer->result_symbol = PAIRED_COMMENT_CONTENT_LIQ;
+        return true;
+
+      } else if (is_raw && valid_symbols[RAW_CONTENT]) {
+        lexer->result_symbol = RAW_CONTENT;
+
+      } else {
+
+        advance(lexer);
+        continue;
+      }
+
+      advance_ws(lexer);
+
+      if (lexer->lookahead == '-') {
+        advance(lexer);
+      }
+
+      if (!is_next_and_advance(lexer, '%')) {
+        continue;
+      }
+
+      if (is_next_and_advance(lexer, '}')) {
+        return true;
+      } 
     }
   }
 

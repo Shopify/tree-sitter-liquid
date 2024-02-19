@@ -93,6 +93,31 @@ Liquid Inline Comment
   {% liquid
     assign value = "string"
     # render "file1"
+    render "file2"
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (assignment
+      (identifier)
+       (string))
+     (comment)
+      (render
+       (string))))
+   (content))
+
+==================
+Liquid Multi-line Inline Comment
+==================
+
+<html>
+  {% liquid
+    assign value = "string"
+    # render "file1"
     # this renders a string
     # cool
     render "file2"
@@ -109,6 +134,66 @@ Liquid Inline Comment
        (string))
      (comment)
      (comment)
+     (comment)
+      (render
+       (string))))
+   (content))
+
+==================
+Liquid Paired Comment
+==================
+
+<html>
+  {% liquid
+    assign value = "string"
+    comment
+      render "file1"
+      echo "renders a string"
+    endcomment
+    render "file2"
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (assignment
+      (identifier)
+       (string))
+     (comment)
+      (render
+       (string))))
+   (content))
+
+==================
+Liquid Nested Paired Comment
+==================
+
+<html>
+  {% liquid
+    assign value = "string"
+    comment
+    comment
+    comment
+      render "file1"
+      echo "renders a string"
+    endcomment
+    endcomment
+    endcomment
+    render "file2"
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (assignment
+      (identifier)
+       (string))
      (comment)
       (render
        (string))))

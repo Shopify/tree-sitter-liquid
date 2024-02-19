@@ -28,9 +28,9 @@ Liquid Tag with If
       value: (filter
         body: (access
           receiver: (identifier)
-          method: (identifier))
+          property: (identifier))
         name: (identifier)))
-     (if_statement
+     (if_liq
       condition: (predicate
         left: (identifier)
         right: (identifier))
@@ -40,7 +40,7 @@ Liquid Tag with If
          name: (identifier))
         (echo
          (identifier)))
-      alternative: (else_statement
+      alternative: (else_liq
         (block
          (assignment
           variable_name: (identifier)
@@ -82,16 +82,17 @@ Liquid Tag with Case
       value: (filter
         body: (access
           receiver: (identifier)
-          method: (identifier))
+          property: (identifier))
         name: (identifier)))
      (assignment
       variable_name: (identifier)
       value: (string))
-     (case_statment
+     (case_liq
       receiver: (identifier)
       conditions: (block
-        (when_statement
-         condition: (string)
+        (when_liq
+         condition: (argument_list 
+           (string))
          consequence: (block
            (assignment
             variable_name: (identifier)
@@ -100,13 +101,14 @@ Liquid Tag with Case
             (filter
              body: (identifier)
              name: (identifier)))))
-        (when_statement
-         condition: (string)
+        (when_liq
+         condition: (argument_list 
+           (string))
          consequence: (block
            (assignment
             variable_name: (identifier)
             value: (string)))))
-      alternative: (else_statement
+      alternative: (else_liq
         (block
          (render
           file: (string))
@@ -127,6 +129,7 @@ Liquid Tag with For Loop
       assign data = product_type
       cycle "group": "one", string, access.string
       echo data
+      break
     endfor
   %}
 </html>
@@ -136,11 +139,11 @@ Liquid Tag with For Loop
    (content)
    (directive
     (liquid_tag
-     (for_loop_statement
+     (for_loop_liq
       item: (identifier)
       iterator: (access
         receiver: (identifier)
-        method: (identifier))
+        property: (identifier))
       body: (block
         (assignment
          variable_name: (identifier)
@@ -151,9 +154,10 @@ Liquid Tag with For Loop
          group_item: (identifier)
          group_item: (access
            receiver: (identifier)
-           method: (identifier)))
+           property: (identifier)))
         (echo
-         (identifier))))))
+         (identifier))
+        (break)))))
 (content))
 
 ==================
@@ -177,14 +181,14 @@ Liquid Tag with Capture
  (content)
  (directive
   (liquid_tag
-   (capture_statement
+   (capture_liq
     variable: (identifier)
     value: (block
-       (if_statement
+       (if_liq
         condition: (identifier)
         consequence: (block
             (identifier))
-        alternative: (else_statement
+        alternative: (else_liq
           (block
              (identifier))))))))
   (content))
@@ -207,11 +211,11 @@ Liquid Tag with Tablerow
    (content)
    (directive
     (liquid_tag
-     (tablerow_statement
+     (tablerow_liq
       item: (identifier)
       iterator: (access
         receiver: (identifier)
-        method: (identifier))
+        property: (identifier))
       body: (block
         (assignment
          variable_name: (identifier)
@@ -220,3 +224,56 @@ Liquid Tag with Tablerow
          (identifier))))))
    (content))
 
+==================
+Liquid Tag with Form
+==================
+
+<html>
+  {% liquid
+    form "type"
+      echo "content"
+    endform
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (form_liq
+      (string)
+      (echo
+       (string)))))
+   (content))
+
+==================
+Liquid Tag with Paginate
+==================
+
+<html>
+  {% liquid
+    paginate collection.products by 3, window_size: 1 
+      echo "content"
+    endpaginate
+  %}
+</html>
+
+---
+  (template
+   (content)
+   (directive
+    (liquid_tag
+     (paginate_liq
+      (access
+       (identifier)
+       (identifier))
+      (number)
+      (argument_list
+       (argument
+        (identifier)
+        (number)))
+      (block
+       (echo
+        (string))))))
+   (content))

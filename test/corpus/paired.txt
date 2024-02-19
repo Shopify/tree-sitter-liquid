@@ -16,7 +16,7 @@ If
    condition: (predicate
       left: (access
          receiver: (identifier)
-         method: (identifier))
+         property: (identifier))
       right: (identifier))
    consequence: (block
      (content))))
@@ -40,7 +40,7 @@ If Contains
      condition: (predicate
        left: (access
          receiver: (identifier)
-         method: (identifier))
+         property: (identifier))
        right: (string))
      consequence: (block
        (content))))
@@ -78,20 +78,20 @@ If Elsif Else
        (directive 
         (access 
          receiver: (identifier) 
-         method: (identifier)))
+         property: (identifier)))
        (content)
        (directive
         (access
          receiver: (identifier)
-         method: (identifier)))
+         property: (identifier)))
        (content))
      alternative: (elsif_tag
        condition: (predicate
          left: (access
            receiver: (access
              receiver: (identifier)
-             method: (identifier))
-           method: (identifier))
+             property: (identifier))
+           property: (identifier))
          right: (number))
        (block
         (content)
@@ -130,7 +130,7 @@ Unless
    condition: 
      (access 
       receiver: (identifier)
-      method: (identifier))
+      property: (identifier))
    consequence: (block 
      (directive 
        (assignment
@@ -138,7 +138,7 @@ Unless
         value: 
           (access
            receiver: (identifier)
-           method: (identifier))))
+           property: (identifier))))
      (content) 
      (directive 
        (identifier))
@@ -158,6 +158,9 @@ Case
     {% when 'Strength' %}
       {% render "file" %}
       <p>This is a strength or health potion.</p>
+    {% when 'Strength', 'dank', 'frank' %}
+      {% render "file" %}
+      <p>This is a strength or health potion.</p>
     {% else %}
       {% render "file" %}
       <div>content</div>
@@ -171,7 +174,7 @@ Case
     (case_tag
      receiver: (access
        receiver: (identifier)
-       method: (identifier))
+       property: (identifier))
      conditions: (block 
        (when_tag
         condition: (predicate
@@ -182,15 +185,26 @@ Case
           (directive
             (access
              receiver: (identifier)
-             method: (identifier)))
+             property: (identifier)))
           (content)
           (directive
             (access
              receiver: (identifier)
-             method: (identifier)))
+             property: (identifier)))
           (content)))
        (when_tag
-        condition: (string)
+        condition: (argument_list 
+          (string))
+        consequence: (block
+          (directive
+            (render
+             file: (string)))
+          (content)))
+       (when_tag
+        condition: (argument_list 
+          (string)
+          (string)
+          (string))
         consequence: (block
           (directive
             (render
@@ -220,7 +234,7 @@ Empty Case
     (case_tag
      receiver: (access
        receiver: (identifier)
-       method: (identifier))))
+       property: (identifier))))
    (content))
 
 ==================
@@ -243,14 +257,14 @@ For Loop
      item: (identifier)
      iterator: (access
        receiver: (identifier)
-       method: (identifier))
+       property: (identifier))
      body: (block
        (directive
         (assignment
          variable_name: (identifier)
          value: (access
            receiver: (identifier)
-           method: (identifier))))
+           property: (identifier))))
        (content)
        (directive
         (identifier))
@@ -267,6 +281,9 @@ For Loop wtih Offest
 <html>
   {% for product in collection.products offest: 2 -%}
     {% assign name = product.title %}
+    {% if name != blank %}
+      {% continue %}
+    {% endif %}
     <div>{{ name }}</div>
     {% echo name %}
   {%- endfor %}
@@ -281,7 +298,7 @@ For Loop wtih Offest
      item: (identifier)
      iterator: (access
        receiver: (identifier)
-       method: (identifier))
+       property: (identifier))
      modifier: (argument_list
        (argument
         key: (identifier)
@@ -292,7 +309,15 @@ For Loop wtih Offest
          variable_name: (identifier)
          value: (access
            receiver: (identifier)
-           method: (identifier))))
+           property: (identifier))))
+       (directive
+        (if_tag
+         condition: (predicate
+           left: (identifier)
+           right: (identifier))
+         consequence: (block
+           (directive
+            (continue)))))
        (content)
        (directive
         (identifier))
@@ -397,7 +422,7 @@ For Loop with Cycle
      item: (identifier)
      iterator: (access
        receiver: (identifier)
-       method: (identifier))
+       property: (identifier))
      body: (block
       (directive
        (cycle
@@ -406,7 +431,7 @@ For Loop with Cycle
         group_item: (identifier)
         group_item: (access
           receiver: (identifier)
-          method: (identifier)))))))
+          property: (identifier)))))))
    (content))
 
 ==================
@@ -534,7 +559,7 @@ Paginate
     (paginate_tag
      item: (access
        receiver: (identifier)
-       method: (identifier))
+       property: (identifier))
      iterator: (number)
      modifier: (argument_list
        (argument
@@ -546,12 +571,12 @@ Paginate
          item: (identifier)
          iterator: (access
            receiver: (identifier)
-           method: (identifier))
+           property: (identifier))
          body: (block
            (directive
             (access
              receiver: (identifier)
-             method: (identifier))))))
+             property: (identifier))))))
        (directive
         (filter
          body: (identifier)
@@ -565,7 +590,14 @@ Form
 {% form 'storefront_password' %}
   <!-- form content -->
 {% endform %}
+
 ---
+(template
+ (directive
+  (form_tag
+   (string)
+   (content)))
+ (content))
 
 ==================
 Form with argument
@@ -574,26 +606,92 @@ Form with argument
 {% form 'form_type', return_to: string %}
   content
 {% endform %}
----
+
+---   
+(template
+ (directive
+  (form_tag
+   (string)
+   (argument_list
+    (argument
+     (identifier)
+     (identifier)))
+   (content))))
 
 ==================
 Form with many arguments
 ==================
 
 {% form "product", product, id: 'custom-id', class: 'custom-class', data-example: '100' %}
-  <!-- form content -->
+  {{ somedata }}
 {% endform %}
+
 ---
+(template
+ (directive
+  (form_tag
+   (string)
+   (argument_list
+    (identifier)
+    (argument
+     (identifier)
+     (string))
+    (argument
+     (identifier)
+     (string))
+    (argument
+     (identifier)
+     (string)))
+   (directive
+    (identifier))))
+ (content))
 
 ==================
-Scanner Error Recovery
+Javascript
 ==================
-{%- gif collection.empty -%}
-  {%- capture current -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
-  {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
-{%- else -%}
-{% endif %}
-{% comment %}
-{% endcomment %}
----
 
+{% javascript %}
+  let x = 10;
+{% endjavascript %}
+
+---
+(template
+ (directive
+  (javascript_tag
+   (content)))
+ (content))
+
+==================
+Schema
+==================
+
+{% schema %}
+  {
+    "property" : "value"
+  }
+{% endschema %}
+
+---
+(template
+ (directive
+  (schema_tag
+   (content)
+   (content)))
+ (content))
+
+==================
+Style
+==================
+
+{% style %}
+  .el{ display: flex: }
+{% endstyle %}
+
+---
+(template
+ (directive
+  (style_tag
+   (content)
+   (content)
+   (content)))
+ (content))

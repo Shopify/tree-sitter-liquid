@@ -41,16 +41,15 @@
   "liquid"
   "cycle"
 
-  ;; throwing?
-  ; "break"
-  ; "continue"
-
   "case"
   "when"
   "endcase"
 
   "for"
   "endfor"
+
+  "form"
+  "endform"
 
   "style"
   "endstyle"

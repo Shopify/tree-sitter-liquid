@@ -13,9 +13,9 @@ module.exports = grammar({
     [$.else_tag],
     [$.elsif_tag],
     [$.when_tag],
-    [$.else_statement],
-    [$.elsif_statement],
-    [$.when_statement],
+    [$.else_liq],
+    [$.elsif_liq],
+    [$.when_liq],
   ],
 
   supertypes: $ => [
@@ -26,8 +26,8 @@ module.exports = grammar({
   externals: ($) => [
     $._inline_comment_content,
     $._paired_comment_content,
+    $._paired_comment_content_liq,
     $.raw_content,
-
     // check if scanner is in error recovery mode
     $.error_sentinel,
   ],
@@ -75,18 +75,14 @@ module.exports = grammar({
       ),
 
     _unpaired_tag: ($) => 
-      seq(
-        $._tag_delimiter_open,
-        choice($.statement, $.liquid_tag),
-        $._tag_delimiter_close,
+      tag(
+        choice(
+          $.statement, 
+          $.liquid_tag
+        )
       ),
 
-    _output_directive: ($) => 
-      seq(
-        $._output_delimiter_open,
-        $.expression,
-        $._output_delimiter_close,
-      ),
+    _output_directive: ($) => output($.expression),
 
     liquid_tag: ($) => 
       seq(
@@ -94,7 +90,7 @@ module.exports = grammar({
         repeat(
           choice(
             $._liquid_node,
-            alias($._inline_comment_content, $.comment)
+            alias($.comment_liq, $.comment)
           )
         )
       ),
@@ -121,21 +117,23 @@ module.exports = grammar({
         $.decrement,
         $.layout,
         $.cycle,
+        $.break,
+        $.continue,
       ),
 
 
     _paired_statement: ($) =>
       choice(
-        $.if_statement,
-        $.unless_statement,
-        $.case_statment,
-        $.for_loop_statement,
-        $.capture_statement,
-        $.tablerow_statement,
+        $.if_liq,
+        $.unless_liq,
+        $.case_liq,
+        $.for_loop_liq,
+        $.capture_liq,
+        $.tablerow_liq,
+        $.form_liq,
+        $.paginate_liq,
       ),
 
-    //TODO:
-    //form tag
     _paired_tag: ($) => 
       choice(
         $.if_tag,
@@ -144,12 +142,12 @@ module.exports = grammar({
         $.for_loop_tag,
         $.capture_tag,
         $.tablerow_tag,
+        $.form_tag,
         $.paginate_tag,
         $.schema_tag,
         $.raw_tag,
         $.style_tag,
         $.javascript_tag,
-        $.form_tag,
       ),
 
     expression: ($) => 
@@ -163,7 +161,7 @@ module.exports = grammar({
 
     _iterator: ($) => 
       prec.left(
-        1, 
+        PRECS.primary, 
         seq(
           field(
             "iterator", choice($.identifier, $.access, $.range)
@@ -176,7 +174,7 @@ module.exports = grammar({
 
     _page_iterator: ($) => 
       prec.left(
-        1,
+        PRECS.primary,
         seq(
           field(
             "iterator", choice($.identifier, $.access, $.number)
@@ -190,75 +188,55 @@ module.exports = grammar({
         )
       ), 
 
-
-    /////////////////
-    // Paired Tags //
-    /////////////////
+    ///////////////////////
+    // Paired Statements //
+    ///////////////////////
 
     for_loop_tag: ($) => 
       seq(
-        $._tag_delimiter_open, 
-        "for", 
-        field("item", $.identifier), 
-        "in", 
-        $._iterator,
-        $._tag_delimiter_close,
-
-        field("body", 
-          alias(
-            repeat(
-              $._node,
-            ), 
-            $.block
-          )
+        tag(
+          "for", 
+          field("item", $.identifier), 
+          "in", 
+          $._iterator,
         ),
+
+        field("body", alias(repeat($._node), $.block)),
 
         optional(field("alternative", $.else_tag)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open, 
-            "endfor", 
-            $._tag_delimiter_close
-          )
+          tag("endfor")
         )
       ),
 
     unless_tag: ($) =>
       seq(
-        $._tag_delimiter_open, 
-        "unless", field("condition", $.expression), 
-        $._tag_delimiter_close,
+        tag(
+          "unless", field("condition", $.expression), 
+        ),
 
         field("consequence", alias(repeat($._node), $.block)),
         repeat(field("alternative", $.elsif_tag)),
         optional(field("alternative", $.else_tag)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open,
-            "endunless", 
-            $._tag_delimiter_close, 
-          )
+          tag("endunless")
         )
       ),
 
     if_tag: ($) =>
       seq(
-        $._tag_delimiter_open, 
-        "if", field("condition", $.expression), 
-        $._tag_delimiter_close, 
+        tag( 
+          "if", field("condition", $.expression), 
+        ),
 
         field("consequence", alias(repeat($._node), $.block)),
         repeat(field("alternative", $.elsif_tag)),
         optional(field("alternative", $.else_tag)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open, 
-            "endif", 
-            $._tag_delimiter_close
-          )
+          tag("endif"), 
         ), 
       ),
 
@@ -266,9 +244,7 @@ module.exports = grammar({
       prec.dynamic(
         PRECS.elsif,
         seq(
-          $._tag_delimiter_open, 
-          "elsif", field("condition", $.expression), 
-          $._tag_delimiter_close,
+          tag("elsif", field("condition", $.expression)),
 
           alias(repeat($._node), $.block),
         ),
@@ -278,10 +254,7 @@ module.exports = grammar({
       prec.dynamic(
         PRECS.else,
         seq(
-          $._tag_delimiter_open, 
-          "else",
-          $._tag_delimiter_close,
-
+          tag("else"),
           alias(repeat($._node), $.block),
         )
       ),
@@ -290,10 +263,16 @@ module.exports = grammar({
       prec.dynamic(
         PRECS.elsif,
         seq(
-          // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
-          $._tag_delimiter_open, "when", 
-          field("condition", $.expression), 
-          $._tag_delimiter_close,
+          tag(
+            "when", 
+            field(
+              "condition", 
+              choice(
+                $.predicate,
+                $.argument_list,
+              )
+            )
+          ),
 
           field("consequence", alias(repeat($._node), $.block)),
         ),
@@ -301,154 +280,117 @@ module.exports = grammar({
 
     case_tag: ($) =>
       seq(
-        $._tag_delimiter_open, 
-        "case", field("receiver", choice($.identifier, $.access)), 
-        $._tag_delimiter_close,
+        tag(
+          "case", field("receiver", choice($.identifier, $.access)), 
+        ),
 
         field("conditions", alias(repeat($.when_tag), $.block)),
         optional(field("alternative", $.else_tag)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open, 
-            "endcase", 
-            $._tag_delimiter_close
-          )
+          tag("endcase"),
         ),
       ),
 
     capture_tag: ($) => 
       seq(
-        $._tag_delimiter_open,
-        "capture", field("variable", $.identifier),
-        $._tag_delimiter_close,
+        tag( 
+          "capture", field("variable", $.identifier),
+        ),
 
         field("value", alias(repeat($._node), $.block)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open, 
-            "endcapture", 
-            $._tag_delimiter_close
-          )
+          tag("endcapture"),
         ),
       ),
 
     tablerow_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "tablerow",
-        field("item", $.identifier),
-        "in",
-        $._iterator,
-        $._tag_delimiter_close,
+        tag(
+          "tablerow",
+          field("item", $.identifier),
+          "in",
+          $._iterator,
+        ),
 
         field("body", alias(repeat($._node), $.block)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open,
-            "endtablerow",
-            $._tag_delimiter_close
-          )
+          tag("endtablerow"),
         )
       ),
 
     paginate_tag: ($) => 
       seq(
-        $._tag_delimiter_open,
-        "paginate",
-        field("item", choice($.identifier, $.access)),
-        "by",
-        $._page_iterator,
-        $._tag_delimiter_close,
+        tag(
+          "paginate",
+          field("item", choice($.identifier, $.access)),
+          "by",
+          $._page_iterator,
+        ),
 
         field("body", alias(repeat($._node), $.block)),
 
         prec.right(
-          seq(
-            $._tag_delimiter_open,
-            "endpaginate",
-            $._tag_delimiter_close,
-          )
+          tag("endpaginate")
         )
       ),
 
     schema_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "schema",
-        $._tag_delimiter_close,
+        tag("schema"),
 
         repeat($.content),
 
-        $._tag_delimiter_open, 
-        "endschema", 
-        $._tag_delimiter_close
+        tag("endschema"), 
       ),
 
     raw_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "raw",
-        $._tag_delimiter_close,
+        tag("raw"),
 
         $.raw_content,
         optional($.raw_tag),
 
-        $._tag_delimiter_open, 
-        "endraw", 
-        $._tag_delimiter_close
+        tag("endraw"), 
       ),
 
-    // TODO: WIP & test
     style_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "style",
-        $._tag_delimiter_close,
+        tag("style"),
 
         repeat($._node),
 
-        $._tag_delimiter_open, 
-        "endstyle", 
-        $._tag_delimiter_close
+        tag("endstyle"), 
       ),
 
-    // TODO: WIP & test
     javascript_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "javascript",
-        $._tag_delimiter_close,
+        tag("javascript"),
 
         repeat($.content),
 
-        $._tag_delimiter_open, 
-        "endjavascript", 
-        $._tag_delimiter_close
+        tag("endjavascript"), 
       ),
 
-    // TODO: WIP & test
     form_tag: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "form",
-        field("type", $.string),
-        optional(
-          field(
-            "parameters", 
-            seq(",", $.argument_list
+        tag(
+          "form",
+          field("type", $.string),
+          optional(
+            field(
+              "parameters", 
+              seq(",", $.argument_list
+              )
             )
-          )
+          ),
         ),
-        $._tag_delimiter_close,
 
-        repeat($.content),
+        repeat($._node),
 
-        $._tag_delimiter_open, 
-        "endform", 
-        $._tag_delimiter_close
+        tag("endform"),
       ),
 
 
@@ -456,50 +398,44 @@ module.exports = grammar({
     // Paired Statements For Liquid Tag //
     //////////////////////////////////////
 
-    for_loop_statement: ($) => 
+
+    for_loop_liq: ($) => 
       seq(
         "for", 
         field("item", $.identifier), 
         "in", 
         $._iterator,
 
-        field("body", 
-          alias(
-            repeat(
-              $._liquid_node,
-            ), 
-            $.block
-          )
-        ),
+        field("body", alias(repeat($._liquid_node), $.block)),
 
-        optional(field("alternative", $.else_statement)),
+        optional(field("alternative", $.else_liq)),
 
         prec.right("endfor"),
       ),
 
-    unless_statement: ($) =>
+    unless_liq: ($) =>
       seq(
         "unless", field("condition", $.expression),
 
         field("consequence", alias(repeat($._liquid_node), $.block)),
-        repeat(field("alternative", $.elsif_statement)),
-        optional(field("alternative", $.else_statement)),
+        repeat(field("alternative", $.elsif_liq)),
+        optional(field("alternative", $.else_liq)),
 
         prec.right("endunless"),
       ),
 
-    if_statement: ($) =>
+    if_liq: ($) =>
       seq(
         "if", field("condition", $.expression),
 
         field("consequence", alias(repeat($._liquid_node), $.block)),
-        repeat(field("alternative", $.elsif_statement)),
-        optional(field("alternative", $.else_statement)),
+        repeat(field("alternative", $.elsif_liq)),
+        optional(field("alternative", $.else_liq)),
 
         prec.right("endif"), 
       ),
 
-    elsif_statement: ($) =>
+    elsif_liq: ($) =>
       prec.dynamic(
         PRECS.elsif,
         seq(
@@ -508,7 +444,7 @@ module.exports = grammar({
         ),
       ),
 
-    else_statement: ($) =>
+    else_liq: ($) =>
       prec.dynamic(
         PRECS.else,
         seq(
@@ -517,28 +453,34 @@ module.exports = grammar({
         )
       ),
 
-    when_statement: ($) => 
+    when_liq: ($) => 
       prec.dynamic(
         PRECS.elsif,
         seq(
-          // TODO: condtion should be more constrained -- https://shopify.dev/docs/api/liquid/tags/case
-          "when", field("condition", $.expression),
+          "when", 
+          field(
+            "condition", 
+            choice(
+              $.predicate,
+              $.argument_list,
+            )
+          ),
 
           field("consequence", alias(repeat($._liquid_node), $.block)),
         ),
       ),
 
-    case_statment: ($) =>
+    case_liq: ($) =>
       seq(
         "case", field("receiver", choice($.identifier, $.access)),
 
-        field("conditions", alias(repeat($.when_statement), $.block)),
-        optional(field("alternative", $.else_statement)),
+        field("conditions", alias(repeat($.when_liq), $.block)),
+        optional(field("alternative", $.else_liq)),
 
         prec.right("endcase"),
       ),
 
-    capture_statement: ($) => 
+    capture_liq: ($) => 
       seq(
         "capture", field("variable", $.identifier),
 
@@ -547,7 +489,7 @@ module.exports = grammar({
         prec.right("endcapture"),
       ),
 
-    tablerow_statement: ($) =>
+    tablerow_liq: ($) =>
       seq(
         "tablerow",
         field("item", $.identifier),
@@ -559,11 +501,44 @@ module.exports = grammar({
         prec.right("endtablerow"),
       ),
 
+    paginate_liq: ($) => 
+      seq(
+        "paginate",
+        field("item", choice($.identifier, $.access)),
+        "by",
+        $._page_iterator,
 
-    /////////////////////////////////////////
-    // Unpaired Expressions And Statements //
-    /////////////////////////////////////////
+        field("body", alias(repeat($._liquid_node), $.block)),
 
+        prec.right("endpaginate")
+      ),
+
+    form_liq: ($) =>
+      seq(
+        "form",
+        field("type", $.string),
+        optional(
+          field(
+            "parameters", 
+            seq(",", $.argument_list
+            )
+          )
+        ),
+
+        repeat($._liquid_node),
+
+        "endform",
+      ),
+
+
+    /////////////////////////
+    // Unpaired Statements //
+    /////////////////////////
+    
+    break: (_) => "break",
+
+    continue: (_) => "continue",
+    
     echo: $ => seq("echo", $.expression),
 
     include: $ => seq("include", $.string),
@@ -578,32 +553,35 @@ module.exports = grammar({
 
     layout: $ => seq("layout", choice($.string, "none")),
 
-    // -- may need to handle embeded tags here - https://liquidjs.com/tags/render.html
     render: ($) =>
       seq(
         "render",
         field("file", $.string),
         optional(
-          field(
-            "modifier",
-            choice(
-              seq(",", $.argument_list),
-              $.opt_as_expr
+          choice(
+            field("arguments", 
+              seq(",", $.argument_list)
+            ),
+            field(
+              "iteration", 
+              seq("for", $._render_param)
+            ),
+            field("with", 
+              seq("with", $._render_param)
             )
           )
         )
       ),
 
-    opt_as_expr: ($) => 
+    _render_param: ($) => 
       seq(
-        choice("with", "for"),
-        field("item", $.identifier),
+        $.identifier,
         optional(
           seq(
-            "as",
-            field("identifier", $.identifier)
+            "as", 
+            field("item", $.identifier)
           )
-        )
+        ),
       ),
 
     filter: ($) =>
@@ -620,20 +598,20 @@ module.exports = grammar({
         choice(
           seq(
             ".",
-            field("method", $.identifier)
+            field("property", $.identifier)
           ),
           seq(
             "[", 
-            field("method", choice($.number, $.string)), 
+            field("property", choice($.number, $.string)), 
             "]"
           )
         ),
       ),
 
     argument_list: ($) =>
-      seq(
-        choice($._literal, $.identifier, $.access, $.argument),
-        repeat(seq(",", choice($._literal, $.identifier, $.access, $.argument)))
+      sep1(
+        choice($._literal, $.identifier, $.access, $.argument), 
+        ","
       ),
 
     argument: ($) =>
@@ -713,8 +691,6 @@ module.exports = grammar({
           [">", "binary_relation"],
           ["and", "clause_connective"],
           ["or", "clause_connective"],
-
-          //TODO: is contains a special case?
           ["contains", "contains"],
         ].map(([operator, precedence]) =>
           prec.left(
@@ -733,40 +709,65 @@ module.exports = grammar({
     // Comments //
     //////////////
 
-    comment: ($) => choice($._inline_comment, $._paired_comment),
+    comment: ($) => 
+      choice(
+        $._inline_comment, 
+        $._paired_comment
+      ),
+
+    comment_liq: ($) => 
+      choice(
+        $._inline_comment_content,
+        $._paired_comment_liq
+      ),
 
     _inline_comment: ($) => 
-      seq(
-        $._tag_delimiter_open, 
-        repeat1($._inline_comment_content),
-        $._tag_delimiter_close
+      tag(
+        repeat1($._inline_comment_content)
       ),
 
     _paired_comment: ($) =>
       seq(
-        $._tag_delimiter_open,
-        "comment", 
-        $._tag_delimiter_close,
+        tag("comment"),
 
         $._paired_comment_content,
         optional($._paired_comment),
 
-        $._tag_delimiter_open,
-        "endcomment", 
-        $._tag_delimiter_close,
+        tag("endcomment")
       ),
 
-    ///////////////
-    // Delmiters //
-    ///////////////
-
-    _output_delimiter_open: (_) => choice("{{", "{{-"),
-
-    _output_delimiter_close: (_) =>choice("}}", "-}}"),
-
-    _tag_delimiter_open: (_) => choice("{%", "{%-"),
-
-    _tag_delimiter_close: (_) => choice("%}", "-%}"),
+    _paired_comment_liq: ($) =>
+      seq(
+        "comment",
+        $._paired_comment_content_liq,
+        optional($._paired_comment_liq),
+        "endcomment",
+      )
 
   },
 });
+
+
+///////////////
+// Delmiters //
+///////////////
+
+function tag(...rule) {
+  return seq(
+    choice("{%", "{%-"),
+    ...rule,
+    choice("%}", "-%}"),
+  )
+}
+
+function output(...rule) {
+  return seq(
+    choice("{{", "{{-"),
+    ...rule,
+    choice("}}", "-}}"),
+  )
+}
+
+function sep1(rule, separator) {
+  return seq(rule, repeat(seq(separator, rule)));
+}
