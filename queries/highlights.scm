@@ -35,55 +35,51 @@
 
 ([
   "as"
+  "assign"
+  "break"
   "by"
-  "in"
-  "with"
-  "liquid"
-  "cycle"
-
-  "case"
-  "when"
-  "endcase"
-
-  "for"
-  "endfor"
-
-  "form"
-  "endform"
-
-  "style"
-  "endstyle"
-
-  "javascript"
-  "endjavascript"
-
   "capture"
-  "endcapture"
-
-  "if"
+  "case"
+  "continue"
+  "cycle"
+  "decrement"
+  "echo"
   "else"
   "elsif"
+  "endcapture"
+  "endcase"
+  "endfor"
+  "endform"
   "endif"
-
-  "unless"
-  "endunless"
-
-  "schema"
-  "endschema"
-
-  "raw"
-  "endraw"
-
-  "tablerow"
-  "endtablerow"
-
-  "paginate"
+  "endjavascript"
   "endpaginate"
-
-  (statement)
+  "endraw"
+  "endschema"
+  "endstyle"
+  "endtablerow"
+  "endunless"
+  "for"
+  "form"
+  "if"
+  "in"
+  "include"
+  "increment"
+  "javascript"
+  "layout"
+  "liquid"
+  "paginate"
+  "raw"
+  "render"
+  "schema"
+  "section"
+  "sections"
+  "style"
+  "tablerow"
+  "unless"
+  "when"
+  "with"
   ] @keyword 
  (#set! priority 101))
-
 
 ((identifier) @variable (#set! priority 101))
 ((string) @string (#set! priority 101))
@@ -93,7 +89,7 @@
 (filter
   name: (identifier) @function.call (#set! priority 101))
 
-(raw_tag
+(raw_statement
   (raw_content) @text.reference (#set! priority 102))
 
 ((comment) @comment (#set! priority 102))

@@ -7,11 +7,10 @@ Literal
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (string))
-   (content))
+  (program
+   (template_content)
+   (string)
+   (template_content))
 
 ==================
 Filter
@@ -22,14 +21,13 @@ Filter
 </html>
 
 ---
-  (template
-   (content)
-   (directive
+  (program
+   (template_content)
     (filter
      body: (string)
      name: (identifier)
-     (argument_list (string))))
-   (content))
+     (argument_list (string)))
+   (template_content))
 
 ==================
 Filter with variable
@@ -41,19 +39,17 @@ Filter with variable
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (assignment
+  (program
+   (template_content)
+    (assignment_statement
      variable_name: (identifier)
-     value: (string)))
-   (content)
-   (directive
+     value: (string))
+   (template_content)
     (filter
      body: (string)
      name: (identifier)
-     (argument_list (identifier))))
-   (content))
+     (argument_list (identifier)))
+   (template_content))
 
 ==================
 Many filters
@@ -64,17 +60,16 @@ Many filters
 </html>
 
 ---
-  (template
-   (content)
-   (directive
+  (program
+   (template_content)
     (filter
      body:
       (filter
        body: (string)
        name: (identifier)
        (argument_list (identifier)))
-     name: (identifier)))
-   (content))
+      name: (identifier))
+   (template_content))
 
 ==================
 Filters with many arguments
@@ -85,19 +80,18 @@ Filters with many arguments
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (assignment
-     variable_name: (identifier)
-     value:
-     (filter
-      body: (identifier)
-      name: (identifier)
-      (argument_list 
-       (string) 
-       (string)))))
-   (content))
+  (program
+   (template_content)
+   (assignment_statement
+    variable_name: (identifier)
+    value:
+    (filter
+     body: (identifier)
+     name: (identifier)
+     (argument_list 
+      (string) 
+      (string))))
+   (template_content))
 
 ==================
 Filters argument hash
@@ -108,16 +102,15 @@ Filters argument hash
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (filter
-     body: (identifier)
-     name: (identifier)
-     (argument_list
-      (boolean)
-      (argument key: (identifier) value: (boolean)))))
-   (content))
+  (program
+   (template_content)
+   (filter
+    body: (identifier)
+    name: (identifier)
+    (argument_list
+     (boolean)
+     (argument key: (identifier) value: (boolean))))
+   (template_content))
 
 ==================
 Filters precedence
@@ -128,21 +121,20 @@ Filters precedence
 </html>
 
 ---
-(template
- (content)
- (directive
+(program
+ (template_content)
+ (filter
+  body:
+  (filter
+   body:
    (filter
-    body:
-     (filter
-      body:
-       (filter
-        body: (string)
-        name: (identifier)
-        (argument_list (string)))
-      name: (identifier))
+    body: (string)
     name: (identifier)
-    (argument_list (string))))
- (content))
+    (argument_list (string)))
+   name: (identifier))
+  name: (identifier)
+  (argument_list (string)))
+ (template_content))
 
 ==================
 Method Call
@@ -153,13 +145,12 @@ Method Call
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (access
-     receiver: (identifier)
-     property: (identifier)))
-   (content))
+  (program
+   (template_content)
+   (access
+    receiver: (identifier)
+    property: (identifier))
+   (template_content))
 
 ==================
 Compound Method Call With Filter
@@ -170,19 +161,18 @@ Compound Method Call With Filter
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (filter
-     body:
+  (program
+   (template_content)
+   (filter
+    body:
+    (access
+     receiver:
      (access
-      receiver:
-      (access
-       receiver: (identifier)
-       property: (string))
-      property: (identifier))
-     name: (identifier)))
-   (content))
+      receiver: (identifier)
+      property: (string))
+     property: (identifier))
+    name: (identifier))
+   (template_content))
 
 ==================
 Render 
@@ -193,12 +183,11 @@ Render
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (render
-     file: (string)))
-   (content))
+  (program
+   (template_content)
+   (render_statement
+    file: (string))
+   (template_content))
 
 ==================
 Render Loop
@@ -209,14 +198,13 @@ Render Loop
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (render
-     file: (string)
-     iteration: (identifier)
-     item: (identifier)))
-(content))
+  (program
+   (template_content)
+   (render_statement
+    file: (string)
+    iteration: (identifier)
+    item: (identifier))
+   (template_content))
 
 ==================
 Render With
@@ -227,13 +215,12 @@ Render With
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (render
+  (program
+   (template_content)
+    (render_statement
      file: (string)
-     with: (identifier)))
-   (content))
+     with: (identifier))
+   (template_content))
 
 ==================
 Render Variable
@@ -244,16 +231,15 @@ Render Variable
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (render
-     file: (string)
-     arguments: (argument_list
-       (argument
-        key: (identifier)
-        value: (identifier)))))
-   (content))
+  (program
+   (template_content)
+   (render_statement
+    file: (string)
+    arguments: (argument_list
+      (argument
+       key: (identifier)
+       value: (identifier))))
+   (template_content))
 
 ==================
 Include 
@@ -264,12 +250,11 @@ Include
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (include
-     (string)))
-   (content))
+  (program
+   (template_content)
+    (include_statement
+     (string))
+    (template_content))
 
 ==================
 Keyword Conflict
@@ -280,11 +265,10 @@ Keyword Conflict
 </html>
 
 ---
-  (template
-   (content)
-   (directive
+  (program
+   (template_content)
     (access
      receiver: (identifier)
-     property: (identifier)))
-   (content))
+     property: (identifier))
+   (template_content))
 

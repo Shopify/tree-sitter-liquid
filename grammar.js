@@ -10,17 +10,12 @@ module.exports = grammar({
   word: ($) => $.identifier,
 
   conflicts: ($) => [
-    [$.else_tag],
-    [$.elsif_tag],
-    [$.when_tag],
-    [$.else_liq],
-    [$.elsif_liq],
-    [$.when_liq],
-  ],
-
-  supertypes: $ => [
-    $.statement,
-    $.expression,
+    [$.else_clause],
+    [$.elsif_clause],
+    [$.when_clause],
+    [$._else_liq],
+    [$._elsif_liq],
+    [$._when_liq],
   ],
 
   externals: ($) => [
@@ -28,6 +23,7 @@ module.exports = grammar({
     $._paired_comment_content,
     $._paired_comment_content_liq,
     $.raw_content,
+
     // check if scanner is in error recovery mode
     $.error_sentinel,
   ],
@@ -48,41 +44,31 @@ module.exports = grammar({
 
   rules: {
 
-    template: ($) =>
+    program: ($) =>
       repeat(
         $._node
       ),
 
     _node: ($) => 
       choice(
-        $.directive,
-        $.content,
+        $._statement,
+        $.template_content,
         $.comment,
       ),
 
-    content: (_) => 
+    template_content: (_) => 
       choice(
         /[^{]+|\{[^{%]/, 
         '{%%', 
         '{{{'
       ),
 
-    directive: ($) => 
+    _statement: ($) => 
       choice(
-        $._unpaired_tag,
-        $._paired_tag,
-        $._output_directive,
+        $._tagged_unpaired_statement,
+        $._tagged_paired_statment,
+        $._output_statement,
       ),
-
-    _unpaired_tag: ($) => 
-      tag(
-        choice(
-          $.statement, 
-          $.liquid_tag
-        )
-      ),
-
-    _output_directive: ($) => output($.expression),
 
     liquid_tag: ($) => 
       seq(
@@ -98,561 +84,75 @@ module.exports = grammar({
     _liquid_node: ($) =>
       seq(
         choice(
-          $.expression,
-          $.statement,
-          $._paired_statement,
+          $._expression,
+          $._untagged_unpaired_statement,
+          $._untagged_paired_statement,
         ),
         /(\r\n|\r|\n)/,
       ),
 
-    statement: ($) =>
-      choice(
-        $.assignment,
-        $.render,
-        $.include,
-        $.section,
-        $.sections,
-        $.echo,
-        $.increment,
-        $.decrement,
-        $.layout,
-        $.cycle,
-        $.break,
-        $.continue,
+    _tagged_unpaired_statement: ($) => 
+      tag(
+        choice(
+          $._untagged_unpaired_statement, 
+          $.liquid_tag
+        )
       ),
 
+    _output_statement: ($) => 
+      output($._expression),
 
-    _paired_statement: ($) =>
+    _untagged_unpaired_statement: ($) =>
       choice(
-        $.if_liq,
-        $.unless_liq,
-        $.case_liq,
-        $.for_loop_liq,
-        $.capture_liq,
-        $.tablerow_liq,
-        $.form_liq,
-        $.paginate_liq,
+        $.assignment_statement,
+        $.render_statement,
+        $.include_statement,
+        $.section_statement,
+        $.sections_statement,
+        $.echo_statement,
+        $.increment_statement,
+        $.decrement_statement,
+        $.layout_statement,
+        $.cycle_statement,
+        $.break_statement,
+        $.continue_statement,
       ),
 
-    _paired_tag: ($) => 
+    _tagged_paired_statment: ($) => 
       choice(
-        $.if_tag,
-        $.unless_tag,
-        $.case_tag,
-        $.for_loop_tag,
-        $.capture_tag,
-        $.tablerow_tag,
-        $.form_tag,
-        $.paginate_tag,
-        $.schema_tag,
-        $.raw_tag,
-        $.style_tag,
-        $.javascript_tag,
+        $.if_statement,
+        $.unless_statement,
+        $.case_statement,
+        $.for_loop_statement,
+        $.capture_statement,
+        $.tablerow_statement,
+        $.form_statement,
+        $.paginate_statement,
+        $.schema_statement,
+        $.raw_statement,
+        $.style_statement,
+        $.javascript_statement,
       ),
 
-    expression: ($) => 
+    _untagged_paired_statement: ($) =>
+      choice(
+        alias($._if_liq, $.if_statement),
+        alias($._unless_liq, $.unless_statement),
+        alias($._case_liq, $.case_statement),
+        alias($._for_loop_liq, $.for_loop_statement),
+        alias($._capture_liq, $.capture_statement),
+        alias($._tablerow_liq, $.tablerow_statement),
+        alias($._form_liq, $.form_statement),
+        alias($._paginate_liq, $.paginate_statement),
+      ),
+
+    _expression: ($) => 
       choice(
         $._literal,
         $.filter,
         $.identifier,
         $.predicate,
         $.access,
-      ),
-
-    _iterator: ($) => 
-      prec.left(
-        PRECS.primary, 
-        seq(
-          field(
-            "iterator", choice($.identifier, $.access, $.range)
-          ), 
-          optional(
-            field("modifier", choice($.argument_list, $.identifier))
-          ), 
-        )
-      ),
-
-    _page_iterator: ($) => 
-      prec.left(
-        PRECS.primary,
-        seq(
-          field(
-            "iterator", choice($.identifier, $.access, $.number)
-          ), 
-          optional(
-            field(
-              "modifier", 
-              seq(",", choice($.argument_list, $.identifier))
-            )
-          )
-        )
-      ), 
-
-    ///////////////////////
-    // Paired Statements //
-    ///////////////////////
-
-    for_loop_tag: ($) => 
-      seq(
-        tag(
-          "for", 
-          field("item", $.identifier), 
-          "in", 
-          $._iterator,
-        ),
-
-        field("body", alias(repeat($._node), $.block)),
-
-        optional(field("alternative", $.else_tag)),
-
-        prec.right(
-          tag("endfor")
-        )
-      ),
-
-    unless_tag: ($) =>
-      seq(
-        tag(
-          "unless", field("condition", $.expression), 
-        ),
-
-        field("consequence", alias(repeat($._node), $.block)),
-        repeat(field("alternative", $.elsif_tag)),
-        optional(field("alternative", $.else_tag)),
-
-        prec.right(
-          tag("endunless")
-        )
-      ),
-
-    if_tag: ($) =>
-      seq(
-        tag( 
-          "if", field("condition", $.expression), 
-        ),
-
-        field("consequence", alias(repeat($._node), $.block)),
-        repeat(field("alternative", $.elsif_tag)),
-        optional(field("alternative", $.else_tag)),
-
-        prec.right(
-          tag("endif"), 
-        ), 
-      ),
-
-    elsif_tag: ($) =>
-      prec.dynamic(
-        PRECS.elsif,
-        seq(
-          tag("elsif", field("condition", $.expression)),
-
-          alias(repeat($._node), $.block),
-        ),
-      ),
-
-    else_tag: ($) =>
-      prec.dynamic(
-        PRECS.else,
-        seq(
-          tag("else"),
-          alias(repeat($._node), $.block),
-        )
-      ),
-
-    when_tag: ($) => 
-      prec.dynamic(
-        PRECS.elsif,
-        seq(
-          tag(
-            "when", 
-            field(
-              "condition", 
-              choice(
-                $.predicate,
-                $.argument_list,
-              )
-            )
-          ),
-
-          field("consequence", alias(repeat($._node), $.block)),
-        ),
-      ),
-
-    case_tag: ($) =>
-      seq(
-        tag(
-          "case", field("receiver", choice($.identifier, $.access)), 
-        ),
-
-        field("conditions", alias(repeat($.when_tag), $.block)),
-        optional(field("alternative", $.else_tag)),
-
-        prec.right(
-          tag("endcase"),
-        ),
-      ),
-
-    capture_tag: ($) => 
-      seq(
-        tag( 
-          "capture", field("variable", $.identifier),
-        ),
-
-        field("value", alias(repeat($._node), $.block)),
-
-        prec.right(
-          tag("endcapture"),
-        ),
-      ),
-
-    tablerow_tag: ($) =>
-      seq(
-        tag(
-          "tablerow",
-          field("item", $.identifier),
-          "in",
-          $._iterator,
-        ),
-
-        field("body", alias(repeat($._node), $.block)),
-
-        prec.right(
-          tag("endtablerow"),
-        )
-      ),
-
-    paginate_tag: ($) => 
-      seq(
-        tag(
-          "paginate",
-          field("item", choice($.identifier, $.access)),
-          "by",
-          $._page_iterator,
-        ),
-
-        field("body", alias(repeat($._node), $.block)),
-
-        prec.right(
-          tag("endpaginate")
-        )
-      ),
-
-    schema_tag: ($) =>
-      seq(
-        tag("schema"),
-
-        repeat($.content),
-
-        tag("endschema"), 
-      ),
-
-    raw_tag: ($) =>
-      seq(
-        tag("raw"),
-
-        $.raw_content,
-        optional($.raw_tag),
-
-        tag("endraw"), 
-      ),
-
-    style_tag: ($) =>
-      seq(
-        tag("style"),
-
-        repeat($._node),
-
-        tag("endstyle"), 
-      ),
-
-    javascript_tag: ($) =>
-      seq(
-        tag("javascript"),
-
-        repeat($.content),
-
-        tag("endjavascript"), 
-      ),
-
-    form_tag: ($) =>
-      seq(
-        tag(
-          "form",
-          field("type", $.string),
-          optional(
-            field(
-              "parameters", 
-              seq(",", $.argument_list
-              )
-            )
-          ),
-        ),
-
-        repeat($._node),
-
-        tag("endform"),
-      ),
-
-
-    //////////////////////////////////////
-    // Paired Statements For Liquid Tag //
-    //////////////////////////////////////
-
-
-    for_loop_liq: ($) => 
-      seq(
-        "for", 
-        field("item", $.identifier), 
-        "in", 
-        $._iterator,
-
-        field("body", alias(repeat($._liquid_node), $.block)),
-
-        optional(field("alternative", $.else_liq)),
-
-        prec.right("endfor"),
-      ),
-
-    unless_liq: ($) =>
-      seq(
-        "unless", field("condition", $.expression),
-
-        field("consequence", alias(repeat($._liquid_node), $.block)),
-        repeat(field("alternative", $.elsif_liq)),
-        optional(field("alternative", $.else_liq)),
-
-        prec.right("endunless"),
-      ),
-
-    if_liq: ($) =>
-      seq(
-        "if", field("condition", $.expression),
-
-        field("consequence", alias(repeat($._liquid_node), $.block)),
-        repeat(field("alternative", $.elsif_liq)),
-        optional(field("alternative", $.else_liq)),
-
-        prec.right("endif"), 
-      ),
-
-    elsif_liq: ($) =>
-      prec.dynamic(
-        PRECS.elsif,
-        seq(
-          "elsif", field("condition", $.expression),
-          alias(repeat($._liquid_node), $.block),
-        ),
-      ),
-
-    else_liq: ($) =>
-      prec.dynamic(
-        PRECS.else,
-        seq(
-          "else",
-          alias(repeat($._liquid_node), $.block),
-        )
-      ),
-
-    when_liq: ($) => 
-      prec.dynamic(
-        PRECS.elsif,
-        seq(
-          "when", 
-          field(
-            "condition", 
-            choice(
-              $.predicate,
-              $.argument_list,
-            )
-          ),
-
-          field("consequence", alias(repeat($._liquid_node), $.block)),
-        ),
-      ),
-
-    case_liq: ($) =>
-      seq(
-        "case", field("receiver", choice($.identifier, $.access)),
-
-        field("conditions", alias(repeat($.when_liq), $.block)),
-        optional(field("alternative", $.else_liq)),
-
-        prec.right("endcase"),
-      ),
-
-    capture_liq: ($) => 
-      seq(
-        "capture", field("variable", $.identifier),
-
-        field("value", alias(repeat($._liquid_node), $.block)),
-
-        prec.right("endcapture"),
-      ),
-
-    tablerow_liq: ($) =>
-      seq(
-        "tablerow",
-        field("item", $.identifier),
-        "in",
-        $._iterator,
-
-        field("body", alias(repeat($._liquid_node), $.block)),
-
-        prec.right("endtablerow"),
-      ),
-
-    paginate_liq: ($) => 
-      seq(
-        "paginate",
-        field("item", choice($.identifier, $.access)),
-        "by",
-        $._page_iterator,
-
-        field("body", alias(repeat($._liquid_node), $.block)),
-
-        prec.right("endpaginate")
-      ),
-
-    form_liq: ($) =>
-      seq(
-        "form",
-        field("type", $.string),
-        optional(
-          field(
-            "parameters", 
-            seq(",", $.argument_list
-            )
-          )
-        ),
-
-        repeat($._liquid_node),
-
-        "endform",
-      ),
-
-
-    /////////////////////////
-    // Unpaired Statements //
-    /////////////////////////
-    
-    break: (_) => "break",
-
-    continue: (_) => "continue",
-    
-    echo: $ => seq("echo", $.expression),
-
-    include: $ => seq("include", $.string),
-
-    section: $ => seq("section", $.string),
-
-    sections: $ => seq("sections", $.string),
-
-    increment: $ => seq("increment", $.identifier),
-
-    decrement: $ => seq("decrement", $.identifier),
-
-    layout: $ => seq("layout", choice($.string, "none")),
-
-    render: ($) =>
-      seq(
-        "render",
-        field("file", $.string),
-        optional(
-          choice(
-            field("arguments", 
-              seq(",", $.argument_list)
-            ),
-            field(
-              "iteration", 
-              seq("for", $._render_param)
-            ),
-            field("with", 
-              seq("with", $._render_param)
-            )
-          )
-        )
-      ),
-
-    _render_param: ($) => 
-      seq(
-        $.identifier,
-        optional(
-          seq(
-            "as", 
-            field("item", $.identifier)
-          )
-        ),
-      ),
-
-    filter: ($) =>
-      seq(
-        field("body", $.expression),
-        "|",
-        field("name", $.identifier),
-        optional(seq(":", $.argument_list))
-      ),
-
-    access: ($) =>
-      seq(
-        field("receiver", choice($.access, $.identifier)),
-        choice(
-          seq(
-            ".",
-            field("property", $.identifier)
-          ),
-          seq(
-            "[", 
-            field("property", choice($.number, $.string)), 
-            "]"
-          )
-        ),
-      ),
-
-    argument_list: ($) =>
-      sep1(
-        choice($._literal, $.identifier, $.access, $.argument), 
-        ","
-      ),
-
-    argument: ($) =>
-      seq(
-        field("key", $.identifier),
-        ":",
-        field("value", choice($._literal, $.identifier, $.access))
-      ),
-
-    assignment: ($) =>
-      seq(
-        "assign",
-        field("variable_name", $.identifier),
-        "=",
-        field("value", $.expression)
-      ),
-
-    range: ($) => 
-      seq(
-        "(", 
-        field("start", choice($.identifier, $.access, $.number)),
-        "..", 
-        field("end", choice($.identifier, $.access, $.number)),
-        ")"
-      ),
-
-    cycle: ($) => 
-      seq(
-        "cycle",
-        optional(
-          field("group_name", seq($.string, ":"))
-        ),
-        field(
-          "group_item", 
-          seq(
-            choice($.number, $.string, $.access, $.identifier),
-            repeat(
-              seq(",", choice($.number, $.string, $.access, $.identifier))
-            )
-          )
-        )
       ),
 
 
@@ -696,24 +196,265 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field("left", $.expression),
+              field("left", $._expression),
               field("operator", operator),
-              field("right", $.expression)
+              field("right", $._expression)
             )
           )
         )
       ),
 
 
-    //////////////
-    // Comments //
-    //////////////
+    /////////////////////////
+    // Unpaired Statements //
+    /////////////////////////
+    
+    break_statement: (_) => choice("break"),
+
+    continue_statement: (_) => choice("continue"),
+    
+    echo_statement: ($) => seq("echo", $._expression),
+
+    include_statement: ($) => seq("include", $.string),
+
+    section_statement: ($) => seq("section", $.string),
+
+    sections_statement: ($) => seq("sections", $.string),
+
+    increment_statement: ($) => seq("increment", $.identifier),
+
+    decrement_statement: ($) => seq("decrement", $.identifier),
+
+    layout_statement: ($) => seq("layout", choice($.string, "none")),
+    
+    assignment_statement: ($) =>
+      seq(
+        "assign",
+        field("variable_name", $.identifier),
+        "=",
+        field("value", $._expression)
+      ),
+
+    cycle_statement: ($) => 
+      seq(
+        "cycle",
+        optional(
+          field("group_name", seq($.string, ":"))
+        ),
+        field(
+          "group_item", 
+          seq(
+            choice($.number, $.string, $.access, $.identifier),
+            repeat(
+              seq(",", choice($.number, $.string, $.access, $.identifier))
+            )
+          )
+        )
+      ),
+
+    render_statement: ($) =>
+      seq(
+        "render",
+        field("file", $.string),
+        optional(
+          choice(
+            field("arguments", 
+              seq(",", $.argument_list)
+            ),
+            field(
+              "iteration", 
+              seq("for", $._render_param)
+            ),
+            field("with", 
+              seq("with", $._render_param)
+            )
+          )
+        )
+      ),
+
+    _render_param: ($) => 
+      seq(
+        $.identifier,
+        optional(
+          seq(
+            "as", 
+            field("item", $.identifier)
+          )
+        ),
+      ),
+
+    filter: ($) =>
+      seq(
+        field("body", $._expression),
+        "|",
+        field("name", $.identifier),
+        optional(seq(":", $.argument_list))
+      ),
+
+    access: ($) =>
+      seq(
+        field("receiver", choice($.access, $.identifier)),
+        choice(
+          seq(
+            ".",
+            field("property", $.identifier)
+          ),
+          seq(
+            "[", 
+            field("property", choice($.number, $.string)), 
+            "]"
+          )
+        ),
+      ),
+
+    argument_list: ($) =>
+      sep1(
+        choice($._literal, $.identifier, $.access, $.argument), 
+        ","
+      ),
+
+    argument: ($) =>
+      seq(
+        field("key", $.identifier),
+        ":",
+        field("value", choice($._literal, $.identifier, $.access))
+      ),
+
+    range: ($) => 
+      seq(
+        "(", 
+        field("start", choice($.identifier, $.access, $.number)),
+        "..", 
+        field("end", choice($.identifier, $.access, $.number)),
+        ")"
+      ),
+
+
+    ///////////////////////
+    // Paired Statements //
+    ///////////////////////
+    
+    // Because paired statements can appear in both tagged and untagged forms 
+    // (inside vs. outside a liquid tag), we abstract their rules to constructors
+    // which allow for a flexible internal representations of sub-rules and tagging.
+    
+    //tagged
+    if_statement: ($) => paired($).tagged._if,
+
+    elsif_clause: ($) => paired($).tagged._elsif,
+
+    else_clause: ($) => paired($).tagged._else,
+
+    for_loop_statement: ($) => paired($).tagged._for_loop,
+
+    case_statement: ($) => paired($).tagged._case,
+
+    when_clause: ($) => paired($).tagged._when,
+
+    unless_statement: ($) => paired($).tagged._unless,
+
+    capture_statement: ($) => paired($).tagged._capture,
+
+    form_statement: ($) => paired($).tagged._form,
+
+    tablerow_statement: ($) => paired($).tagged._tablerow,
+
+    paginate_statement: ($) => paired($).tagged._paginate,
+
+    
+    // untagged
+    _if_liq: ($) => paired($).untagged._if,
+
+    _elsif_liq: ($) => paired($).untagged._elsif,
+
+    _else_liq: ($) => paired($).untagged._else,
+
+    _for_loop_liq: ($) => paired($).untagged._for_loop,
+
+    _case_liq: ($) => paired($).untagged._case,
+
+    _when_liq: ($) => paired($).untagged._when,
+
+    _unless_liq: ($) => paired($).untagged._unless,
+
+    _capture_liq: ($) => paired($).untagged._capture,
+
+    _form_liq: ($) => paired($).untagged._form,
+
+    _tablerow_liq: ($) => paired($).untagged._tablerow,
+
+    _paginate_liq: ($) => paired($).untagged._paginate,
+
+
+    // alias untagged clauses
+    _else_aliased: ($) => alias($._else_liq, $.else_clause),
+
+    _elsif_aliased: ($) => alias($._elsif_liq, $.elsif_clause),
+    
+    _when_aliased: ($) => alias($._when_liq, $.when_clause),
+
+    
+    _iterator: ($) => 
+      prec.left(
+        PRECS.primary, 
+        seq(
+          field(
+            "iterator", choice($.identifier, $.access, $.range)
+          ), 
+          optional(
+            field("modifier", choice($.argument_list, $.identifier))
+          ), 
+        )
+      ),
+
+    _page_iterator: ($) => 
+      prec.left(
+        PRECS.primary,
+        seq(
+          field(
+            "iterator", choice($.identifier, $.access, $.number)
+          ), 
+          optional(
+            field(
+              "modifier", 
+              seq(",", choice($.argument_list, $.identifier))
+            )
+          )
+        )
+      ), 
+
+    schema_statement: ($) =>
+      seq(
+        tag("schema"),
+        repeat($.template_content),
+        tag("endschema"), 
+      ),
+
+    style_statement: ($) =>
+      seq(
+        tag("style"),
+        repeat($._node),
+        tag("endstyle"), 
+      ),
+
+    javascript_statement: ($) =>
+      seq(
+        tag("javascript"),
+        repeat($.template_content),
+        tag("endjavascript"), 
+      ),
+
+    raw_statement: ($) =>
+      seq(
+        tag("raw"),
+        $.raw_content,
+        optional($.raw_statement),
+        tag("endraw"), 
+      ),
+
 
     comment: ($) => 
-      choice(
-        $._inline_comment, 
-        $._paired_comment
-      ),
+      choice($._inline_comment, $._paired_comment),
 
     comment_liq: ($) => 
       choice(
@@ -722,17 +463,13 @@ module.exports = grammar({
       ),
 
     _inline_comment: ($) => 
-      tag(
-        repeat1($._inline_comment_content)
-      ),
+      tag(repeat1($._inline_comment_content)),
 
     _paired_comment: ($) =>
       seq(
         tag("comment"),
-
         $._paired_comment_content,
         optional($._paired_comment),
-
         tag("endcomment")
       ),
 
@@ -742,28 +479,196 @@ module.exports = grammar({
         $._paired_comment_content_liq,
         optional($._paired_comment_liq),
         "endcomment",
-      )
-
+      ),
   },
 });
 
 
-///////////////
-// Delmiters //
-///////////////
+function paired($) {
+  return {
+    tagged: statements($, {
+      node: $._node,
+      else: $.else_clause,
+      elsif: $.elsif_clause,
+      when: $.when_clause,
+      wrapper: tag,
+    }),
 
-function tag(...rule) {
+    untagged: statements($, {
+      node: $._liquid_node,
+      else: $._else_aliased,
+      elsif: $._elsif_aliased,
+      when: $._when_aliased,
+      wrapper: seq,
+    })
+  }
+}
+
+function statements($, rules) {
+  return {
+
+    _if: seq(
+      rules.wrapper(
+        "if", 
+        field("condition", $._expression)
+      ),
+
+      field("consequence", alias(repeat(rules.node), $.block)),
+      repeat(field("alternative", rules.elsif)),
+      optional(field("alternative", rules.else)),
+
+      prec.right(
+        rules.wrapper("endif")
+      )
+    ),
+
+    _elsif: prec.dynamic(
+      PRECS.elsif,
+      seq(
+        rules.wrapper("elsif", field("condition", $._expression)),
+        alias(repeat(rules.node), $.block),
+      )
+    ),
+
+    _else: prec.dynamic(
+      PRECS.else,
+      seq(
+        rules.wrapper("else"),
+        alias(repeat(rules.node), $.block),
+      )
+    ),
+
+    _for_loop: seq(
+      rules.wrapper(
+        "for", 
+        field("item", $.identifier), 
+        "in", 
+        $._iterator,
+      ),
+
+      field("body", alias(repeat(rules.node), $.block)),
+
+      optional(field("alternative", rules.else)),
+
+      prec.right(
+        rules.wrapper("endfor")
+      )
+    ),
+
+    _unless: seq(
+      rules.wrapper(
+        "unless", field("condition", $._expression), 
+      ),
+
+      field("consequence", alias(repeat(rules.node), $.block)),
+      repeat(field("alternative", rules.elsif)),
+      optional(field("alternative", rules.else)),
+
+      prec.right(
+        rules.wrapper("endunless")
+      )
+    ),
+
+    _when: prec.dynamic(
+      PRECS.elsif,
+      seq(
+        rules.wrapper(
+          "when", 
+          field("condition", choice( $.predicate, $.argument_list))
+        ),
+
+        field("consequence", alias( repeat(rules.node), $.block)),
+      ),
+    ),
+
+    _case: seq(
+      rules.wrapper(
+        "case", field("receiver", choice($.identifier, $.access)), 
+      ),
+
+      field("conditions", alias(repeat(rules.when), $.block)),
+      optional(field("alternative", rules.else)),
+
+      prec.right(
+        rules.wrapper("endcase"),
+      )
+    ),
+
+    _capture: seq(
+      rules.wrapper( 
+        "capture", field("variable", $.identifier),
+      ),
+
+      field("value", alias(repeat(rules.node), $.block)),
+
+      prec.right(
+        rules.wrapper("endcapture"),
+      ),
+    ),
+
+    _tablerow: seq(
+      rules.wrapper(
+        "tablerow",
+        field("item", $.identifier),
+        "in",
+        $._iterator,
+      ),
+
+      field("body", alias(repeat(rules.node), $.block)),
+
+      prec.right(
+        rules.wrapper("endtablerow"),
+      )
+    ),
+
+    _paginate: seq(
+      rules.wrapper(
+        "paginate",
+        field("item", choice($.identifier, $.access)),
+        "by",
+        $._page_iterator,
+      ),
+
+      field("body", alias(repeat(rules.node), $.block)),
+
+      prec.right(
+        rules.wrapper("endpaginate")
+      )
+    ),
+
+    _form: seq(
+      rules.wrapper(
+        "form",
+        field("type", $.string),
+        optional(
+          field(
+            "parameters", 
+            seq(",", $.argument_list
+            )
+          )
+        )
+      ),
+
+      repeat(rules.node),
+
+      rules.wrapper("endform")
+    ),
+  }
+}
+
+
+function tag(...rules) {
   return seq(
     choice("{%", "{%-"),
-    ...rule,
+    ...rules,
     choice("%}", "-%}"),
   )
 }
 
-function output(...rule) {
+function output(...rules) {
   return seq(
     choice("{{", "{{-"),
-    ...rule,
+    ...rules,
     choice("}}", "-}}"),
   )
 }
@@ -771,3 +676,4 @@ function output(...rule) {
 function sep1(rule, separator) {
   return seq(rule, repeat(seq(separator, rule)));
 }
+

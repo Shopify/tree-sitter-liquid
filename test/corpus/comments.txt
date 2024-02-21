@@ -7,10 +7,10 @@ Inline Comment
 </html>
 
 ---
-(template
- (content)
+(program
+ (template_content)
  (comment)
- (content))
+ (template_content))
 
 ==================
 Multiline Inline Comment
@@ -25,10 +25,10 @@ Multiline Inline Comment
 </html>
 
 ---
-(template
- (content)
+(program
+ (template_content)
  (comment)
- (content))
+ (template_content))
 
 ==================
 Paired Tag Comment
@@ -47,14 +47,13 @@ Paired Tag Comment
 </html>
 
 ---
-(template
-  (content)
-  (directive
-   (if_tag
+  (program
+   (template_content)
+   (if_statement
     condition: (boolean)
     consequence: (block
-      (comment))))
-    (content))
+      (comment)))
+   (template_content))
 
 ==================
 Nested Comments
@@ -69,9 +68,9 @@ Nested Comments
 {% endcomment %}
 
 ---
-  (template
+  (program
    (comment)
-   (content))
+   (template_content))
 
 ==================
 Comment Error
@@ -82,7 +81,7 @@ Comment Error
 {% endcomment %}
 
 ---
-  (template
+  (program
    (ERROR))
 
 ==================
@@ -98,17 +97,16 @@ Liquid Inline Comment
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (assignment
-      (identifier)
-       (string))
-     (comment)
-      (render
-       (string))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (assignment_statement
+     (identifier)
+     (string))
+    (comment)
+    (render_statement
+     (string)))
+   (template_content))
 
 ==================
 Liquid Multi-line Inline Comment
@@ -125,19 +123,18 @@ Liquid Multi-line Inline Comment
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (assignment
-      (identifier)
-       (string))
-     (comment)
-     (comment)
-     (comment)
-      (render
-       (string))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (assignment_statement
+     (identifier)
+     (string))
+    (comment)
+    (comment)
+    (comment)
+    (render_statement
+     (string)))
+   (template_content))
 
 ==================
 Liquid Paired Comment
@@ -155,17 +152,16 @@ Liquid Paired Comment
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (assignment
-      (identifier)
-       (string))
-     (comment)
-      (render
-       (string))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (assignment_statement
+     (identifier)
+     (string))
+    (comment)
+    (render_statement
+     (string)))
+   (template_content))
 
 ==================
 Liquid Nested Paired Comment
@@ -187,17 +183,16 @@ Liquid Nested Paired Comment
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (assignment
-      (identifier)
-       (string))
-     (comment)
-      (render
-       (string))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (assignment_statement
+     (identifier)
+     (string))
+    (comment)
+    (render_statement
+     (string)))
+   (template_content))
 
 ==================
 Raw Tag
@@ -214,12 +209,11 @@ Raw Tag
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (raw_tag
-     (raw_content)))
-   (content))
+  (program
+   (template_content)
+   (raw_statement
+    (raw_content))
+   (template_content))
 
 ==================
 Nested Raw
@@ -235,15 +229,14 @@ Nested Raw
 
 ---
 
-(template
- (directive
-  (raw_tag
+(program
+ (raw_statement
+  (raw_content)
+  (raw_statement
    (raw_content)
-   (raw_tag
-    (raw_content)
-    (raw_tag
-     (raw_content)))))
- (content))
+   (raw_statement
+    (raw_content))))
+ (template_content))
 
 ==================
 Raw/Comment Nesting
@@ -259,10 +252,9 @@ Raw/Comment Nesting
 {% endraw %}
 
 ---
-  (template
+  (program
    (comment)
-   (directive
-    (raw_tag
-     (raw_content)))
-   (content))
+   (raw_statement
+    (raw_content))
+   (template_content))
 

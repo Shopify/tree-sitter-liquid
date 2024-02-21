@@ -1,18 +1,19 @@
-((content) @injection.content
+((template_content) @injection.content
  (#set! injection.language "html")
  (#set! injection.combined))
 
-((schema_tag
-  (content) @injection.content)
+((schema_statement
+  (template_content) @injection.content)
  (#set! injection.language "json")
  (#set! injection.combined))
 
-((style_tag
-  (content) @injection.content)
+((style_statement
+  (template_content) @injection.content)
  (#set! injection.language "css")
  (#set! injection.combined))
 
-((javascript_tag
-  (content) @injection.content)
- (#set! injection.language "javascript"))
+((javascript_statement
+  (template_content) @injection.content)
+ (#set! injection.language "javascript")
+ (#set! injection.combined))
 

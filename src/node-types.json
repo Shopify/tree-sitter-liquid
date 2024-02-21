@@ -1,93 +1,5 @@
 [
   {
-    "type": "expression",
-    "named": true,
-    "subtypes": [
-      {
-        "type": "access",
-        "named": true
-      },
-      {
-        "type": "boolean",
-        "named": true
-      },
-      {
-        "type": "filter",
-        "named": true
-      },
-      {
-        "type": "identifier",
-        "named": true
-      },
-      {
-        "type": "number",
-        "named": true
-      },
-      {
-        "type": "predicate",
-        "named": true
-      },
-      {
-        "type": "string",
-        "named": true
-      }
-    ]
-  },
-  {
-    "type": "statement",
-    "named": true,
-    "subtypes": [
-      {
-        "type": "assignment",
-        "named": true
-      },
-      {
-        "type": "break",
-        "named": true
-      },
-      {
-        "type": "continue",
-        "named": true
-      },
-      {
-        "type": "cycle",
-        "named": true
-      },
-      {
-        "type": "decrement",
-        "named": true
-      },
-      {
-        "type": "echo",
-        "named": true
-      },
-      {
-        "type": "include",
-        "named": true
-      },
-      {
-        "type": "increment",
-        "named": true
-      },
-      {
-        "type": "layout",
-        "named": true
-      },
-      {
-        "type": "render",
-        "named": true
-      },
-      {
-        "type": "section",
-        "named": true
-      },
-      {
-        "type": "sections",
-        "named": true
-      }
-    ]
-  },
-  {
     "type": "access",
     "named": true,
     "fields": {
@@ -203,7 +115,7 @@
     }
   },
   {
-    "type": "assignment",
+    "type": "assignment_statement",
     "named": true,
     "fields": {
       "value": {
@@ -211,7 +123,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -234,14 +170,30 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "capture_liq",
+          "type": "access",
           "named": true
         },
         {
-          "type": "case_liq",
+          "type": "assignment_statement",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "capture_statement",
+          "named": true
+        },
+        {
+          "type": "case_statement",
           "named": true
         },
         {
@@ -249,51 +201,115 @@
           "named": true
         },
         {
-          "type": "content",
+          "type": "continue_statement",
           "named": true
         },
         {
-          "type": "directive",
+          "type": "cycle_statement",
           "named": true
         },
         {
-          "type": "expression",
+          "type": "decrement_statement",
           "named": true
         },
         {
-          "type": "for_loop_liq",
+          "type": "echo_statement",
           "named": true
         },
         {
-          "type": "form_liq",
+          "type": "filter",
           "named": true
         },
         {
-          "type": "if_liq",
+          "type": "for_loop_statement",
           "named": true
         },
         {
-          "type": "paginate_liq",
+          "type": "form_statement",
           "named": true
         },
         {
-          "type": "statement",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "tablerow_liq",
+          "type": "if_statement",
           "named": true
         },
         {
-          "type": "unless_liq",
+          "type": "include_statement",
           "named": true
         },
         {
-          "type": "when_liq",
+          "type": "increment_statement",
           "named": true
         },
         {
-          "type": "when_tag",
+          "type": "javascript_statement",
+          "named": true
+        },
+        {
+          "type": "layout_statement",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paginate_statement",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
+          "type": "raw_statement",
+          "named": true
+        },
+        {
+          "type": "render_statement",
+          "named": true
+        },
+        {
+          "type": "schema_statement",
+          "named": true
+        },
+        {
+          "type": "section_statement",
+          "named": true
+        },
+        {
+          "type": "sections_statement",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "style_statement",
+          "named": true
+        },
+        {
+          "type": "tablerow_statement",
+          "named": true
+        },
+        {
+          "type": "template_content",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
+          "named": true
+        },
+        {
+          "type": "when_clause",
           "named": true
         }
       ]
@@ -305,7 +321,12 @@
     "fields": {}
   },
   {
-    "type": "capture_liq",
+    "type": "break_statement",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "capture_statement",
     "named": true,
     "fields": {
       "value": {
@@ -331,33 +352,7 @@
     }
   },
   {
-    "type": "capture_tag",
-    "named": true,
-    "fields": {
-      "value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "variable": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "case_liq",
+    "type": "case_statement",
     "named": true,
     "fields": {
       "alternative": {
@@ -365,47 +360,7 @@
         "required": false,
         "types": [
           {
-            "type": "else_liq",
-            "named": true
-          }
-        ]
-      },
-      "conditions": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "receiver": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "case_tag",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "else_tag",
+            "type": "else_clause",
             "named": true
           }
         ]
@@ -442,12 +397,12 @@
     "fields": {}
   },
   {
-    "type": "content",
+    "type": "continue_statement",
     "named": true,
     "fields": {}
   },
   {
-    "type": "cycle",
+    "type": "cycle_statement",
     "named": true,
     "fields": {
       "group_item": {
@@ -493,7 +448,7 @@
     }
   },
   {
-    "type": "decrement",
+    "type": "decrement_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -508,7 +463,7 @@
     }
   },
   {
-    "type": "directive",
+    "type": "echo_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -516,85 +471,38 @@
       "required": true,
       "types": [
         {
-          "type": "capture_tag",
+          "type": "access",
           "named": true
         },
         {
-          "type": "case_tag",
+          "type": "boolean",
           "named": true
         },
         {
-          "type": "expression",
+          "type": "filter",
           "named": true
         },
         {
-          "type": "for_loop_tag",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "form_tag",
+          "type": "number",
           "named": true
         },
         {
-          "type": "if_tag",
+          "type": "predicate",
           "named": true
         },
         {
-          "type": "javascript_tag",
-          "named": true
-        },
-        {
-          "type": "liquid_tag",
-          "named": true
-        },
-        {
-          "type": "paginate_tag",
-          "named": true
-        },
-        {
-          "type": "raw_tag",
-          "named": true
-        },
-        {
-          "type": "schema_tag",
-          "named": true
-        },
-        {
-          "type": "statement",
-          "named": true
-        },
-        {
-          "type": "style_tag",
-          "named": true
-        },
-        {
-          "type": "tablerow_tag",
-          "named": true
-        },
-        {
-          "type": "unless_tag",
+          "type": "string",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "echo",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "else_liq",
+    "type": "else_clause",
     "named": true,
     "fields": {},
     "children": {
@@ -609,22 +517,7 @@
     }
   },
   {
-    "type": "else_tag",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "block",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "elsif_liq",
+    "type": "elsif_clause",
     "named": true,
     "fields": {
       "condition": {
@@ -632,33 +525,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
             "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "block",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "elsif_tag",
-    "named": true,
-    "fields": {
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
+          },
           {
-            "type": "expression",
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -684,7 +575,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -712,7 +627,7 @@
     }
   },
   {
-    "type": "for_loop_liq",
+    "type": "for_loop_statement",
     "named": true,
     "fields": {
       "alternative": {
@@ -720,7 +635,7 @@
         "required": false,
         "types": [
           {
-            "type": "else_liq",
+            "type": "else_clause",
             "named": true
           }
         ]
@@ -780,75 +695,7 @@
     }
   },
   {
-    "type": "for_loop_tag",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "else_tag",
-            "named": true
-          }
-        ]
-      },
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "item": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "iterator": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "range",
-            "named": true
-          }
-        ]
-      },
-      "modifier": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "argument_list",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "form_liq",
+    "type": "form_statement",
     "named": true,
     "fields": {
       "parameters": {
@@ -881,98 +728,146 @@
       "required": false,
       "types": [
         {
-          "type": "capture_liq",
+          "type": "access",
           "named": true
         },
         {
-          "type": "case_liq",
+          "type": "assignment_statement",
           "named": true
         },
         {
-          "type": "expression",
+          "type": "boolean",
           "named": true
         },
         {
-          "type": "for_loop_liq",
+          "type": "break_statement",
           "named": true
         },
         {
-          "type": "form_liq",
+          "type": "capture_statement",
           "named": true
         },
         {
-          "type": "if_liq",
+          "type": "case_statement",
           "named": true
         },
-        {
-          "type": "paginate_liq",
-          "named": true
-        },
-        {
-          "type": "statement",
-          "named": true
-        },
-        {
-          "type": "tablerow_liq",
-          "named": true
-        },
-        {
-          "type": "unless_liq",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "form_tag",
-    "named": true,
-    "fields": {
-      "parameters": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "argument_list",
-            "named": true
-          }
-        ]
-      },
-      "type": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "string",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
         {
           "type": "comment",
           "named": true
         },
         {
-          "type": "content",
+          "type": "continue_statement",
           "named": true
         },
         {
-          "type": "directive",
+          "type": "cycle_statement",
+          "named": true
+        },
+        {
+          "type": "decrement_statement",
+          "named": true
+        },
+        {
+          "type": "echo_statement",
+          "named": true
+        },
+        {
+          "type": "filter",
+          "named": true
+        },
+        {
+          "type": "for_loop_statement",
+          "named": true
+        },
+        {
+          "type": "form_statement",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "increment_statement",
+          "named": true
+        },
+        {
+          "type": "javascript_statement",
+          "named": true
+        },
+        {
+          "type": "layout_statement",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paginate_statement",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
+          "type": "raw_statement",
+          "named": true
+        },
+        {
+          "type": "render_statement",
+          "named": true
+        },
+        {
+          "type": "schema_statement",
+          "named": true
+        },
+        {
+          "type": "section_statement",
+          "named": true
+        },
+        {
+          "type": "sections_statement",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "style_statement",
+          "named": true
+        },
+        {
+          "type": "tablerow_statement",
+          "named": true
+        },
+        {
+          "type": "template_content",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "if_liq",
+    "type": "if_statement",
     "named": true,
     "fields": {
       "alternative": {
@@ -980,11 +875,11 @@
         "required": false,
         "types": [
           {
-            "type": "else_liq",
+            "type": "else_clause",
             "named": true
           },
           {
-            "type": "elsif_liq",
+            "type": "elsif_clause",
             "named": true
           }
         ]
@@ -994,7 +889,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -1012,47 +931,7 @@
     }
   },
   {
-    "type": "if_tag",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "else_tag",
-            "named": true
-          },
-          {
-            "type": "elsif_tag",
-            "named": true
-          }
-        ]
-      },
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      },
-      "consequence": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "include",
+    "type": "include_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1067,7 +946,7 @@
     }
   },
   {
-    "type": "increment",
+    "type": "increment_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1082,7 +961,7 @@
     }
   },
   {
-    "type": "javascript_tag",
+    "type": "javascript_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1090,14 +969,14 @@
       "required": false,
       "types": [
         {
-          "type": "content",
+          "type": "template_content",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "layout",
+    "type": "layout_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1120,11 +999,27 @@
       "required": false,
       "types": [
         {
-          "type": "capture_liq",
+          "type": "access",
           "named": true
         },
         {
-          "type": "case_liq",
+          "type": "assignment_statement",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "capture_statement",
+          "named": true
+        },
+        {
+          "type": "case_statement",
           "named": true
         },
         {
@@ -1132,108 +1027,94 @@
           "named": true
         },
         {
-          "type": "expression",
+          "type": "continue_statement",
           "named": true
         },
         {
-          "type": "for_loop_liq",
+          "type": "cycle_statement",
           "named": true
         },
         {
-          "type": "form_liq",
+          "type": "decrement_statement",
           "named": true
         },
         {
-          "type": "if_liq",
+          "type": "echo_statement",
           "named": true
         },
         {
-          "type": "paginate_liq",
+          "type": "filter",
           "named": true
         },
         {
-          "type": "statement",
+          "type": "for_loop_statement",
           "named": true
         },
         {
-          "type": "tablerow_liq",
+          "type": "form_statement",
           "named": true
         },
         {
-          "type": "unless_liq",
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "increment_statement",
+          "named": true
+        },
+        {
+          "type": "layout_statement",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paginate_statement",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
+          "type": "render_statement",
+          "named": true
+        },
+        {
+          "type": "section_statement",
+          "named": true
+        },
+        {
+          "type": "sections_statement",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tablerow_statement",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "paginate_liq",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "item": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "iterator": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "access",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          }
-        ]
-      },
-      "modifier": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "argument_list",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "paginate_tag",
+    "type": "paginate_statement",
     "named": true,
     "fields": {
       "body": {
@@ -1307,7 +1188,31 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -1383,11 +1288,182 @@
         "required": true,
         "types": [
           {
-            "type": "expression",
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "filter",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "predicate",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
       }
+    }
+  },
+  {
+    "type": "program",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "access",
+          "named": true
+        },
+        {
+          "type": "assignment_statement",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "capture_statement",
+          "named": true
+        },
+        {
+          "type": "case_statement",
+          "named": true
+        },
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "continue_statement",
+          "named": true
+        },
+        {
+          "type": "cycle_statement",
+          "named": true
+        },
+        {
+          "type": "decrement_statement",
+          "named": true
+        },
+        {
+          "type": "echo_statement",
+          "named": true
+        },
+        {
+          "type": "filter",
+          "named": true
+        },
+        {
+          "type": "for_loop_statement",
+          "named": true
+        },
+        {
+          "type": "form_statement",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "increment_statement",
+          "named": true
+        },
+        {
+          "type": "javascript_statement",
+          "named": true
+        },
+        {
+          "type": "layout_statement",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paginate_statement",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
+          "type": "raw_statement",
+          "named": true
+        },
+        {
+          "type": "render_statement",
+          "named": true
+        },
+        {
+          "type": "schema_statement",
+          "named": true
+        },
+        {
+          "type": "section_statement",
+          "named": true
+        },
+        {
+          "type": "sections_statement",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "style_statement",
+          "named": true
+        },
+        {
+          "type": "tablerow_statement",
+          "named": true
+        },
+        {
+          "type": "template_content",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1433,7 +1509,7 @@
     }
   },
   {
-    "type": "raw_tag",
+    "type": "raw_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1445,14 +1521,14 @@
           "named": true
         },
         {
-          "type": "raw_tag",
+          "type": "raw_statement",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "render",
+    "type": "render_statement",
     "named": true,
     "fields": {
       "arguments": {
@@ -1528,7 +1604,7 @@
     }
   },
   {
-    "type": "schema_tag",
+    "type": "schema_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1536,14 +1612,14 @@
       "required": false,
       "types": [
         {
-          "type": "content",
+          "type": "template_content",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "section",
+    "type": "section_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1558,7 +1634,7 @@
     }
   },
   {
-    "type": "sections",
+    "type": "sections_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1578,7 +1654,7 @@
     "fields": {}
   },
   {
-    "type": "style_tag",
+    "type": "style_statement",
     "named": true,
     "fields": {},
     "children": {
@@ -1586,22 +1662,146 @@
       "required": false,
       "types": [
         {
+          "type": "access",
+          "named": true
+        },
+        {
+          "type": "assignment_statement",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "capture_statement",
+          "named": true
+        },
+        {
+          "type": "case_statement",
+          "named": true
+        },
+        {
           "type": "comment",
           "named": true
         },
         {
-          "type": "content",
+          "type": "continue_statement",
           "named": true
         },
         {
-          "type": "directive",
+          "type": "cycle_statement",
+          "named": true
+        },
+        {
+          "type": "decrement_statement",
+          "named": true
+        },
+        {
+          "type": "echo_statement",
+          "named": true
+        },
+        {
+          "type": "filter",
+          "named": true
+        },
+        {
+          "type": "for_loop_statement",
+          "named": true
+        },
+        {
+          "type": "form_statement",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "increment_statement",
+          "named": true
+        },
+        {
+          "type": "javascript_statement",
+          "named": true
+        },
+        {
+          "type": "layout_statement",
+          "named": true
+        },
+        {
+          "type": "liquid_tag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paginate_statement",
+          "named": true
+        },
+        {
+          "type": "predicate",
+          "named": true
+        },
+        {
+          "type": "raw_statement",
+          "named": true
+        },
+        {
+          "type": "render_statement",
+          "named": true
+        },
+        {
+          "type": "schema_statement",
+          "named": true
+        },
+        {
+          "type": "section_statement",
+          "named": true
+        },
+        {
+          "type": "sections_statement",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "style_statement",
+          "named": true
+        },
+        {
+          "type": "tablerow_statement",
+          "named": true
+        },
+        {
+          "type": "template_content",
+          "named": true
+        },
+        {
+          "type": "unless_statement",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "tablerow_liq",
+    "type": "tablerow_statement",
     "named": true,
     "fields": {
       "body": {
@@ -1659,30 +1859,29 @@
     }
   },
   {
-    "type": "tablerow_tag",
+    "type": "template_content",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "unless_statement",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": false,
+      "alternative": {
+        "multiple": true,
         "required": false,
         "types": [
           {
-            "type": "block",
+            "type": "else_clause",
             "named": true
-          }
-        ]
-      },
-      "item": {
-        "multiple": false,
-        "required": true,
-        "types": [
+          },
           {
-            "type": "identifier",
+            "type": "elsif_clause",
             "named": true
           }
         ]
       },
-      "iterator": {
+      "condition": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1691,149 +1890,28 @@
             "named": true
           },
           {
-            "type": "identifier",
+            "type": "boolean",
             "named": true
           },
           {
-            "type": "range",
-            "named": true
-          }
-        ]
-      },
-      "modifier": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "argument_list",
+            "type": "filter",
             "named": true
           },
           {
             "type": "identifier",
             "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "template",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "comment",
-          "named": true
-        },
-        {
-          "type": "content",
-          "named": true
-        },
-        {
-          "type": "directive",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "unless_liq",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "else_liq",
-            "named": true
           },
           {
-            "type": "elsif_liq",
-            "named": true
-          }
-        ]
-      },
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      },
-      "consequence": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "unless_tag",
-    "named": true,
-    "fields": {
-      "alternative": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "else_tag",
-            "named": true
-          },
-          {
-            "type": "elsif_tag",
-            "named": true
-          }
-        ]
-      },
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "expression",
-            "named": true
-          }
-        ]
-      },
-      "consequence": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "when_liq",
-    "named": true,
-    "fields": {
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "argument_list",
+            "type": "number",
             "named": true
           },
           {
             "type": "predicate",
             "named": true
+          },
+          {
+            "type": "string",
+            "named": true
           }
         ]
       },
@@ -1850,7 +1928,7 @@
     }
   },
   {
-    "type": "when_tag",
+    "type": "when_clause",
     "named": true,
     "fields": {
       "condition": {
@@ -1997,7 +2075,7 @@
   },
   {
     "type": "break",
-    "named": true
+    "named": false
   },
   {
     "type": "by",
@@ -2021,7 +2099,7 @@
   },
   {
     "type": "continue",
-    "named": true
+    "named": false
   },
   {
     "type": "cycle",

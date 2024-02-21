@@ -17,35 +17,34 @@ Liquid Tag with If
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (include
-      (string))
-     (assignment
-      variable_name: (identifier)
-      value: (filter
-        body: (access
-          receiver: (identifier)
-          property: (identifier))
-        name: (identifier)))
-     (if_liq
-      condition: (predicate
-        left: (identifier)
-        right: (identifier))
-      consequence: (block
-        (filter
-         body: (identifier)
-         name: (identifier))
-        (echo
-         (identifier)))
-      alternative: (else_liq
-        (block
-         (assignment
-          variable_name: (identifier)
-          value: (string)))))))
-(content))
+  (program
+   (template_content)
+   (liquid_tag
+    (include_statement
+     (string))
+    (assignment_statement
+     variable_name: (identifier)
+     value: (filter
+       body: (access
+         receiver: (identifier)
+         property: (identifier))
+       name: (identifier)))
+    (if_statement
+     condition: (predicate
+       left: (identifier)
+       right: (identifier))
+     consequence: (block
+       (filter
+        body: (identifier)
+        name: (identifier))
+       (echo_statement
+        (identifier)))
+     alternative: (else_clause
+       (block
+        (assignment_statement
+         variable_name: (identifier)
+         value: (string))))))
+(template_content))
 
 ==================
 Liquid Tag with Case
@@ -73,51 +72,50 @@ Liquid Tag with Case
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (assignment
-      variable_name: (identifier)
-      value: (filter
-        body: (access
-          receiver: (identifier)
-          property: (identifier))
-        name: (identifier)))
-     (assignment
-      variable_name: (identifier)
-      value: (string))
-     (case_liq
-      receiver: (identifier)
-      conditions: (block
-        (when_liq
-         condition: (argument_list 
-           (string))
-         consequence: (block
-           (assignment
-            variable_name: (identifier)
-            value: (string))
-           (echo
-            (filter
-             body: (identifier)
-             name: (identifier)))))
-        (when_liq
-         condition: (argument_list 
-           (string))
-         consequence: (block
-           (assignment
-            variable_name: (identifier)
-            value: (string)))))
-      alternative: (else_liq
-        (block
-         (render
-          file: (string))
-         (filter
-          body: (identifier)
-          name: (identifier)))))
-  (echo
-   (identifier))))
-(content))
+  (program
+   (template_content)
+   (liquid_tag
+    (assignment_statement
+     variable_name: (identifier)
+     value: (filter
+       body: (access
+         receiver: (identifier)
+         property: (identifier))
+       name: (identifier)))
+    (assignment_statement
+     variable_name: (identifier)
+     value: (string))
+    (case_statement
+     receiver: (identifier)
+     conditions: (block
+       (when_clause
+        condition: (argument_list 
+          (string))
+        consequence: (block
+          (assignment_statement
+           variable_name: (identifier)
+           value: (string))
+          (echo_statement
+           (filter
+            body: (identifier)
+            name: (identifier)))))
+       (when_clause
+        condition: (argument_list 
+          (string))
+        consequence: (block
+          (assignment_statement
+           variable_name: (identifier)
+           value: (string)))))
+     alternative: (else_clause
+         (block
+          (render_statement
+           file: (string))
+          (filter
+           body: (identifier)
+           name: (identifier)))))
+  (echo_statement
+   (identifier)))
+(template_content))
 
 ==================
 Liquid Tag with For Loop
@@ -135,30 +133,29 @@ Liquid Tag with For Loop
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (for_loop_liq
-      item: (identifier)
-      iterator: (access
-        receiver: (identifier)
-        property: (identifier))
-      body: (block
-        (assignment
-         variable_name: (identifier)
-         value: (identifier))
-        (cycle
-         group_name: (string)
-         group_item: (string)
-         group_item: (identifier)
-         group_item: (access
-           receiver: (identifier)
-           property: (identifier)))
-        (echo
-         (identifier))
-        (break)))))
-(content))
+  (program
+   (template_content)
+   (liquid_tag
+    (for_loop_statement
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       property: (identifier))
+     body: (block
+       (assignment_statement
+        variable_name: (identifier)
+        value: (identifier))
+       (cycle_statement
+        group_name: (string)
+        group_item: (string)
+        group_item: (identifier)
+        group_item: (access
+          receiver: (identifier)
+          property: (identifier)))
+       (echo_statement
+        (identifier))
+       (break_statement))))
+(template_content))
 
 ==================
 Liquid Tag with Capture
@@ -177,21 +174,20 @@ Liquid Tag with Capture
 </html>
 
 ---
-(template
- (content)
- (directive
-  (liquid_tag
-   (capture_liq
-    variable: (identifier)
-    value: (block
-       (if_liq
+  (program
+   (template_content)
+   (liquid_tag
+    (capture_statement
+     variable: (identifier)
+     value: (block
+       (if_statement
         condition: (identifier)
         consequence: (block
-            (identifier))
-        alternative: (else_liq
+          (identifier))
+        alternative: (else_clause
           (block
-             (identifier))))))))
-  (content))
+           (identifier)))))))
+   (template_content))
 
 ==================
 Liquid Tag with Tablerow
@@ -207,22 +203,21 @@ Liquid Tag with Tablerow
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (tablerow_liq
-      item: (identifier)
-      iterator: (access
-        receiver: (identifier)
-        property: (identifier))
-      body: (block
-        (assignment
-         variable_name: (identifier)
-         value: (identifier))
-        (echo
-         (identifier))))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (tablerow_statement
+     item: (identifier)
+     iterator: (access
+       receiver: (identifier)
+       property: (identifier))
+     body: (block
+       (assignment_statement
+        variable_name: (identifier)
+        value: (identifier))
+       (echo_statement
+        (identifier)))))
+   (template_content))
 
 ==================
 Liquid Tag with Form
@@ -237,15 +232,14 @@ Liquid Tag with Form
 </html>
 
 ---
-  (template
-   (content)
-   (directive
-    (liquid_tag
-     (form_liq
-      (string)
-      (echo
-       (string)))))
-   (content))
+  (program
+   (template_content)
+   (liquid_tag
+    (form_statement
+     (string)
+     (echo_statement
+      (string))))
+   (template_content))
 
 ==================
 Liquid Tag with Paginate
@@ -260,11 +254,10 @@ Liquid Tag with Paginate
 </html>
 
 ---
-  (template
-   (content)
-   (directive
+  (program
+   (template_content)
     (liquid_tag
-     (paginate_liq
+     (paginate_statement
       (access
        (identifier)
        (identifier))
@@ -274,6 +267,6 @@ Liquid Tag with Paginate
         (identifier)
         (number)))
       (block
-       (echo
-        (string))))))
-   (content))
+       (echo_statement
+        (string)))))
+   (template_content))
