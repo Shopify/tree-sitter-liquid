@@ -25,13 +25,6 @@
   ] @punctuation.delimiter 
  (#set! priority 101))
 
-([
-  "|"
-  ":"
-  "="
-  (predicate)
-  ] @operator 
- (#set! priority 101))
 
 ([
   "as"
@@ -61,7 +54,6 @@
   "for"
   "form"
   "if"
-  "in"
   "include"
   "increment"
   "javascript"
@@ -81,6 +73,22 @@
   ] @keyword 
  (#set! priority 101))
 
+([
+  "and"
+  "contains"
+  "in"
+  "or"
+  ] @keyword.operator
+ (#set! priority 101))
+
+([
+  "|"
+  ":"
+  "="
+  (predicate)
+  ] @operator 
+ (#set! priority 101))
+
 ((identifier) @variable (#set! priority 101))
 ((string) @string (#set! priority 101))
 ((boolean) @boolean (#set! priority 101))
@@ -93,4 +101,5 @@
   (raw_content) @text.reference (#set! priority 102))
 
 ((comment) @comment (#set! priority 102))
+
 

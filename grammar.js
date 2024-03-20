@@ -338,7 +338,7 @@ module.exports = grammar({
     // (inside vs. outside a liquid tag), we abstract their rules to constructors
     // which allow for a flexible internal representations of sub-rules and tagging.
     
-    //tagged
+    // tagged
     if_statement: ($) => paired($).tagged._if,
 
     elsif_clause: ($) => paired($).tagged._elsif,
@@ -639,7 +639,7 @@ function statements($, rules) {
     _form: seq(
       rules.wrapper(
         "form",
-        field("type", $.string),
+        field("type", choice($.string, $.identifier, $.access)),
         optional(
           field(
             "parameters", 

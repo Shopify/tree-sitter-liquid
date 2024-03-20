@@ -717,6 +717,14 @@
         "required": true,
         "types": [
           {
+            "type": "access",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           }
