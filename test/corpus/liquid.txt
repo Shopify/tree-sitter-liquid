@@ -133,7 +133,7 @@ Method Call
 Compound Method Call With Filter
 ==================
 
-{{ data.page.title | reverse}}
+{{ data.page.title | reverse }}
 
 ---
 
@@ -148,3 +148,62 @@ Compound Method Call With Filter
         method: (identifier))
      method: (identifier)))
   name: (identifier)))
+
+==================
+Translation call with with string
+==================
+
+{% t "page_title" %}
+
+---
+
+(program
+ (expression
+  (translation_expression
+   translation_key: (string))))
+
+==================
+Translation call with identifier
+==================
+
+{% t page_title %}
+
+---
+
+(program
+ (expression
+  (translation_expression
+  translation_key: (identifier))))
+
+==================
+Translation definition
+==================
+
+{% t= "page_title" en:"Title" es:"Título" %}
+
+---
+
+(program
+ (statement
+  (translation_declaration
+   translation_key: (string)
+   (locale_declaration
+    locale_key: (identifier)
+    (string))
+   (locale_declaration
+    locale_key: (identifier)
+    (string)))))
+
+==================
+Include tag
+==================
+
+{% include "parts/translations_part" %}
+
+---
+
+(program
+ (statement
+  (include_statement
+   template_type: (identifier)
+   template_name: (identifier))))

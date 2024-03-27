@@ -164,6 +164,10 @@
         {
           "type": "string",
           "named": true
+        },
+        {
+          "type": "translation_expression",
+          "named": true
         }
       ]
     }
@@ -203,6 +207,58 @@
       "types": [
         {
           "type": "argument_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "include_statement",
+    "named": true,
+    "fields": {
+      "template_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "template_type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "locale_declaration",
+    "named": true,
+    "fields": {
+      "locale_key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -330,6 +386,14 @@
         {
           "type": "assignment",
           "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "translation_declaration",
+          "named": true
         }
       ]
     }
@@ -338,6 +402,52 @@
     "type": "string",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "translation_declaration",
+    "named": true,
+    "fields": {
+      "translation_key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "locale_declaration",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "translation_expression",
+    "named": true,
+    "fields": {
+      "translation_key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "!=",
@@ -432,11 +542,23 @@
     "named": true
   },
   {
+    "type": "include",
+    "named": false
+  },
+  {
     "type": "number",
     "named": true
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "t",
+    "named": false
+  },
+  {
+    "type": "t=",
     "named": false
   },
   {

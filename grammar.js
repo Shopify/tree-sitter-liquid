@@ -20,8 +20,8 @@ module.exports = grammar({
         seq(
           choice("{{", "{%"),
           choice($.filter, $.expression, $.statement),
-          choice("}}", "%}")
-        )
+          choice("}}", "%}"),
+        ),
       ),
 
     filter: ($) =>
@@ -29,18 +29,26 @@ module.exports = grammar({
         field("body", choice($.expression, $.filter)),
         "|",
         field("name", $.identifier),
-        optional(seq(":", $.argument_list))
+        optional(seq(":", $.argument_list)),
       ),
 
-    statement: ($) => choice($.assignment),
+    statement: ($) =>
+      choice($.assignment, $.translation_declaration, $.include_statement),
 
-    expression: ($) => choice($._literal, $.identifier, $.predicate, $.call),
+    expression: ($) =>
+      choice(
+        $._literal,
+        $.identifier,
+        $.predicate,
+        $.call,
+        $.translation_expression,
+      ),
 
     call: ($) =>
       seq(
         field("receiver", choice($.call, $.identifier)),
         ".",
-        field("method", $.identifier)
+        field("method", $.identifier),
       ),
 
     assignment: ($) =>
@@ -48,7 +56,7 @@ module.exports = grammar({
         "assign",
         field("variable_name", $.identifier),
         "=",
-        field("value", choice($.filter, $.expression))
+        field("value", choice($.filter, $.expression)),
       ),
 
     _literal: ($) => choice($.string, $.number, $.boolean),
@@ -64,15 +72,38 @@ module.exports = grammar({
     argument_list: ($) =>
       seq(
         choice($._literal, $.identifier, $.argument),
-        repeat(seq(",", choice($._literal, $.identifier, $.argument)))
+        repeat(seq(",", choice($._literal, $.identifier, $.argument))),
       ),
 
     argument: ($) =>
       seq(
         field("key", $.identifier),
         ":",
-        field("value", choice($._literal, $.identifier))
+        field("value", choice($._literal, $.identifier)),
       ),
+
+    include_statement: ($) =>
+      seq(
+        "include",
+        '"',
+        field("template_type", $.identifier),
+        "/",
+        field("template_name", $.identifier),
+        '"',
+      ),
+
+    translation_expression: ($) =>
+      seq("t", field("translation_key", choice($.string, $.identifier))),
+
+    translation_declaration: ($) =>
+      seq(
+        "t=",
+        field("translation_key", $.string),
+        repeat($.locale_declaration),
+      ),
+
+    locale_declaration: ($) =>
+      seq(field("locale_key", $.identifier), ":", $.string),
 
     predicate: ($) =>
       choice(
@@ -97,10 +128,10 @@ module.exports = grammar({
             seq(
               field("left", $.expression),
               field("operator", operator),
-              field("right", $.expression)
-            )
-          )
-        )
+              field("right", $.expression),
+            ),
+          ),
+        ),
       ),
   },
 });
